@@ -6,15 +6,26 @@ import {
   Store,
   Archive,
   BarChart3,
-  Settings,
+  UserCircle,
   Bell,
   HelpCircle,
   Search,
   LogOut,
+  ChevronDown,
+  Building2,
+  Check,
 } from "lucide-react";
 import { Logo } from "@/components/Logo";
-import { type ReactNode } from "react";
+import { useState, type ReactNode } from "react";
 import { cn } from "@/lib/utils";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 type NavItem = { to: string; label: string; icon: typeof LayoutGrid };
 
@@ -25,6 +36,12 @@ const NAV: NavItem[] = [
   { to: "/resellers", label: "Resellers", icon: Store },
   { to: "/archives", label: "Archives", icon: Archive },
   { to: "/analytics", label: "Analytics", icon: BarChart3 },
+];
+
+const COMPANIES = [
+  { id: "kstomer", name: "Kstomer" },
+  { id: "acme", name: "Acme Studio" },
+  { id: "northwind", name: "Northwind Co." },
 ];
 
 export function AppShell({
@@ -81,36 +98,41 @@ export function AppShell({
         </nav>
 
         <div className="px-3 pb-6 space-y-1 border-t border-sidebar-border pt-4 mt-4">
-          <Link
-            to="/settings"
-            className={cn(
-              "flex items-center gap-3 rounded-md px-3 py-2 text-[14px] transition-colors",
-              pathname === "/settings"
-                ? "bg-[color:var(--color-sidebar-active)] text-white font-semibold"
-                : "text-sidebar-muted hover:text-white hover:bg-white/5",
-            )}
-          >
-            <Settings className="h-[18px] w-[18px]" />
-            <span>Settings</span>
-          </Link>
-          <Link
-            to="/"
-            className="flex items-center gap-3 rounded-md px-3 py-2 text-[14px] text-sidebar-muted hover:text-white hover:bg-white/5"
-          >
-            <LogOut className="h-[18px] w-[18px]" />
-            <span>Log out</span>
-          </Link>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button
+                className="flex w-full items-center gap-3 rounded-md px-3 py-2 text-[14px] text-sidebar-muted hover:text-white hover:bg-white/5 transition-colors"
+              >
+                <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-secondary text-secondary-foreground text-[11px] font-semibold">
+                  JS
+                </div>
+                <span className="flex-1 text-left text-white">Julien S.</span>
+                <ChevronDown className="h-4 w-4 opacity-70" />
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent side="top" align="start" className="w-56">
+              <DropdownMenuLabel>Julien Saliba</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem asChild>
+                <Link to="/settings" className="flex items-center gap-2">
+                  <UserCircle className="h-4 w-4" />
+                  <span>Mon compte</span>
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link to="/" className="flex items-center gap-2">
+                  <LogOut className="h-4 w-4" />
+                  <span>Log out</span>
+                </Link>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </aside>
 
       <div className="flex-1 ml-60 flex flex-col min-w-0">
         <header className="sticky top-0 z-20 flex items-center gap-4 border-b border-border bg-background/85 backdrop-blur px-8 h-16">
-          <div className="flex items-center gap-3">
-            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-secondary text-secondary-foreground text-xs font-semibold">
-              JS
-            </div>
-            <span className="text-sm font-medium">Julien S.</span>
-          </div>
+          <CompanySwitcher />
 
           {search && (
             <div className="flex-1 max-w-xl mx-auto">
@@ -152,5 +174,37 @@ export function AppShell({
         </main>
       </div>
     </div>
+  );
+}
+
+function CompanySwitcher() {
+  const [current, setCurrent] = useState(COMPANIES[0]);
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <button className="flex items-center gap-2 rounded-md border border-border bg-card px-3 h-9 text-sm font-medium hover:bg-muted transition-colors">
+          <Building2 className="h-4 w-4 text-muted-foreground" />
+          <span>{current.name}</span>
+          <ChevronDown className="h-4 w-4 text-muted-foreground" />
+        </button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="start" className="w-56">
+        <DropdownMenuLabel>Entreprises</DropdownMenuLabel>
+        <DropdownMenuSeparator />
+        {COMPANIES.map((c) => (
+          <DropdownMenuItem
+            key={c.id}
+            onClick={() => setCurrent(c)}
+            className="flex items-center justify-between"
+          >
+            <span className="flex items-center gap-2">
+              <Building2 className="h-4 w-4 text-muted-foreground" />
+              {c.name}
+            </span>
+            {c.id === current.id && <Check className="h-4 w-4" />}
+          </DropdownMenuItem>
+        ))}
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 }
