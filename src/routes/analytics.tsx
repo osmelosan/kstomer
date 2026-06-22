@@ -17,9 +17,18 @@ import {
   BarChart3,
   Lightbulb,
   AlertTriangle,
+  CalendarIcon,
 } from "lucide-react";
 import { useTranslation, Trans } from "react-i18next";
 import i18n from "@/lib/i18n";
+import { useState } from "react";
+import { format } from "date-fns";
+import { fr as frLocale, es as esLocale, enUS } from "date-fns/locale";
+import type { DateRange } from "react-day-picker";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/analytics")({
   head: () => ({ meta: [{ title: i18n.t("analytics.metaTitle") }] }),
@@ -45,7 +54,25 @@ function Analytics() {
     { label: t("analytics.sources.directSearch"), value: 15 },
     { label: t("analytics.sources.others"), value: 15 },
   ];
-  const PERIODS = [t("analytics.last30"), t("analytics.quarter"), t("analytics.year")];
+  const PERIODS: { key: string; label: string }[] = [
+    { key: "last30", label: t("analytics.last30") },
+    { key: "quarter", label: t("analytics.quarter") },
+    { key: "year", label: t("analytics.year") },
+  ];
+  const [selected, setSelected] = useState<string>("last30");
+  const [range, setRange] = useState<DateRange | undefined>(undefined);
+  const [open, setOpen] = useState(false);
+
+  const lang = (i18n.language || "fr").split("-")[0];
+  const dfLocale = lang === "es" ? esLocale : lang === "en" ? enUS : frLocale;
+
+  const formatRange = (r: DateRange) => {
+    if (r.from && r.to) {
+      return `${format(r.from, "d MMM", { locale: dfLocale })} – ${format(r.to, "d MMM yyyy", { locale: dfLocale })}`;
+    }
+    if (r.from) return format(r.from, "d MMM yyyy", { locale: dfLocale });
+    return t("analytics.pickDateRange");
+  };
 
   return (
     <AppShell
@@ -53,17 +80,72 @@ function Analytics() {
       title={t("analytics.title")}
       subtitle={t("analytics.subtitle")}
       actions={
-        <div className="hidden md:inline-flex items-center rounded-md border border-input bg-card overflow-hidden text-sm ml-2">
-          {PERIODS.map((l, i) => (
-            <button
-              key={l}
-              className={`h-10 px-3 ${
-                i === 0 ? "bg-secondary text-secondary-foreground font-semibold" : "text-muted-foreground"
-              }`}
-            >
-              {l}
-            </button>
-          ))}
+        <div className="hidden md:inline-flex items-center gap-2 ml-2">
+          <div className="inline-flex items-center rounded-md border border-input bg-card overflow-hidden text-sm">
+            {PERIODS.map((p) => (
+              <button
+                key={p.key}
+                onClick={() => setSelected(p.key)}
+                className={cn(
+                  "h-10 px-3",
+                  selected === p.key
+                    ? "bg-secondary text-secondary-foreground font-semibold"
+                    : "text-muted-foreground hover:text-foreground",
+                )}
+              >
+                {p.label}
+              </button>
+            ))}
+          </div>
+          <Popover open={open} onOpenChange={setOpen}>
+            <PopoverTrigger asChild>
+              <Button
+                variant="outline"
+                className={cn(
+                  "h-10 gap-2 text-sm font-normal",
+                  selected === "custom" && "bg-secondary text-secondary-foreground font-semibold border-secondary hover:bg-secondary hover:text-secondary-foreground",
+                )}
+              >
+                <CalendarIcon className="h-4 w-4" />
+                {selected === "custom" && range
+                  ? formatRange(range)
+                  : t("analytics.custom")}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-0" align="end">
+              <Calendar
+                mode="range"
+                selected={range}
+                onSelect={(r) => {
+                  setRange(r);
+                  if (r?.from) setSelected("custom");
+                }}
+                numberOfMonths={2}
+                locale={dfLocale}
+                initialFocus
+                className={cn("p-3 pointer-events-auto")}
+              />
+              <div className="flex items-center justify-between gap-2 p-3 border-t border-border">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => {
+                    setRange(undefined);
+                    setSelected("last30");
+                  }}
+                >
+                  {t("analytics.reset")}
+                </Button>
+                <Button
+                  size="sm"
+                  onClick={() => setOpen(false)}
+                  disabled={!range?.from || !range?.to}
+                >
+                  {t("analytics.apply")}
+                </Button>
+              </div>
+            </PopoverContent>
+          </Popover>
         </div>
       }
     >
