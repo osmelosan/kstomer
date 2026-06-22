@@ -363,7 +363,16 @@ export const en = {
     searchPlaceholder: "Search a partner…",
     activePartners: "Active partners",
     partnerRevenue: "Partner revenue (M)",
-    goldTier: "Gold tier",
+    ai: {
+      title: "AI portfolio analysis",
+      cta: "Analyze my portfolio",
+      regenerate: "Regenerate",
+      loading: "Analyzing…",
+      errorGeneric: "Could not generate the analysis. Try again.",
+      errorRate: "Too many requests. Try again in a moment.",
+      errorCredits: "AI credits exhausted. Top up your workspace.",
+      disclaimer: "AI-generated — verify before acting.",
+    },
     th: {
       partner: "Partner",
       tier: "Tier",

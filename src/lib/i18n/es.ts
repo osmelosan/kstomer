@@ -363,7 +363,16 @@ export const es = {
     searchPlaceholder: "Buscar un socio…",
     activePartners: "Socios activos",
     partnerRevenue: "Facturación socios (M)",
-    goldTier: "Nivel Gold",
+    ai: {
+      title: "Análisis IA de la cartera",
+      cta: "Analizar mi cartera",
+      regenerate: "Regenerar",
+      loading: "Analizando…",
+      errorGeneric: "No se pudo generar el análisis. Reintenta.",
+      errorRate: "Demasiadas solicitudes. Espera un momento.",
+      errorCredits: "Créditos IA agotados. Recarga tu espacio.",
+      disclaimer: "Generado por IA — verifica antes de actuar.",
+    },
     th: {
       partner: "Socio",
       tier: "Nivel",
