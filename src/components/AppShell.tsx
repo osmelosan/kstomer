@@ -35,8 +35,8 @@ const NAV: NavItem[] = [
   { to: "/kanban", key: "nav.kanban", icon: KanbanSquare },
   { to: "/contacts", key: "nav.contacts", icon: Contact2 },
   { to: "/resellers", key: "nav.resellers", icon: Store },
-  { to: "/archives", key: "nav.archives", icon: Archive },
   { to: "/analytics", key: "nav.analytics", icon: BarChart3 },
+  { to: "/archives", key: "nav.archives", icon: Archive },
 ];
 
 const COMPANIES = [
