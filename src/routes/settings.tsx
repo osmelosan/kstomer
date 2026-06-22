@@ -15,7 +15,6 @@ import { SUPPORTED_LANGUAGES, type LanguageCode } from "@/lib/i18n";
 import {
   CreditCard,
   Download,
-  ShieldCheck,
   Monitor,
   Smartphone,
   Trash2,
@@ -27,6 +26,7 @@ import {
   Check,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+
 
 export const Route = createFileRoute("/settings")({
   component: SettingsPage,
@@ -434,5 +434,5 @@ function Toggle({
   );
 }
 
-// Unused but kept for ShieldCheck import side-effect; can be removed.
-void ShieldCheck;
+
+
