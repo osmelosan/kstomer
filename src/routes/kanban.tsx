@@ -1,6 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { AppShell } from "@/components/AppShell";
 import { useEffect, useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
+import i18n from "@/lib/i18n";
 import {
   MoreHorizontal,
   Mail,
@@ -11,6 +13,7 @@ import {
   Check,
   X,
 } from "lucide-react";
+
 import {
   DndContext,
   DragOverlay,
@@ -72,9 +75,10 @@ import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 
 export const Route = createFileRoute("/kanban")({
-  head: () => ({ meta: [{ title: "Pipeline Commercial — Kstomer" }] }),
+  head: () => ({ meta: [{ title: i18n.t("kanban.metaTitle") }] }),
   component: KanbanPage,
 });
+
 
 // ---------- Types ----------
 type Tone = "success" | "warning" | "destructive";
