@@ -250,6 +250,7 @@ function ProspectRow({
   contactName,
   email,
   phone,
+  website,
 }: {
   company: string;
   sector: string;
@@ -259,6 +260,7 @@ function ProspectRow({
   contactName: string;
   email: string;
   phone: string;
+  website: string;
 }) {
   const { t } = useTranslation();
   const tone: Tone = fit >= 90 ? "success" : fit >= 80 ? "info" : "warning";
@@ -301,10 +303,19 @@ function ProspectRow({
               <Phone className="h-3 w-3 shrink-0" />
               <span className="tabular-nums">{phone}</span>
             </a>
+            <a
+              href={website}
+              target="_blank"
+              rel="noopener noreferrer"
+              title={t("dashboard.contactWebsite")}
+              className="inline-flex items-center gap-1 text-[11px] text-secondary hover:underline truncate"
+            >
+              <Globe className="h-3 w-3 shrink-0" />
+              <span className="truncate">{website.replace(/^https?:\/\//, "")}</span>
+            </a>
           </div>
         </div>
       </div>
     </div>
   );
 }
-
