@@ -140,12 +140,20 @@ export function AppShell({
             <div className="flex-1 max-w-xl mx-auto">
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <input
-                  className="w-full h-10 pl-9 pr-3 rounded-md bg-muted border border-transparent text-sm placeholder:text-muted-foreground focus:outline-none focus:bg-card focus:border-input focus:ring-2 focus:ring-ring/40"
-                  placeholder={search.placeholder ?? "Rechercher…"}
-                  value={search.value ?? ""}
-                  onChange={(e) => search.onChange?.(e.target.value)}
-                />
+                {search.onChange ? (
+                  <input
+                    className="w-full h-10 pl-9 pr-3 rounded-md bg-muted border border-transparent text-sm placeholder:text-muted-foreground focus:outline-none focus:bg-card focus:border-input focus:ring-2 focus:ring-ring/40"
+                    placeholder={search.placeholder ?? "Rechercher…"}
+                    value={search.value ?? ""}
+                    onChange={(e) => search.onChange?.(e.target.value)}
+                  />
+                ) : (
+                  <input
+                    className="w-full h-10 pl-9 pr-3 rounded-md bg-muted border border-transparent text-sm placeholder:text-muted-foreground focus:outline-none focus:bg-card focus:border-input focus:ring-2 focus:ring-ring/40"
+                    placeholder={search.placeholder ?? "Rechercher…"}
+                  />
+                )}
+
 
               </div>
             </div>
