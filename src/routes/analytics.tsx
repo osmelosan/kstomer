@@ -326,3 +326,103 @@ function Legend({ dot, children }: { dot: string; children: React.ReactNode }) {
     </span>
   );
 }
+
+type AIStatus = "idle" | "loading" | "ready" | "error";
+
+function AIInsightsCard() {
+  const { t, i18n: i18nInstance } = useTranslation();
+  const analyze = useServerFn(analyzeAnalytics);
+  const [status, setStatus] = useState<AIStatus>("idle");
+  const [markdown, setMarkdown] = useState<string>("");
+  const [errorKey, setErrorKey] = useState<string>("analytics.ai.errorGeneric");
+
+  const run = async () => {
+    setStatus("loading");
+    try {
+      const lang = (i18nInstance.language?.slice(0, 2) ?? "fr") as "fr" | "en" | "es";
+      const safeLang = (["fr", "en", "es"] as const).includes(lang) ? lang : "fr";
+      const result = await analyze({
+        data: {
+          language: safeLang,
+          kpis: {
+            revenue: "45 280 €",
+            conversion: "24.8%",
+            activeContacts: "1284",
+            opportunities: "128 500 €",
+          },
+          sources: [
+            { label: "LinkedIn", value: 42 },
+            { label: "Referral", value: 28 },
+            { label: "Direct search", value: 15 },
+            { label: "Others", value: 15 },
+          ],
+          segments: [
+            { name: "SaaS", volume: 42, conversion: "32.4%", avgValue: "1240 €", health: 4 },
+            { name: "Solopreneurs", volume: 156, conversion: "18.2%", avgValue: "450 €", health: 3 },
+            { name: "Agencies", volume: 28, conversion: "26.1%", avgValue: "2100 €", health: 5 },
+          ],
+        },
+      });
+      setMarkdown(result.markdown);
+      setStatus("ready");
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "";
+      if (msg.includes("RATE_LIMIT")) setErrorKey("analytics.ai.errorRate");
+      else if (msg.includes("CREDITS_EXHAUSTED")) setErrorKey("analytics.ai.errorCredits");
+      else setErrorKey("analytics.ai.errorGeneric");
+      setStatus("error");
+    }
+  };
+
+  useEffect(() => {
+    void run();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  return (
+    <div className="k-card p-6 mb-5 border-l-4 border-l-secondary">
+      <div className="flex items-start justify-between mb-4 gap-4">
+        <div className="flex items-center gap-2.5">
+          <div className="h-9 w-9 rounded-md bg-secondary/10 text-secondary grid place-items-center">
+            <Sparkles className="h-4 w-4" />
+          </div>
+          <div>
+            <h3 className="font-semibold text-[15px] tracking-tight">{t("analytics.ai.title")}</h3>
+            <p className="text-xs text-muted-foreground mt-0.5">{t("analytics.ai.disclaimer")}</p>
+          </div>
+        </div>
+        <button
+          type="button"
+          onClick={run}
+          disabled={status === "loading"}
+          className="inline-flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-md border border-border hover:bg-muted/60 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+        >
+          <RefreshCw className={`h-3.5 w-3.5 ${status === "loading" ? "animate-spin" : ""}`} />
+          {status === "loading" ? t("analytics.ai.loading") : t("analytics.ai.regenerate")}
+        </button>
+      </div>
+
+      {status === "loading" && (
+        <div className="space-y-2 animate-pulse">
+          <div className="h-3 bg-muted rounded w-3/4" />
+          <div className="h-3 bg-muted rounded w-full" />
+          <div className="h-3 bg-muted rounded w-5/6" />
+          <div className="h-3 bg-muted rounded w-2/3" />
+        </div>
+      )}
+
+      {status === "error" && (
+        <div className="flex items-start gap-2 text-sm text-error">
+          <AlertCircle className="h-4 w-4 mt-0.5 shrink-0" />
+          <span>{t(errorKey)}</span>
+        </div>
+      )}
+
+      {status === "ready" && (
+        <div className="prose prose-sm max-w-none text-foreground prose-headings:text-foreground prose-strong:text-foreground prose-p:my-2 prose-ul:my-2 prose-ol:my-2 prose-li:my-0.5">
+          <ReactMarkdown>{markdown}</ReactMarkdown>
+        </div>
+      )}
+    </div>
+  );
+}
