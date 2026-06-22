@@ -6,15 +6,26 @@ import {
   Store,
   Archive,
   BarChart3,
-  Settings,
+  UserCircle,
   Bell,
   HelpCircle,
   Search,
   LogOut,
+  ChevronDown,
+  Building2,
+  Check,
 } from "lucide-react";
 import { Logo } from "@/components/Logo";
-import { type ReactNode } from "react";
+import { useState, type ReactNode } from "react";
 import { cn } from "@/lib/utils";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 type NavItem = { to: string; label: string; icon: typeof LayoutGrid };
 
@@ -25,6 +36,12 @@ const NAV: NavItem[] = [
   { to: "/resellers", label: "Resellers", icon: Store },
   { to: "/archives", label: "Archives", icon: Archive },
   { to: "/analytics", label: "Analytics", icon: BarChart3 },
+];
+
+const COMPANIES = [
+  { id: "kstomer", name: "Kstomer" },
+  { id: "acme", name: "Acme Studio" },
+  { id: "northwind", name: "Northwind Co." },
 ];
 
 export function AppShell({
