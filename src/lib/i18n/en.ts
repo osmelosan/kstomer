@@ -174,6 +174,7 @@ export const en = {
     saveNote: "Save note",
     partnerTier: "Gold Certified Partner",
     associate: "Associate sales rep",
+    relatedContacts: "Partners & related contacts",
   },
   newContact: {
     metaTitle: "New contact — Kstomer",
