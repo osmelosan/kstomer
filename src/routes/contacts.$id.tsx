@@ -303,30 +303,21 @@ function ContactDetails() {
               </div>
 
               <div className="flex items-center gap-2">
-                {editing ? (
+                <AutosaveIndicator status={profileAutosave.status} savedAt={profileAutosave.savedAt} />
+                <button
+                  onClick={() => setEditing((e) => !e)}
+                  className={`inline-flex items-center gap-2 h-10 px-4 rounded-md text-sm font-semibold ${
+                    editing
+                      ? "border border-input bg-card hover:bg-muted"
+                      : "bg-primary text-primary-foreground hover:bg-primary/90"
+                  }`}
+                >
+                  {editing ? <Check className="h-4 w-4" /> : <Pencil className="h-4 w-4" />}
+                  {editing ? t("contactDetail.save") : t("contactDetail.editProfile")}
+                </button>
+                {!editing && (
                   <>
-                    <button
-                      onClick={cancelEdit}
-                      className="h-10 px-3 rounded-md border border-input bg-card text-sm font-medium hover:bg-muted"
-                    >
-                      {t("contactDetail.cancel")}
-                    </button>
-                    <button
-                      onClick={saveEdit}
-                      className="h-10 px-4 rounded-md bg-primary text-primary-foreground text-sm font-semibold hover:bg-primary/90"
-                    >
-                      {t("contactDetail.save")}
-                    </button>
-                  </>
-                ) : (
-                  <>
-                    <button
-                      onClick={startEdit}
-                      className="inline-flex items-center gap-2 h-10 px-4 rounded-md bg-primary text-primary-foreground text-sm font-semibold hover:bg-primary/90"
-                    >
-                      <Pencil className="h-4 w-4" />
-                      {t("contactDetail.editProfile")}
-                    </button>
+
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
                         <button
