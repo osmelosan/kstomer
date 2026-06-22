@@ -174,6 +174,7 @@ export const es = {
     saveNote: "Guardar nota",
     partnerTier: "Socio Cert. Gold",
     associate: "Comercial asociado",
+    relatedContacts: "Socios y contactos relacionados",
   },
   newContact: {
     metaTitle: "Nuevo contacto — Kstomer",

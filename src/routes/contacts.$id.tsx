@@ -105,6 +105,9 @@ function ContactDetails() {
         </div>
 
         <aside className="space-y-3">
+          <h4 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+            {t("contactDetail.relatedContacts")}
+          </h4>
           <div className="k-card p-5 flex items-center gap-3">
             <div className="h-10 w-10 rounded-full bg-secondary/10 grid place-items-center text-secondary">
               <BadgeCheck className="h-5 w-5" />
