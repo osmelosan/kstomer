@@ -1,0 +1,142 @@
+import { createFileRoute, useParams, Link } from "@tanstack/react-router";
+import { AppShell } from "@/components/AppShell";
+import { BadgeCheck, FileText, History } from "lucide-react";
+import { useState } from "react";
+
+export const Route = createFileRoute("/contacts/$id")({
+  head: () => ({ meta: [{ title: "Détails du contact — Kstomer" }] }),
+  component: ContactDetails,
+});
+
+function ContactDetails() {
+  const { id } = useParams({ from: "/contacts/$id" });
+  const [note, setNote] = useState(
+    "Julien est intéressé par le pack Premium CRM. Il souhaite intégrer son équipe de 3 personnes d'ici le mois prochain. Discussion prévue pour les remises sur volume.\n\nDernier point : Validation du budget Q4 confirmée.",
+  );
+
+  const display = id
+    .split("-")
+    .map((s) => s[0]?.toUpperCase() + s.slice(1))
+    .join(" ");
+
+  return (
+    <AppShell title="Détails du Contact">
+      <div className="mb-4">
+        <Link
+          to="/contacts"
+          className="text-sm text-muted-foreground hover:text-foreground"
+        >
+          ← Retour aux contacts
+        </Link>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-6">
+        <div className="space-y-6">
+          <div className="k-card p-8">
+            <div className="flex items-start gap-5">
+              <div className="h-20 w-20 rounded-2xl bg-muted grid place-items-center text-2xl font-bold text-muted-foreground">
+                {display
+                  .split(" ")
+                  .map((s) => s[0])
+                  .slice(0, 2)
+                  .join("")}
+              </div>
+              <div className="flex-1">
+                <h2 className="text-[24px] font-bold tracking-tight">
+                  {display}
+                </h2>
+                <div className="flex items-center gap-2 text-sm text-muted-foreground mt-1">
+                  <BadgeCheck className="h-4 w-4 text-secondary" />
+                  CEO chez Beaumont Digital
+                </div>
+              </div>
+              <button className="h-10 px-4 rounded-md bg-primary text-primary-foreground text-sm font-semibold hover:bg-primary/90">
+                Modifier le profil
+              </button>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8 pt-6 border-t border-border">
+              <div>
+                <div className="k-label mb-2">Email professionnel</div>
+                <div className="font-medium">julien.b@beaumont.digital</div>
+                <div className="k-label mt-5 mb-2">Téléphone</div>
+                <div className="font-medium">+33 6 12 34 56 78</div>
+              </div>
+              <div>
+                <div className="k-label mb-3">Niveau de confiance</div>
+                <div className="flex gap-2">
+                  {[1, 2, 3, 4, 5].map((i) => (
+                    <span
+                      key={i}
+                      className="h-3 flex-1 rounded-full"
+                      style={{
+                        background:
+                          i <= 4
+                            ? "var(--color-secondary)"
+                            : "color-mix(in oklab, var(--color-secondary) 15%, transparent)",
+                      }}
+                    />
+                  ))}
+                </div>
+                <div className="mt-3 text-secondary font-semibold text-sm">
+                  4 / 5 — Très Confiant
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="k-card p-8">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="flex items-center gap-2 text-[20px] font-semibold">
+                <FileText className="h-5 w-5 text-secondary" />
+                Notes du Projet
+                <span className="ml-2 inline-flex items-center text-[10px] font-bold rounded-full px-2 py-0.5 bg-success-soft text-success">
+                  Modifié
+                </span>
+              </h3>
+              <button className="inline-flex items-center gap-2 h-10 px-3 rounded-md border border-input bg-card text-sm">
+                <History className="h-4 w-4" /> Historique des versions
+              </button>
+            </div>
+            <textarea
+              value={note}
+              onChange={(e) => setNote(e.target.value)}
+              rows={7}
+              className="w-full rounded-md border border-input p-4 text-sm bg-card focus:outline-none focus:ring-2 focus:ring-ring/40"
+            />
+            <div className="flex justify-end mt-4">
+              <button className="h-10 px-5 rounded-md bg-primary text-primary-foreground text-sm font-semibold hover:bg-primary/90">
+                Sauvegarder la note
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <aside className="space-y-3">
+          <div className="k-card p-5 flex items-center gap-3">
+            <div className="h-10 w-10 rounded-full bg-secondary/10 grid place-items-center text-secondary">
+              <BadgeCheck className="h-5 w-5" />
+            </div>
+            <div>
+              <div className="text-sm font-semibold">TechSolutions</div>
+              <div className="text-xs text-muted-foreground">
+                Partenaire Cert. Gold
+              </div>
+            </div>
+          </div>
+          <div className="k-card p-5 flex items-center gap-3">
+            <div className="h-10 w-10 rounded-full bg-muted grid place-items-center">
+              SM
+            </div>
+            <div>
+              <div className="text-sm font-semibold">Sophie Martin</div>
+              <div className="text-xs text-muted-foreground">
+                Commercial associé
+              </div>
+            </div>
+          </div>
+        </aside>
+      </div>
+    </AppShell>
+  );
+}
