@@ -117,7 +117,7 @@ export function AppShell({
               <DropdownMenuItem asChild>
                 <Link to="/settings" className="flex items-center gap-2">
                   <UserCircle className="h-4 w-4" />
-                  <span>Mon compte</span>
+                  <span>Paramètres</span>
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
