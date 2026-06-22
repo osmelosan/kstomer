@@ -45,13 +45,13 @@ export function AppShell({
   return (
     <div className="flex min-h-screen bg-background text-foreground">
       <aside className="fixed inset-y-0 left-0 z-30 flex w-60 flex-col bg-sidebar text-sidebar-foreground">
-        <div className="flex items-center h-16 px-4">
-          <Link to="/dashboard" className="block">
+        <div className="flex items-center h-24 px-3">
+          <Link to="/dashboard" className="block w-full">
             <Logo
               variant="horizontal"
               theme="on-dark"
               priority
-              className="h-12 max-w-[200px]"
+              className="h-[88px] w-full max-w-[216px]"
             />
           </Link>
         </div>
