@@ -6,6 +6,10 @@ import {
   FileText,
   MoreHorizontal,
   TrendingUp,
+  Sparkles,
+  Building2,
+  ArrowUpRight,
+  RefreshCw,
 } from "lucide-react";
 
 export const Route = createFileRoute("/dashboard")({
@@ -84,38 +88,49 @@ function Dashboard() {
         </section>
 
         <section className="space-y-4">
-          <SectionHeader title="Dernières opportunités" cta="Pipeline complet" />
+          <div className="flex items-center justify-between">
+            <h2 className="text-xs font-semibold text-foreground uppercase tracking-[0.08em] inline-flex items-center gap-2">
+              <Sparkles className="h-3.5 w-3.5 text-secondary" />
+              Prospects suggérés par l'IA
+            </h2>
+            <button className="text-xs font-medium text-secondary hover:underline inline-flex items-center gap-1">
+              <RefreshCw className="h-3 w-3" /> Actualiser
+            </button>
+          </div>
           <div className="bg-card rounded-2xl border border-border shadow-card overflow-hidden">
-            <div className="overflow-x-auto">
-              <table className="w-full text-left">
-                <thead>
-                  <tr className="border-b border-border bg-muted/60">
-                    <Th>Nom</Th>
-                    <Th>Montant</Th>
-                    <Th>Statut</Th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-border">
-                  <OppRow
-                    title="Refonte identité visuelle"
-                    company="Agence Créa Loft"
-                    amount="3 200 €"
-                    status={{ label: "GAGNÉ", tone: "success" }}
-                  />
-                  <OppRow
-                    title="Consulting UX / UI"
-                    company="TechnoStream"
-                    amount="1 850 €"
-                    status={{ label: "EN NÉGO", tone: "info" }}
-                  />
-                  <OppRow
-                    title="Pack Audit SEO"
-                    company="E-Shop Direct"
-                    amount="950 €"
-                    status={{ label: "À CONTACTER", tone: "warning" }}
-                  />
-                </tbody>
-              </table>
+            <div className="px-4 py-2.5 bg-secondary/5 border-b border-border flex items-center gap-2">
+              <span className="text-[10px] font-bold tracking-wider text-secondary uppercase">
+                Basé sur
+              </span>
+              <span className="text-[11px] text-foreground font-medium">
+                Refonte identité visuelle · Consulting UX/UI · Audit SEO
+              </span>
+            </div>
+            <div className="divide-y divide-border">
+              <ProspectRow
+                company="Studio Maelis"
+                sector="Marque cosmétique D2C · 12 employés"
+                fit={94}
+                reason="Refonte de site annoncée sur LinkedIn la semaine dernière"
+                match="Refonte identité"
+              />
+              <ProspectRow
+                company="Northgate Logistics"
+                sector="SaaS B2B logistique · 45 employés"
+                fit={87}
+                reason="Levée de fonds Série A — recrute un Head of Design"
+                match="Consulting UX/UI"
+              />
+              <ProspectRow
+                company="Boulangerie Lumen"
+                sector="Réseau franchisé · 8 boutiques"
+                fit={79}
+                reason="Trafic organique en baisse de 22% sur 90 jours"
+                match="Audit SEO"
+              />
+            </div>
+            <div className="px-4 py-2 border-t border-border bg-muted/30 text-[10px] text-muted-foreground">
+              Mis à jour il y a 4 min · 3 nouveaux signaux détectés
             </div>
           </div>
         </section>
@@ -269,5 +284,49 @@ function OppRow({
         </span>
       </td>
     </tr>
+  );
+}
+
+function ProspectRow({
+  company,
+  sector,
+  fit,
+  reason,
+  match,
+}: {
+  company: string;
+  sector: string;
+  fit: number;
+  reason: string;
+  match: string;
+}) {
+  const tone: Tone = fit >= 90 ? "success" : fit >= 80 ? "info" : "warning";
+  return (
+    <div className="p-4 hover:bg-muted/50 transition-colors flex items-start gap-4 group">
+      <div className="h-10 w-10 rounded-xl bg-muted flex items-center justify-center shrink-0">
+        <Building2 className="h-5 w-5 text-muted-foreground" />
+      </div>
+      <div className="flex-1 min-w-0">
+        <div className="flex items-center gap-2">
+          <p className="text-sm font-semibold truncate">{company}</p>
+          <span
+            className={`px-1.5 py-0.5 rounded-full text-[9px] font-bold tracking-wider border tabular-nums ${toneClasses(tone)}`}
+          >
+            {fit}% FIT
+          </span>
+        </div>
+        <p className="text-[11px] text-muted-foreground truncate">{sector}</p>
+        <p className="text-xs text-foreground/80 mt-1.5 line-clamp-2">
+          <Sparkles className="h-3 w-3 inline-block mr-1 -mt-0.5 text-secondary" />
+          {reason}
+        </p>
+        <p className="text-[10px] text-muted-foreground mt-1 uppercase tracking-wider">
+          Match : <span className="text-secondary font-semibold">{match}</span>
+        </p>
+      </div>
+      <button className="shrink-0 p-2 rounded-lg hover:bg-secondary hover:text-secondary-foreground text-muted-foreground transition-colors">
+        <ArrowUpRight className="h-4 w-4" />
+      </button>
+    </div>
   );
 }
