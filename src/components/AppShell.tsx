@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import { Logo } from "@/components/Logo";
 import { useState, type ReactNode } from "react";
+import { useTranslation } from "react-i18next";
 import { cn } from "@/lib/utils";
 import {
   DropdownMenu,
@@ -27,18 +28,17 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-type NavItem = { to: string; label: string; icon: typeof LayoutGrid };
+type NavItem = { to: string; key: string; icon: typeof LayoutGrid };
 
 const NAV: NavItem[] = [
-  { to: "/dashboard", label: "Dashboard", icon: LayoutGrid },
-  { to: "/kanban", label: "Kanban", icon: KanbanSquare },
-  { to: "/contacts", label: "Contacts", icon: Contact2 },
-  { to: "/resellers", label: "Resellers", icon: Store },
-  { to: "/archives", label: "Archives", icon: Archive },
-  { to: "/analytics", label: "Analytics", icon: BarChart3 },
+  { to: "/dashboard", key: "nav.dashboard", icon: LayoutGrid },
+  { to: "/kanban", key: "nav.kanban", icon: KanbanSquare },
+  { to: "/contacts", key: "nav.contacts", icon: Contact2 },
+  { to: "/resellers", key: "nav.resellers", icon: Store },
+  { to: "/archives", key: "nav.archives", icon: Archive },
+  { to: "/analytics", key: "nav.analytics", icon: BarChart3 },
 ];
 
-const ALL_COMPANIES = { id: "all", name: "Toutes les entreprises" };
 const COMPANIES = [
   { id: "kstomer", name: "Kstomer" },
   { id: "acme", name: "Acme Studio" },
@@ -59,7 +59,7 @@ export function AppShell({
   actions?: ReactNode;
 }) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
-
+  const { t } = useTranslation();
 
   return (
     <div className="flex min-h-screen bg-background text-foreground">
@@ -79,7 +79,7 @@ export function AppShell({
         </div>
 
         <nav className="flex-1 px-3 space-y-1">
-          {NAV.map(({ to, label, icon: Icon }) => {
+          {NAV.map(({ to, key, icon: Icon }) => {
             const active = pathname === to || pathname.startsWith(to + "/");
             return (
               <Link
@@ -93,7 +93,7 @@ export function AppShell({
                 )}
               >
                 <Icon className="h-[18px] w-[18px]" />
-                <span>{label}</span>
+                <span>{t(key)}</span>
               </Link>
             );
           })}
@@ -118,13 +118,13 @@ export function AppShell({
               <DropdownMenuItem asChild>
                 <Link to="/settings" className="flex items-center gap-2">
                   <UserCircle className="h-4 w-4" />
-                  <span>Paramètres</span>
+                  <span>{t("common.settings")}</span>
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
                 <Link to="/" className="flex items-center gap-2">
                   <LogOut className="h-4 w-4" />
-                  <span>Log out</span>
+                  <span>{t("common.logout")}</span>
                 </Link>
               </DropdownMenuItem>
             </DropdownMenuContent>
@@ -143,27 +143,25 @@ export function AppShell({
                 {search.onChange ? (
                   <input
                     className="w-full h-10 pl-9 pr-3 rounded-md bg-muted border border-transparent text-sm placeholder:text-muted-foreground focus:outline-none focus:bg-card focus:border-input focus:ring-2 focus:ring-ring/40"
-                    placeholder={search.placeholder ?? "Rechercher…"}
+                    placeholder={search.placeholder ?? t("common.search")}
                     value={search.value ?? ""}
                     onChange={(e) => search.onChange?.(e.target.value)}
                   />
                 ) : (
                   <input
                     className="w-full h-10 pl-9 pr-3 rounded-md bg-muted border border-transparent text-sm placeholder:text-muted-foreground focus:outline-none focus:bg-card focus:border-input focus:ring-2 focus:ring-ring/40"
-                    placeholder={search.placeholder ?? "Rechercher…"}
+                    placeholder={search.placeholder ?? t("common.search")}
                   />
                 )}
-
-
               </div>
             </div>
           )}
 
           <div className={cn("flex items-center gap-2", !search && "ml-auto")}>
-            <button className="h-9 w-9 grid place-items-center rounded-full hover:bg-muted text-muted-foreground">
+            <button className="h-9 w-9 grid place-items-center rounded-full hover:bg-muted text-muted-foreground" aria-label={t("common.help")}>
               <Bell className="h-[18px] w-[18px]" />
             </button>
-            <button className="h-9 w-9 grid place-items-center rounded-full hover:bg-muted text-muted-foreground">
+            <button className="h-9 w-9 grid place-items-center rounded-full hover:bg-muted text-muted-foreground" aria-label={t("common.help")}>
               <HelpCircle className="h-[18px] w-[18px]" />
             </button>
             {actions}
@@ -191,31 +189,30 @@ export function AppShell({
 }
 
 function CompanySwitcher() {
-  const [current, setCurrent] = useState(COMPANIES[0]);
+  const { t } = useTranslation();
+  const ALL = { id: "all", name: t("appshell.allCompanies") };
+  const [current, setCurrent] = useState<{ id: string; name: string }>(COMPANIES[0]);
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <button className="flex items-center gap-2 rounded-md border border-border bg-card px-3 h-9 text-sm font-medium hover:bg-muted transition-colors">
           <Building2 className="h-4 w-4 text-muted-foreground" />
-          <span>{current.name}</span>
+          <span>{current.id === "all" ? t("appshell.allCompanies") : current.name}</span>
           <ChevronDown className="h-4 w-4 text-muted-foreground" />
         </button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="start" className="w-56">
-        <DropdownMenuLabel>Entreprises</DropdownMenuLabel>
+        <DropdownMenuLabel>{t("appshell.companies")}</DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuItem
-          onClick={() => setCurrent(ALL_COMPANIES)}
+          onClick={() => setCurrent(ALL)}
           className="flex items-center justify-between"
         >
           <span className="flex items-center gap-2 font-semibold">
             <Building2 className="h-4 w-4 text-secondary" />
-            Toutes
-            <span className="text-[10px] uppercase tracking-wider text-muted-foreground font-bold ml-1">
-              {"\n"}
-            </span>
+            {t("appshell.all")}
           </span>
-          {current.id === ALL_COMPANIES.id && <Check className="h-4 w-4" />}
+          {current.id === "all" && <Check className="h-4 w-4" />}
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         {COMPANIES.map((c) => (
