@@ -1,23 +1,11 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { AppShell } from "@/components/AppShell";
 import {
-  TrendingUp,
-  Users,
-  AlertCircle,
   Plus,
-  Zap,
   Mail,
-  Calendar,
-  MessageSquare,
-  Rocket,
-  Leaf,
-  Building2,
-  Share2,
   FileText,
-  Check,
-  MoreVertical,
-  History,
-  HandHelping,
+  MoreHorizontal,
+  TrendingUp,
 } from "lucide-react";
 
 export const Route = createFileRoute("/dashboard")({
@@ -35,207 +23,177 @@ function Dashboard() {
       actions={
         <Link
           to="/contacts/new"
-          className="ml-2 inline-flex items-center gap-2 h-10 px-4 rounded-md bg-primary text-primary-foreground text-sm font-semibold hover:bg-primary/90"
+          className="ml-2 inline-flex items-center gap-2 h-10 px-4 rounded-md bg-secondary text-secondary-foreground text-sm font-semibold shadow-sm hover:bg-secondary/90 active:scale-[0.98] transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50"
         >
-          <Plus className="h-4 w-4" /> Nouveau contact
+          <Plus className="h-4 w-4" /> Nouvelle opportunité
         </Link>
       }
     >
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-10">
+      {/* Metric cards */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
         <MetricCard
-          label="Revenu mensuel"
-          value="8 450,00 €"
-          delta="+12.4%"
-          icon={<TrendingUp className="h-4 w-4" />}
-          deltaTone="success"
-          footer="vs. mois dernier"
+          label="Chiffre d'affaires"
+          value="12 450,00 €"
+          accent={{ tone: "success", label: "+12%" }}
+          progress={75}
+          footer="Objectif : 16 000 € ce mois"
         />
         <MetricCard
-          label="Abonnés actifs"
-          value="142"
-          icon={<Users className="h-4 w-4" />}
-          progress={70}
-        />
-        <MetricCard
-          label="Relances"
-          value="12"
-          critical
+          label="Opportunités actives"
+          value="24"
+          accent={{ tone: "info", label: "8 nouvelles" }}
           footer={
-            <span className="inline-flex items-center text-xs font-semibold rounded-md bg-[color:var(--color-danger-soft)] text-destructive px-3 py-2">
-              3 actions immédiates requises
+            <span className="inline-flex items-center gap-1">
+              <TrendingUp className="h-3 w-3 text-success" />
+              +15% vs mois dernier
             </span>
           }
         />
-      </div>
-
-      <SectionHeader
-        icon={<Zap className="h-5 w-5 text-warning" />}
-        title="Actions Prioritaires"
-        cta="Voir tout le flux"
-      />
-
-      <div className="space-y-3 mb-12">
-        <ActionRow
-          tag={{ label: "RETARD", tone: "destructive" }}
-          title="Relance en retard : Jean Dupont"
-          subtitle="Client SaaS Pro · Dernière interaction il y a 8 jours"
-          icon={<History className="h-5 w-5 text-destructive" />}
-          iconBg="bg-[color:var(--color-danger-soft)]"
-          action={
-            <Pill icon={<Mail className="h-4 w-4" />}>
-              Envoyer un email de rappel
-            </Pill>
-          }
-        />
-        <ActionRow
-          tag={{ label: "J-3", tone: "warning" }}
-          title="Renouvellement proche : TechCorp"
-          subtitle="Abonnement annuel Enterprise · 2 400 € / an"
-          icon={<Calendar className="h-5 w-5 text-warning" />}
-          iconBg="bg-warning-soft"
-          action={
-            <Pill icon={<HandHelping className="h-4 w-4" />}>
-              Appeler pour faire le point sur la satisfaction
-            </Pill>
-          }
-        />
-        <ActionRow
-          tag={{ label: "INACTIF 10J", tone: "neutral" }}
-          title="Revendeur silencieux : Emilie Sales"
-          subtitle="Partenaire Bronze · Pas d'enregistrement d'opportunité"
-          icon={<MessageSquare className="h-5 w-5 text-muted-foreground" />}
-          iconBg="bg-muted"
-          action={
-            <Pill icon={<MessageSquare className="h-4 w-4" />}>
-              Proposer un point d'étape par message
-            </Pill>
-          }
+        <MetricCard
+          label="Taux de conversion"
+          value="38,2%"
+          accent={{ tone: "warning", label: "À surveiller" }}
+          footer="Cycle moyen : 12 jours"
         />
       </div>
 
-      <SectionHeader
-        icon={<Rocket className="h-5 w-5 text-secondary" />}
-        title="Opportunités de Prospection"
-      />
-      <p className="text-sm text-muted-foreground mb-4">
-        Aujourd'hui, vous pouvez proposer vos services à ces 2 entreprises dans
-        votre secteur.
-      </p>
+      {/* Two-column layout: actions + opportunities table */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <section className="space-y-4">
+          <SectionHeader title="Actions prioritaires" cta="Voir tout" />
+          <div className="bg-card rounded-2xl border border-border divide-y divide-border overflow-hidden shadow-card">
+            <ActionRow
+              icon={<Mail className="h-5 w-5 text-muted-foreground" />}
+              title="Relancer Thomas Durand"
+              subtitle="Devis envoyé il y a 3 jours"
+              tag={{ label: "URGENT", tone: "warning" }}
+            />
+            <ActionRow
+              icon={<FileText className="h-5 w-5 text-muted-foreground" />}
+              title="Finaliser le contrat SaaS"
+              subtitle="Client : StartUp Vision"
+              tag={{ label: "À FAIRE", tone: "info" }}
+            />
+            <ActionRow
+              icon={<Mail className="h-5 w-5 text-muted-foreground" />}
+              title="Relance en retard : Jean Dupont"
+              subtitle="Dernière interaction il y a 8 jours"
+              tag={{ label: "RETARD", tone: "danger" }}
+            />
+          </div>
+        </section>
 
-      <div className="space-y-3">
-        <ActionRow
-          tag={{ label: "GREEN TECH", tone: "success" }}
-          title="EcoSolutions"
-          subtitle="Secteur local · Potentiel de collaboration élevé"
-          icon={<Leaf className="h-5 w-5 text-success" />}
-          iconBg="bg-success-soft"
-          action={
-            <Pill icon={<FileText className="h-4 w-4" />}>
-              Envoyer une proposition personnalisée
-            </Pill>
-          }
-          trailing={<MoreButton />}
-        />
-        <ActionRow
-          tag={{ label: "SAAS BTP", tone: "info" }}
-          title="BuildIt"
-          subtitle="Ville voisine · En forte croissance"
-          icon={<Building2 className="h-5 w-5 text-secondary" />}
-          iconBg="bg-secondary/10"
-          action={
-            <Pill icon={<Share2 className="h-4 w-4" />}>
-              Contacter via LinkedIn
-            </Pill>
-          }
-          trailing={<MoreButton />}
-        />
+        <section className="space-y-4">
+          <SectionHeader title="Dernières opportunités" cta="Pipeline complet" />
+          <div className="bg-card rounded-2xl border border-border shadow-card overflow-hidden">
+            <div className="overflow-x-auto">
+              <table className="w-full text-left">
+                <thead>
+                  <tr className="border-b border-border bg-muted/60">
+                    <Th>Nom</Th>
+                    <Th>Montant</Th>
+                    <Th>Statut</Th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-border">
+                  <OppRow
+                    title="Refonte identité visuelle"
+                    company="Agence Créa Loft"
+                    amount="3 200 €"
+                    status={{ label: "GAGNÉ", tone: "success" }}
+                  />
+                  <OppRow
+                    title="Consulting UX / UI"
+                    company="TechnoStream"
+                    amount="1 850 €"
+                    status={{ label: "EN NÉGO", tone: "info" }}
+                  />
+                  <OppRow
+                    title="Pack Audit SEO"
+                    company="E-Shop Direct"
+                    amount="950 €"
+                    status={{ label: "À CONTACTER", tone: "warning" }}
+                  />
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
       </div>
     </AppShell>
   );
 }
 
+/* ---------- Components ---------- */
+
+type Tone = "success" | "warning" | "info" | "danger" | "neutral";
+
+function toneClasses(tone: Tone) {
+  switch (tone) {
+    case "success":
+      return "bg-success-soft text-success border-success/20";
+    case "warning":
+      return "bg-warning-soft text-warning-foreground border-warning/30";
+    case "info":
+      return "bg-secondary/10 text-secondary border-secondary/20";
+    case "danger":
+      return "bg-[color:var(--color-danger-soft)] text-destructive border-destructive/20";
+    default:
+      return "bg-muted text-muted-foreground border-border";
+  }
+}
+
 function MetricCard({
   label,
   value,
-  delta,
-  deltaTone,
-  icon,
+  accent,
   progress,
   footer,
-  critical,
 }: {
   label: string;
   value: string;
-  delta?: string;
-  deltaTone?: "success" | "warning";
-  icon?: React.ReactNode;
+  accent?: { tone: Tone; label: string };
   progress?: number;
   footer?: React.ReactNode;
-  critical?: boolean;
 }) {
   return (
-    <div className="k-card p-6 flex flex-col gap-4">
-      <div className="flex items-center justify-between">
-        <span className="k-label">{label}</span>
-        {delta ? (
+    <div className="bg-card p-6 rounded-2xl border border-border shadow-card hover:shadow-card-hover transition-shadow">
+      <div className="flex justify-between items-start gap-3">
+        <p className="text-sm font-medium text-muted-foreground">{label}</p>
+        {accent && (
           <span
-            className={`inline-flex items-center gap-1 text-xs font-semibold rounded-md px-2 py-1 ${
-              deltaTone === "success"
-                ? "bg-success-soft text-success"
-                : "bg-warning-soft text-warning-foreground"
-            }`}
+            className={`shrink-0 px-2 py-1 text-[10px] font-bold rounded-full uppercase tracking-wider border ${toneClasses(accent.tone)}`}
           >
-            {icon}
-            {delta}
-          </span>
-        ) : critical ? (
-          <span className="h-2 w-2 rounded-full bg-destructive" />
-        ) : (
-          <span className="text-muted-foreground">{icon}</span>
-        )}
-      </div>
-      <div className="flex items-baseline gap-3">
-        <span className="text-[36px] font-bold tracking-tight leading-none">
-          {value}
-        </span>
-        {critical && (
-          <span className="text-destructive text-sm font-semibold">
-            Critiques
+            {accent.label}
           </span>
         )}
       </div>
+      <p className="text-[30px] font-bold leading-tight mt-2 tabular-nums tracking-tight">
+        {value}
+      </p>
       {typeof progress === "number" && (
-        <div className="h-1.5 rounded-full bg-secondary/15 overflow-hidden">
+        <div className="mt-4 h-1 w-full bg-muted rounded-full overflow-hidden">
           <div
-            className="h-full bg-secondary"
+            className="h-full bg-secondary rounded-full transition-all"
             style={{ width: `${progress}%` }}
           />
         </div>
       )}
       {footer && (
-        <div className="text-sm text-muted-foreground">{footer}</div>
+        <p className="text-[11px] text-muted-foreground mt-2">{footer}</p>
       )}
     </div>
   );
 }
 
-function SectionHeader({
-  icon,
-  title,
-  cta,
-}: {
-  icon: React.ReactNode;
-  title: string;
-  cta?: string;
-}) {
+function SectionHeader({ title, cta }: { title: string; cta?: string }) {
   return (
-    <div className="flex items-center justify-between mb-4">
-      <h2 className="flex items-center gap-2 text-[20px] font-semibold tracking-tight">
-        {icon}
+    <div className="flex items-center justify-between">
+      <h2 className="text-xs font-semibold text-foreground uppercase tracking-[0.08em]">
         {title}
       </h2>
       {cta && (
-        <button className="text-sm font-semibold text-secondary hover:underline">
+        <button className="text-xs font-medium text-secondary hover:underline">
           {cta}
         </button>
       )}
@@ -243,93 +201,73 @@ function SectionHeader({
   );
 }
 
-type Tone = "success" | "warning" | "destructive" | "info" | "neutral";
-
-function tagClasses(tone: Tone) {
-  switch (tone) {
-    case "success":
-      return "bg-success-soft text-success";
-    case "warning":
-      return "bg-warning-soft text-warning-foreground";
-    case "destructive":
-      return "bg-destructive text-destructive-foreground";
-    case "info":
-      return "bg-secondary/10 text-secondary";
-    default:
-      return "bg-foreground text-background";
-  }
-}
-
 function ActionRow({
-  tag,
+  icon,
   title,
   subtitle,
-  action,
-  icon,
-  iconBg,
-  trailing,
+  tag,
 }: {
-  tag: { label: string; tone: Tone };
+  icon: React.ReactNode;
   title: string;
   subtitle: string;
-  action?: React.ReactNode;
-  icon?: React.ReactNode;
-  iconBg?: string;
-  trailing?: React.ReactNode;
+  tag: { label: string; tone: Tone };
 }) {
   return (
-    <div className="k-card p-5 flex items-start gap-4">
-      <div
-        className={`h-12 w-12 rounded-lg flex items-center justify-center shrink-0 ${
-          iconBg ?? "bg-muted"
-        }`}
-      >
+    <div className="p-4 hover:bg-muted/50 transition-colors flex items-center gap-4 group">
+      <div className="h-10 w-10 rounded-full bg-muted flex items-center justify-center shrink-0">
         {icon}
       </div>
       <div className="flex-1 min-w-0">
-        <div className="flex items-center gap-3 flex-wrap">
-          <span
-            className={`inline-flex items-center text-[11px] font-bold tracking-wider px-2 py-1 rounded-md ${tagClasses(
-              tag.tone,
-            )}`}
-          >
-            {tag.label}
-          </span>
-          <span className="font-semibold">{title}</span>
-        </div>
-        <div className="text-sm text-muted-foreground mt-1">{subtitle}</div>
-        {action && <div className="mt-3">{action}</div>}
+        <p className="text-sm font-semibold truncate">{title}</p>
+        <p className="text-xs text-muted-foreground truncate">{subtitle}</p>
       </div>
-      <div className="shrink-0">
-        {trailing ?? (
-          <button className="h-9 w-9 rounded-full border border-border grid place-items-center text-muted-foreground hover:text-foreground hover:bg-muted">
-            <Check className="h-4 w-4" />
-          </button>
-        )}
+      <div className="flex items-center gap-2 shrink-0">
+        <span
+          className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold tracking-wider border ${toneClasses(tag.tone)}`}
+        >
+          {tag.label}
+        </span>
+        <button className="opacity-0 group-hover:opacity-100 p-1 hover:bg-border rounded transition-all text-muted-foreground">
+          <MoreHorizontal className="h-4 w-4" />
+        </button>
       </div>
     </div>
   );
 }
 
-function MoreButton() {
+function Th({ children }: { children: React.ReactNode }) {
   return (
-    <button className="h-9 w-9 rounded-full border border-border grid place-items-center text-muted-foreground hover:text-foreground hover:bg-muted">
-      <MoreVertical className="h-4 w-4" />
-    </button>
+    <th className="px-4 py-3 text-[10px] font-bold text-muted-foreground uppercase tracking-widest">
+      {children}
+    </th>
   );
 }
 
-function Pill({
-  icon,
-  children,
+function OppRow({
+  title,
+  company,
+  amount,
+  status,
 }: {
-  icon: React.ReactNode;
-  children: React.ReactNode;
+  title: string;
+  company: string;
+  amount: string;
+  status: { label: string; tone: Tone };
 }) {
   return (
-    <button className="inline-flex items-center gap-2 rounded-md bg-secondary/10 text-secondary px-3 py-2 text-sm font-medium hover:bg-secondary/15">
-      {icon}
-      {children}
-    </button>
+    <tr className="hover:bg-muted/50 transition-colors cursor-pointer">
+      <td className="px-4 py-3">
+        <p className="text-sm font-medium">{title}</p>
+        <p className="text-[10px] text-muted-foreground">{company}</p>
+      </td>
+      <td className="px-4 py-3 text-sm font-semibold tabular-nums">{amount}</td>
+      <td className="px-4 py-3">
+        <span
+          className={`px-2 py-0.5 rounded-full text-[10px] font-bold tracking-wider border ${toneClasses(status.tone)}`}
+        >
+          {status.label}
+        </span>
+      </td>
+    </tr>
   );
 }
