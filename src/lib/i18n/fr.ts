@@ -168,6 +168,7 @@ export const fr = {
     },
     contactEmail: "Envoyer un email",
     contactPhone: "Appeler",
+    contactWebsite: "Voir le site web",
   },
   contacts: {
     metaTitle: "Contacts — Kstomer",
