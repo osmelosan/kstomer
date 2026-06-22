@@ -6,6 +6,10 @@ import {
   FileText,
   MoreHorizontal,
   TrendingUp,
+  Sparkles,
+  Building2,
+  ArrowUpRight,
+  RefreshCw,
 } from "lucide-react";
 
 export const Route = createFileRoute("/dashboard")({
