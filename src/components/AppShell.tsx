@@ -176,3 +176,35 @@ export function AppShell({
     </div>
   );
 }
+
+function CompanySwitcher() {
+  const [current, setCurrent] = useState(COMPANIES[0]);
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <button className="flex items-center gap-2 rounded-md border border-border bg-card px-3 h-9 text-sm font-medium hover:bg-muted transition-colors">
+          <Building2 className="h-4 w-4 text-muted-foreground" />
+          <span>{current.name}</span>
+          <ChevronDown className="h-4 w-4 text-muted-foreground" />
+        </button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="start" className="w-56">
+        <DropdownMenuLabel>Entreprises</DropdownMenuLabel>
+        <DropdownMenuSeparator />
+        {COMPANIES.map((c) => (
+          <DropdownMenuItem
+            key={c.id}
+            onClick={() => setCurrent(c)}
+            className="flex items-center justify-between"
+          >
+            <span className="flex items-center gap-2">
+              <Building2 className="h-4 w-4 text-muted-foreground" />
+              {c.name}
+            </span>
+            {c.id === current.id && <Check className="h-4 w-4" />}
+          </DropdownMenuItem>
+        ))}
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+}
