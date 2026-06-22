@@ -8,8 +8,8 @@ type LogoTheme = "on-dark" | "on-light";
 
 const SOURCES: Record<LogoVariant, Record<LogoTheme, string>> = {
   horizontal: {
-    "on-dark": horizontalOnDark.url,
-    "on-light": horizontalOnLight.url,
+    "on-dark": horizontalOnLight.url,
+    "on-light": horizontalOnDark.url,
   },
   icon: {
     "on-dark": isotipo.url,
