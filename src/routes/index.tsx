@@ -32,8 +32,9 @@ function WelcomePage() {
         </h1>
 
         <p className="mt-6 text-muted-foreground text-[16px] leading-7">
-          Rejoignez les solopreneurs qui gèrent leur activité avec une précision
-          absolue grâce à Kstomer.
+          Prenez le contrôle en 10 minutes. Kstomer et son IA font le travail
+          pour que vous ayez une vue claire de votre pipeline et signiez plus,
+          sans effort d'organisation.
         </p>
 
         <div className="mt-10 flex items-center justify-center gap-3">
