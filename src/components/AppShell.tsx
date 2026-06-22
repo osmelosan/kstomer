@@ -38,6 +38,7 @@ const NAV: NavItem[] = [
   { to: "/analytics", label: "Analytics", icon: BarChart3 },
 ];
 
+const ALL_COMPANIES = { id: "all", name: "Toutes les entreprises" };
 const COMPANIES = [
   { id: "kstomer", name: "Kstomer" },
   { id: "acme", name: "Acme Studio" },
