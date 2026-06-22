@@ -256,6 +256,12 @@ export const es = {
       lastInteraction: "Última interacción hace 2 días",
       owner: "Propietario: Thomas Melo",
     },
+    autosave: {
+      pending: "Cambios pendientes…",
+      saving: "Guardando…",
+      saved: "Guardado",
+      savedAt: "Guardado a las {{time}}",
+    },
   },
   newContact: {
     metaTitle: "Nuevo contacto — Kstomer",
