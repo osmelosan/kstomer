@@ -37,8 +37,8 @@ function SettingsPage() {
               Profil
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-              <Field label="Nom complet" defaultValue="Julien S." />
-              <Field label="Email" defaultValue="julien@kstomer.io" />
+              <Field label="Nom complet" defaultValue="Thomas Melo" />
+              <Field label="Email" defaultValue="thomas@kstomer.io" />
               <Field label="Société" defaultValue="Kstomer Lab" />
               <Field label="Fuseau horaire" defaultValue="Europe/Paris" />
             </div>
