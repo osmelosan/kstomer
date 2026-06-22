@@ -286,3 +286,47 @@ function OppRow({
     </tr>
   );
 }
+
+function ProspectRow({
+  company,
+  sector,
+  fit,
+  reason,
+  match,
+}: {
+  company: string;
+  sector: string;
+  fit: number;
+  reason: string;
+  match: string;
+}) {
+  const tone: Tone = fit >= 90 ? "success" : fit >= 80 ? "info" : "warning";
+  return (
+    <div className="p-4 hover:bg-muted/50 transition-colors flex items-start gap-4 group">
+      <div className="h-10 w-10 rounded-xl bg-muted flex items-center justify-center shrink-0">
+        <Building2 className="h-5 w-5 text-muted-foreground" />
+      </div>
+      <div className="flex-1 min-w-0">
+        <div className="flex items-center gap-2">
+          <p className="text-sm font-semibold truncate">{company}</p>
+          <span
+            className={`px-1.5 py-0.5 rounded-full text-[9px] font-bold tracking-wider border tabular-nums ${toneClasses(tone)}`}
+          >
+            {fit}% FIT
+          </span>
+        </div>
+        <p className="text-[11px] text-muted-foreground truncate">{sector}</p>
+        <p className="text-xs text-foreground/80 mt-1.5 line-clamp-2">
+          <Sparkles className="h-3 w-3 inline-block mr-1 -mt-0.5 text-secondary" />
+          {reason}
+        </p>
+        <p className="text-[10px] text-muted-foreground mt-1 uppercase tracking-wider">
+          Match : <span className="text-secondary font-semibold">{match}</span>
+        </p>
+      </div>
+      <button className="shrink-0 p-2 rounded-lg hover:bg-secondary hover:text-secondary-foreground text-muted-foreground transition-colors">
+        <ArrowUpRight className="h-4 w-4" />
+      </button>
+    </div>
+  );
+}
