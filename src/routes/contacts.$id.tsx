@@ -508,42 +508,32 @@ function ContactDetails() {
 
           {/* Notes */}
           <div className="k-card p-8">
-            <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center justify-between mb-4 gap-3 flex-wrap">
               <h3 className="flex items-center gap-2 text-[20px] font-semibold">
                 <FileText className="h-5 w-5 text-secondary" />
                 {t("contactDetail.projectNotes")}
-                {draftNote !== note && (
-                  <span className="ml-2 inline-flex items-center text-[10px] font-bold rounded-full px-2 py-0.5 bg-success-soft text-success">
-                    {t("contactDetail.modified")}
-                  </span>
-                )}
               </h3>
-              <button
-                onClick={() => setVersionsOpen(true)}
-                className="inline-flex items-center gap-2 h-10 px-3 rounded-md border border-input bg-card text-sm hover:bg-muted"
-              >
-                <History className="h-4 w-4" /> {t("contactDetail.versionHistory")}
-                {versions.length > 0 && (
-                  <span className="ml-1 text-xs text-muted-foreground">({versions.length})</span>
-                )}
-              </button>
+              <div className="flex items-center gap-2">
+                <AutosaveIndicator status={noteAutosave.status} savedAt={noteAutosave.savedAt} />
+                <button
+                  onClick={() => setVersionsOpen(true)}
+                  className="inline-flex items-center gap-2 h-10 px-3 rounded-md border border-input bg-card text-sm hover:bg-muted"
+                >
+                  <History className="h-4 w-4" /> {t("contactDetail.versionHistory")}
+                  {versions.length > 0 && (
+                    <span className="ml-1 text-xs text-muted-foreground">({versions.length})</span>
+                  )}
+                </button>
+              </div>
             </div>
             <Textarea
-              value={draftNote}
-              onChange={(e) => setDraftNote(e.target.value)}
+              value={note}
+              onChange={(e) => setNote(e.target.value)}
               rows={7}
               className="text-sm"
             />
-            <div className="flex justify-end mt-4">
-              <button
-                onClick={saveNote}
-                disabled={draftNote === note}
-                className="h-10 px-5 rounded-md bg-primary text-primary-foreground text-sm font-semibold hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {t("contactDetail.saveNote")}
-              </button>
-            </div>
           </div>
+
 
           {/* Activity */}
           <div className="k-card p-8">
