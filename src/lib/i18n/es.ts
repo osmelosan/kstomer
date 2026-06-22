@@ -166,6 +166,8 @@ export const es = {
       bakeryReason: "Tráfico orgánico cae un 22% en 90 días",
       bakeryMatch: "Auditoría SEO",
     },
+    contactEmail: "Enviar correo",
+    contactPhone: "Llamar",
   },
   contacts: {
     metaTitle: "Contactos — Kstomer",

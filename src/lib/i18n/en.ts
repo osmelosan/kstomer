@@ -166,6 +166,8 @@ export const en = {
       bakeryReason: "Organic traffic down 22% over 90 days",
       bakeryMatch: "SEO audit",
     },
+    contactEmail: "Send email",
+    contactPhone: "Call",
   },
   contacts: {
     metaTitle: "Contacts — Kstomer",

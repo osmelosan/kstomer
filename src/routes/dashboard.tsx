@@ -3,12 +3,12 @@ import { AppShell } from "@/components/AppShell";
 import {
   Plus,
   Mail,
+  Phone,
   FileText,
   MoreHorizontal,
   TrendingUp,
   Sparkles,
   Building2,
-  ArrowUpRight,
   RefreshCw,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -104,6 +104,9 @@ function Dashboard() {
                 fit={94}
                 reason={t("dashboard.prospects.maelisReason")}
                 match={t("dashboard.prospects.maelisMatch")}
+                contactName="Camille Roux — Directrice"
+                email="camille@studiomaelis.fr"
+                phone="+33 6 12 34 56 78"
               />
               <ProspectRow
                 company="Northgate Logistics"
@@ -111,6 +114,9 @@ function Dashboard() {
                 fit={87}
                 reason={t("dashboard.prospects.northgateReason")}
                 match={t("dashboard.prospects.northgateMatch")}
+                contactName="Marc Delvaux — Head of Design"
+                email="m.delvaux@northgate.io"
+                phone="+33 6 98 76 54 32"
               />
               <ProspectRow
                 company="Boulangerie Lumen"
@@ -118,7 +124,11 @@ function Dashboard() {
                 fit={79}
                 reason={t("dashboard.prospects.bakeryReason")}
                 match={t("dashboard.prospects.bakeryMatch")}
+                contactName="Inès Marchand — Fondatrice"
+                email="ines@lumen-bakery.fr"
+                phone="+33 7 22 11 33 44"
               />
+
             </div>
             <div className="px-4 py-2 border-t border-border bg-muted/30 text-[10px] text-muted-foreground">
               {t("dashboard.updatedAgo")}
@@ -233,12 +243,18 @@ function ProspectRow({
   fit,
   reason,
   match,
+  contactName,
+  email,
+  phone,
 }: {
   company: string;
   sector: string;
   fit: number;
   reason: string;
   match: string;
+  contactName: string;
+  email: string;
+  phone: string;
 }) {
   const { t } = useTranslation();
   const tone: Tone = fit >= 90 ? "success" : fit >= 80 ? "info" : "warning";
@@ -262,10 +278,29 @@ function ProspectRow({
         <p className="text-[10px] text-muted-foreground mt-1 uppercase tracking-wider">
           {t("dashboard.match")} : <span className="text-secondary font-semibold">{match}</span>
         </p>
+        <div className="mt-2 pt-2 border-t border-border/60 space-y-1">
+          <p className="text-[11px] font-medium text-foreground truncate">{contactName}</p>
+          <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+            <a
+              href={`mailto:${email}`}
+              title={t("dashboard.contactEmail")}
+              className="inline-flex items-center gap-1 text-[11px] text-secondary hover:underline truncate"
+            >
+              <Mail className="h-3 w-3 shrink-0" />
+              <span className="truncate">{email}</span>
+            </a>
+            <a
+              href={`tel:${phone.replace(/\s/g, "")}`}
+              title={t("dashboard.contactPhone")}
+              className="inline-flex items-center gap-1 text-[11px] text-secondary hover:underline"
+            >
+              <Phone className="h-3 w-3 shrink-0" />
+              <span className="tabular-nums">{phone}</span>
+            </a>
+          </div>
+        </div>
       </div>
-      <button className="shrink-0 p-2 rounded-lg hover:bg-secondary hover:text-secondary-foreground text-muted-foreground transition-colors">
-        <ArrowUpRight className="h-4 w-4" />
-      </button>
     </div>
   );
 }
+
