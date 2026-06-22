@@ -198,8 +198,10 @@ function findColumnIdByCard(board: Board, cardId: string): string | undefined {
 
 // ---------- Page ----------
 function KanbanPage() {
+  const { t } = useTranslation();
   const [board, setBoard] = useState<Board>(() => (typeof window !== "undefined" ? loadBoard() : initialBoard()));
   const [sortMode, setSortMode] = useState<SortMode>("manual");
+
   const [search, setSearch] = useState("");
   const [tagFilter, setTagFilter] = useState<string | "all">("all");
   const [minConfidence, setMinConfidence] = useState(1);
@@ -347,10 +349,11 @@ function KanbanPage() {
       ...p,
       columns: [
         ...p.columns,
-        { id: uid(), title: "Nouvelle colonne", cardIds: [], accent: ACCENTS[p.columns.length % ACCENTS.length] },
+        { id: uid(), title: i18n.t("kanban.newColumn"), cardIds: [], accent: ACCENTS[p.columns.length % ACCENTS.length] },
       ],
     }));
   }
+
 
   function renameColumn(id: string, title: string) {
     setBoard((p) => ({ ...p, columns: p.columns.map((c) => (c.id === id ? { ...c, title } : c)) }));
@@ -385,9 +388,9 @@ function KanbanPage() {
   function addCard(columnId: string) {
     const c: Card = {
       id: uid(),
-      name: "Nouvelle opportunité",
+      name: i18n.t("kanban.newOpportunity"),
       amount: 0,
-      tag: { label: "NORMAL", tone: "success" },
+      tag: { label: i18n.t("kanban.tags.normal"), tone: "success" },
       confidence: 3,
       createdAt: new Date().toISOString(),
     };
@@ -397,6 +400,7 @@ function KanbanPage() {
     }));
     setEditingCardId(c.id);
   }
+
 
   function updateCard(card: Card) {
     setBoard((p) => ({ ...p, cards: { ...p.cards, [card.id]: card } }));
@@ -415,7 +419,8 @@ function KanbanPage() {
   }
 
   function exportCSV() {
-    const rows = [["Colonne", "Nom", "Montant", "Tag", "Confiance", "Créé le", "Notes"]];
+    const rows = [[t("kanban.csv.column"), t("kanban.csv.name"), t("kanban.csv.amount"), t("kanban.csv.tag"), t("kanban.csv.confidence"), t("kanban.csv.createdAt"), t("kanban.csv.notes")]];
+
     board.columns.forEach((col) => {
       col.cardIds.forEach((id) => {
         const c = board.cards[id];
@@ -448,10 +453,10 @@ function KanbanPage() {
 
   return (
     <AppShell
-      title="Pipeline Commercial"
-      subtitle="Visualisez et gérez vos opportunités de vente en temps réel."
+      title={t("kanban.title")}
+      subtitle={t("kanban.subtitle")}
       search={{
-        placeholder: "Rechercher des leads, contacts…",
+        placeholder: t("kanban.searchPlaceholder"),
         value: search,
         onChange: setSearch,
       }}
@@ -460,30 +465,30 @@ function KanbanPage() {
       <div className="flex flex-wrap items-center gap-3 mb-5">
         <Select value={sortMode} onValueChange={(v) => setSortMode(v as SortMode)}>
           <SelectTrigger className="h-9 w-[180px]">
-            <SelectValue placeholder="Trier" />
+            <SelectValue placeholder={t("kanban.sort")} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="manual">Tri manuel</SelectItem>
-            <SelectItem value="name-asc">Nom (A → Z)</SelectItem>
-            <SelectItem value="date-desc">Plus récent</SelectItem>
-            <SelectItem value="date-asc">Plus ancien</SelectItem>
+            <SelectItem value="manual">{t("kanban.sortManual")}</SelectItem>
+            <SelectItem value="name-asc">{t("kanban.sortNameAsc")}</SelectItem>
+            <SelectItem value="date-desc">{t("kanban.sortDateDesc")}</SelectItem>
+            <SelectItem value="date-asc">{t("kanban.sortDateAsc")}</SelectItem>
           </SelectContent>
         </Select>
 
         <Select value={tagFilter} onValueChange={(v) => setTagFilter(v)}>
           <SelectTrigger className="h-9 w-[160px]">
-            <SelectValue placeholder="Tag" />
+            <SelectValue placeholder={t("kanban.tag")} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">Tous les tags</SelectItem>
-            {allTags.map((t) => (
-              <SelectItem key={t} value={t}>{t}</SelectItem>
+            <SelectItem value="all">{t("kanban.allTags")}</SelectItem>
+            {allTags.map((tg) => (
+              <SelectItem key={tg} value={tg}>{tg}</SelectItem>
             ))}
           </SelectContent>
         </Select>
 
         <div className="flex items-center gap-2 text-sm">
-          <span className="text-muted-foreground">Confiance ≥</span>
+          <span className="text-muted-foreground">{t("kanban.confidenceMin")}</span>
           <div className="w-28">
             <Slider
               value={[minConfidence]}
@@ -498,18 +503,19 @@ function KanbanPage() {
 
         <div className="flex items-center gap-2 text-sm">
           <Switch checked={compact} onCheckedChange={setCompact} id="compact" />
-          <label htmlFor="compact" className="text-muted-foreground cursor-pointer">Vue compacte</label>
+          <label htmlFor="compact" className="text-muted-foreground cursor-pointer">{t("kanban.compactView")}</label>
         </div>
 
         <div className="ml-auto flex items-center gap-2">
           <Button variant="outline" size="sm" onClick={exportCSV}>
-            <Download className="h-4 w-4 mr-1.5" /> Exporter
+            <Download className="h-4 w-4 mr-1.5" /> {t("kanban.export")}
           </Button>
           <Button size="sm" onClick={addColumn}>
-            <Plus className="h-4 w-4 mr-1.5" /> Ajouter une colonne
+            <Plus className="h-4 w-4 mr-1.5" /> {t("kanban.addColumn")}
           </Button>
         </div>
       </div>
+
 
       <DndContext
         sensors={sensors}
