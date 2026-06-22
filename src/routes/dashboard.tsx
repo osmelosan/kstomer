@@ -4,6 +4,7 @@ import {
   Plus,
   Mail,
   Phone,
+  Globe,
   FileText,
   MoreHorizontal,
   TrendingUp,
@@ -107,6 +108,7 @@ function Dashboard() {
                 contactName="Camille Roux — Directrice"
                 email="camille@studiomaelis.fr"
                 phone="+33 6 12 34 56 78"
+                website="https://studiomaelis.fr"
               />
               <ProspectRow
                 company="Northgate Logistics"
@@ -117,6 +119,7 @@ function Dashboard() {
                 contactName="Marc Delvaux — Head of Design"
                 email="m.delvaux@northgate.io"
                 phone="+33 6 98 76 54 32"
+                website="https://northgate.io"
               />
               <ProspectRow
                 company="Boulangerie Lumen"
@@ -127,6 +130,7 @@ function Dashboard() {
                 contactName="Inès Marchand — Fondatrice"
                 email="ines@lumen-bakery.fr"
                 phone="+33 7 22 11 33 44"
+                website="https://lumen-bakery.fr"
               />
 
             </div>
@@ -246,6 +250,7 @@ function ProspectRow({
   contactName,
   email,
   phone,
+  website,
 }: {
   company: string;
   sector: string;
@@ -255,6 +260,7 @@ function ProspectRow({
   contactName: string;
   email: string;
   phone: string;
+  website: string;
 }) {
   const { t } = useTranslation();
   const tone: Tone = fit >= 90 ? "success" : fit >= 80 ? "info" : "warning";
@@ -297,10 +303,19 @@ function ProspectRow({
               <Phone className="h-3 w-3 shrink-0" />
               <span className="tabular-nums">{phone}</span>
             </a>
+            <a
+              href={website}
+              target="_blank"
+              rel="noopener noreferrer"
+              title={t("dashboard.contactWebsite")}
+              className="inline-flex items-center gap-1 text-[11px] text-secondary hover:underline truncate"
+            >
+              <Globe className="h-3 w-3 shrink-0" />
+              <span className="truncate">{website.replace(/^https?:\/\//, "")}</span>
+            </a>
           </div>
         </div>
       </div>
     </div>
   );
 }
-
