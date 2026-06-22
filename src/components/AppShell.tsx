@@ -45,7 +45,7 @@ export function AppShell({
   return (
     <div className="flex min-h-screen bg-background text-foreground">
       <aside className="fixed inset-y-0 left-0 z-30 flex w-60 flex-col bg-sidebar text-sidebar-foreground">
-        <div className="flex items-center shrink-0 h-[112px] px-3 pt-2">
+        <div className="flex items-start shrink-0 h-[96px] px-3 pt-0">
           <Link to="/dashboard" className="block w-full">
             <Logo
               variant="horizontal"
