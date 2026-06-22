@@ -270,28 +270,17 @@ function Analytics() {
         </table>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-        <div className="rounded-2xl bg-primary text-primary-foreground p-7">
-          <span className="inline-flex items-center text-[10px] font-bold tracking-wider px-2 py-1 rounded-md bg-secondary text-secondary-foreground">
-            <Lightbulb className="h-3 w-3 mr-1" /> {t("analytics.aiOpportunity")}
-          </span>
-          <h3 className="mt-4 text-[22px] font-bold tracking-tight">{t("analytics.maximizeEvenings")}</h3>
-          <p className="mt-2 text-sm text-primary-foreground/80">{t("analytics.eveningsBody")}</p>
-          <button className="mt-5 inline-flex items-center gap-2 text-sm font-semibold text-secondary hover:underline">
-            {t("analytics.scheduleReminders")}
-          </button>
-        </div>
+      <AIInsightsCard />
 
-        <div className="rounded-2xl bg-warning-soft border border-warning/30 p-7">
-          <AlertTriangle className="h-6 w-6 text-warning-foreground" />
-          <h3 className="mt-3 text-[20px] font-bold tracking-tight">{t("analytics.renewalsTitle")}</h3>
-          <p className="mt-2 text-sm text-foreground/80">
-            <Trans i18nKey="analytics.renewalsBody" components={[<strong className="text-foreground" />]} />
-          </p>
-          <button className="mt-5 inline-flex items-center gap-2 h-10 px-4 rounded-md bg-warning text-warning-foreground text-sm font-semibold">
-            {t("analytics.seeList")}
-          </button>
-        </div>
+      <div className="rounded-2xl bg-warning-soft border border-warning/30 p-7">
+        <AlertTriangle className="h-6 w-6 text-warning-foreground" />
+        <h3 className="mt-3 text-[20px] font-bold tracking-tight">{t("analytics.renewalsTitle")}</h3>
+        <p className="mt-2 text-sm text-foreground/80">
+          <Trans i18nKey="analytics.renewalsBody" components={[<strong className="text-foreground" />]} />
+        </p>
+        <button className="mt-5 inline-flex items-center gap-2 h-10 px-4 rounded-md bg-warning text-warning-foreground text-sm font-semibold">
+          {t("analytics.seeList")}
+        </button>
       </div>
     </AppShell>
   );
