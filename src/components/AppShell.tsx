@@ -143,7 +143,10 @@ export function AppShell({
                 <input
                   className="w-full h-10 pl-9 pr-3 rounded-md bg-muted border border-transparent text-sm placeholder:text-muted-foreground focus:outline-none focus:bg-card focus:border-input focus:ring-2 focus:ring-ring/40"
                   placeholder={search.placeholder ?? "Rechercher…"}
+                  value={search.value ?? ""}
+                  onChange={(e) => search.onChange?.(e.target.value)}
                 />
+
               </div>
             </div>
           )}
