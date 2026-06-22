@@ -104,6 +104,9 @@ function Dashboard() {
                 fit={94}
                 reason={t("dashboard.prospects.maelisReason")}
                 match={t("dashboard.prospects.maelisMatch")}
+                contactName="Camille Roux — Directrice"
+                email="camille@studiomaelis.fr"
+                phone="+33 6 12 34 56 78"
               />
               <ProspectRow
                 company="Northgate Logistics"
@@ -111,6 +114,9 @@ function Dashboard() {
                 fit={87}
                 reason={t("dashboard.prospects.northgateReason")}
                 match={t("dashboard.prospects.northgateMatch")}
+                contactName="Marc Delvaux — Head of Design"
+                email="m.delvaux@northgate.io"
+                phone="+33 6 98 76 54 32"
               />
               <ProspectRow
                 company="Boulangerie Lumen"
@@ -118,7 +124,11 @@ function Dashboard() {
                 fit={79}
                 reason={t("dashboard.prospects.bakeryReason")}
                 match={t("dashboard.prospects.bakeryMatch")}
+                contactName="Inès Marchand — Fondatrice"
+                email="ines@lumen-bakery.fr"
+                phone="+33 7 22 11 33 44"
               />
+
             </div>
             <div className="px-4 py-2 border-t border-border bg-muted/30 text-[10px] text-muted-foreground">
               {t("dashboard.updatedAgo")}
