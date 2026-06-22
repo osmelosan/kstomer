@@ -313,10 +313,11 @@ function SecuritySection({ twoFA, setTwoFA }: { twoFA: boolean; setTwoFA: (v: bo
                     <div className="text-sm font-medium flex items-center gap-2">
                       {s.device}
                       {s.current && (
-                        <span className="px-1.5 py-0.5 rounded bg-tertiary-container text-on-tertiary-container text-[10px] font-bold">
+                        <span className="px-1.5 py-0.5 rounded bg-secondary text-secondary-foreground text-[10px] font-bold">
                           {t("settings.security.thisDevice")}
                         </span>
                       )}
+
                     </div>
                     <div className="text-xs text-muted-foreground">{s.lastSeen}</div>
                   </div>
