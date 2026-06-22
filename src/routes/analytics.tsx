@@ -17,9 +17,18 @@ import {
   BarChart3,
   Lightbulb,
   AlertTriangle,
+  CalendarIcon,
 } from "lucide-react";
 import { useTranslation, Trans } from "react-i18next";
 import i18n from "@/lib/i18n";
+import { useState } from "react";
+import { format } from "date-fns";
+import { fr as frLocale, es as esLocale, enUS } from "date-fns/locale";
+import type { DateRange } from "react-day-picker";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/analytics")({
   head: () => ({ meta: [{ title: i18n.t("analytics.metaTitle") }] }),
