@@ -19,12 +19,12 @@ export const Route = createFileRoute("/")({
 function WelcomePage() {
   return (
     <main className="min-h-screen bg-background flex items-center justify-center px-6 py-16">
-      <div className="w-full max-w-2xl rounded-2xl bg-card border border-border shadow-[0_1px_3px_rgba(15,27,61,0.05)] px-10 py-14 text-center">
+      <div className="w-full max-w-xl rounded-2xl bg-card border border-border shadow-[0_1px_3px_rgba(15,27,61,0.05)] px-10 py-14 text-center">
         <Logo
           variant="horizontal"
           theme="on-light"
           priority
-          className="h-32 md:h-36 mx-auto mb-10"
+          className="h-20 md:h-24 mx-auto mb-10"
         />
 
         <h1 className="text-[40px] leading-[1.1] font-extrabold tracking-tight">

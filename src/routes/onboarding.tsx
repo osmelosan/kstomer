@@ -22,7 +22,7 @@ function Onboarding() {
     <main className="min-h-screen bg-background px-6 py-10">
       <header className="flex items-center justify-between max-w-5xl mx-auto">
         <Link to="/" className="block" aria-label="Accueil Kstomer">
-          <Logo variant="horizontal" theme="on-light" className="h-[84px]" />
+          <Logo variant="horizontal" theme="on-light" className="h-14" />
         </Link>
         <button className="flex items-center gap-2 text-sm font-semibold uppercase tracking-wider text-muted-foreground">
           AIDE <HelpCircle className="h-5 w-5" />
