@@ -12,7 +12,7 @@ import {
   Search,
   LogOut,
 } from "lucide-react";
-import { Logo } from "@/components/Logo";
+import logoOnDark from "@/assets/kstomer-on-dark.png";
 import { type ReactNode } from "react";
 import { cn } from "@/lib/utils";
 
@@ -45,9 +45,13 @@ export function AppShell({
   return (
     <div className="flex min-h-screen bg-background text-foreground">
       <aside className="fixed inset-y-0 left-0 z-30 flex w-60 flex-col bg-sidebar text-sidebar-foreground">
-        <div className="px-5 pt-6 pb-6">
-          <Link to="/dashboard" className="block" aria-label="Kstomer — accueil">
-            <Logo eager className="w-full max-h-12 h-auto" />
+        <div className="flex items-center px-5 pt-6 pb-8">
+          <Link to="/dashboard" className="block">
+            <img
+              src={logoOnDark}
+              alt="Kstomer Smart CRM"
+              className="h-10 w-auto object-contain"
+            />
           </Link>
         </div>
 

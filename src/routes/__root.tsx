@@ -11,8 +11,6 @@ import { useEffect, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
-import isotipoAsset from "@/assets/kstomer-isotipo.svg.asset.json";
-import logoAsset from "@/assets/kstomer-logo-transparent.png.asset.json";
 
 function NotFoundComponent() {
   return (
@@ -91,15 +89,11 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         content: "Le CRM efficace, précis et sans bruit pour solopreneurs.",
       },
       { property: "og:type", content: "website" },
-      { property: "og:image", content: logoAsset.url },
       { name: "twitter:card", content: "summary" },
-      { name: "twitter:image", content: logoAsset.url },
-      { name: "theme-color", content: "#0F1B3D" },
     ],
     links: [
       { rel: "stylesheet", href: appCss },
       { rel: "icon", type: "image/svg+xml", href: "/favicon.svg" },
-      { rel: "apple-touch-icon", href: isotipoAsset.url },
       {
         rel: "preconnect",
         href: "https://fonts.googleapis.com",
@@ -123,7 +117,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 
 function RootShell({ children }: { children: ReactNode }) {
   return (
-    <html lang="fr">
+    <html lang="en">
       <head>
         <HeadContent />
       </head>
