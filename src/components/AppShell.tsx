@@ -107,12 +107,12 @@ export function AppShell({
                 <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-secondary text-secondary-foreground text-[11px] font-semibold">
                   TM
                 </div>
-                <span className="flex-1 text-left text-white">Thomas M.</span>
+                <span className="flex-1 text-left text-white">Thomas Melo</span>
                 <ChevronDown className="h-4 w-4 opacity-70" />
               </button>
             </DropdownMenuTrigger>
             <DropdownMenuContent side="top" align="start" className="w-56">
-              <DropdownMenuLabel>Thomas M.</DropdownMenuLabel>
+              <DropdownMenuLabel>Thomas Melo</DropdownMenuLabel>
               <DropdownMenuSeparator />
               <DropdownMenuItem asChild>
                 <Link to="/settings" className="flex items-center gap-2">
