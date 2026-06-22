@@ -243,12 +243,18 @@ function ProspectRow({
   fit,
   reason,
   match,
+  contactName,
+  email,
+  phone,
 }: {
   company: string;
   sector: string;
   fit: number;
   reason: string;
   match: string;
+  contactName: string;
+  email: string;
+  phone: string;
 }) {
   const { t } = useTranslation();
   const tone: Tone = fit >= 90 ? "success" : fit >= 80 ? "info" : "warning";
@@ -272,10 +278,29 @@ function ProspectRow({
         <p className="text-[10px] text-muted-foreground mt-1 uppercase tracking-wider">
           {t("dashboard.match")} : <span className="text-secondary font-semibold">{match}</span>
         </p>
+        <div className="mt-2 pt-2 border-t border-border/60 space-y-1">
+          <p className="text-[11px] font-medium text-foreground truncate">{contactName}</p>
+          <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+            <a
+              href={`mailto:${email}`}
+              title={t("dashboard.contactEmail")}
+              className="inline-flex items-center gap-1 text-[11px] text-secondary hover:underline truncate"
+            >
+              <Mail className="h-3 w-3 shrink-0" />
+              <span className="truncate">{email}</span>
+            </a>
+            <a
+              href={`tel:${phone.replace(/\s/g, "")}`}
+              title={t("dashboard.contactPhone")}
+              className="inline-flex items-center gap-1 text-[11px] text-secondary hover:underline"
+            >
+              <Phone className="h-3 w-3 shrink-0" />
+              <span className="tabular-nums">{phone}</span>
+            </a>
+          </div>
+        </div>
       </div>
-      <button className="shrink-0 p-2 rounded-lg hover:bg-secondary hover:text-secondary-foreground text-muted-foreground transition-colors">
-        <ArrowUpRight className="h-4 w-4" />
-      </button>
     </div>
   );
 }
+
