@@ -105,14 +105,14 @@ export function AppShell({
                 className="flex w-full items-center gap-3 rounded-md px-3 py-2 text-[14px] text-sidebar-muted hover:text-white hover:bg-white/5 transition-colors"
               >
                 <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-secondary text-secondary-foreground text-[11px] font-semibold">
-                  JS
+                  TM
                 </div>
-                <span className="flex-1 text-left text-white">Julien S.</span>
+                <span className="flex-1 text-left text-white">Thomas M.</span>
                 <ChevronDown className="h-4 w-4 opacity-70" />
               </button>
             </DropdownMenuTrigger>
             <DropdownMenuContent side="top" align="start" className="w-56">
-              <DropdownMenuLabel>Julien Saliba</DropdownMenuLabel>
+              <DropdownMenuLabel>Thomas M.</DropdownMenuLabel>
               <DropdownMenuSeparator />
               <DropdownMenuItem asChild>
                 <Link to="/settings" className="flex items-center gap-2">
