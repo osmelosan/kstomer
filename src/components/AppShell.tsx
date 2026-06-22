@@ -192,6 +192,20 @@ function CompanySwitcher() {
       <DropdownMenuContent align="start" className="w-56">
         <DropdownMenuLabel>Entreprises</DropdownMenuLabel>
         <DropdownMenuSeparator />
+        <DropdownMenuItem
+          onClick={() => setCurrent(ALL_COMPANIES)}
+          className="flex items-center justify-between"
+        >
+          <span className="flex items-center gap-2 font-semibold">
+            <Building2 className="h-4 w-4 text-secondary" />
+            Toutes
+            <span className="text-[10px] uppercase tracking-wider text-muted-foreground font-bold ml-1">
+              Admin
+            </span>
+          </span>
+          {current.id === ALL_COMPANIES.id && <Check className="h-4 w-4" />}
+        </DropdownMenuItem>
+        <DropdownMenuSeparator />
         {COMPANIES.map((c) => (
           <DropdownMenuItem
             key={c.id}
