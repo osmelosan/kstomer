@@ -474,6 +474,15 @@ export const es = {
     renewalsTitle: "Renovaciones próximas",
     renewalsBody: "12 suscripciones «Premium» vencen en los próximos 30 días. Valor en riesgo: <0>5.400 €</0>.",
     seeList: "Ver la lista",
+    ai: {
+      title: "Análisis IA del rendimiento",
+      disclaimer: "Generado por IA — verifica antes de actuar.",
+      regenerate: "Regenerar",
+      loading: "Analizando…",
+      errorGeneric: "No se pudo generar el análisis. Inténtalo de nuevo.",
+      errorRate: "Demasiadas solicitudes. Espera un momento.",
+      errorCredits: "Créditos IA agotados. Recarga tu espacio.",
+    },
   },
   settings: {
     metaTitle: "Ajustes — Kstomer",
