@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import logoLight from "@/assets/kstomer-dark-on-light.png";
+import { Logo } from "@/components/Logo";
 import { ArrowRight, BadgeCheck } from "lucide-react";
 
 export const Route = createFileRoute("/")({
@@ -20,10 +20,11 @@ function WelcomePage() {
   return (
     <main className="min-h-screen bg-background flex items-center justify-center px-6 py-16">
       <div className="w-full max-w-xl rounded-2xl bg-card border border-border shadow-[0_1px_3px_rgba(15,27,61,0.05)] px-10 py-14 text-center">
-        <img
-          src={logoLight}
-          alt="Kstomer"
-          className="h-16 w-auto mx-auto mb-10 object-contain"
+        <Logo
+          variant="horizontal"
+          theme="on-light"
+          priority
+          className="h-20 md:h-24 mx-auto mb-10"
         />
 
         <h1 className="text-[40px] leading-[1.1] font-extrabold tracking-tight">
