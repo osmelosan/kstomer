@@ -24,6 +24,9 @@ import {
   Paperclip,
   TrendingUp,
   RotateCcw,
+  Check,
+  Loader2,
+  CloudUpload,
 } from "lucide-react";
 import { useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -52,6 +55,7 @@ import {
   SheetTitle,
   SheetDescription,
 } from "@/components/ui/sheet";
+import { useAutosave, type AutosaveStatus } from "@/hooks/use-autosave";
 
 export const Route = createFileRoute("/contacts/$id")({
   head: () => ({ meta: [{ title: i18n.t("contactDetail.metaTitle") }] }),
