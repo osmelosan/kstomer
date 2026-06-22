@@ -63,7 +63,7 @@ function Dashboard() {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         <section className="space-y-4">
-          <SectionHeader title={t("dashboard.priorityActions")} cta={t("dashboard.seeAll")} />
+          <SectionHeader title={t("dashboard.priorityActions")} cta={t("dashboard.seeAll")} ctaTo="/tasks" />
           <div className="bg-card rounded-2xl border border-border divide-y divide-border overflow-hidden shadow-card">
             <ActionRow
               icon={<Mail className="h-5 w-5 text-muted-foreground" />}
@@ -181,11 +181,16 @@ function MetricCard({
   );
 }
 
-function SectionHeader({ title, cta }: { title: string; cta?: string }) {
+function SectionHeader({ title, cta, ctaTo }: { title: string; cta?: string; ctaTo?: string }) {
   return (
     <div className="flex items-center justify-between">
       <h2 className="text-xs font-semibold text-foreground uppercase tracking-[0.08em]">{title}</h2>
-      {cta && (
+      {cta && ctaTo && (
+        <Link to={ctaTo} className="text-xs font-medium text-secondary hover:underline">
+          {cta}
+        </Link>
+      )}
+      {cta && !ctaTo && (
         <button className="text-xs font-medium text-secondary hover:underline">{cta}</button>
       )}
     </div>
