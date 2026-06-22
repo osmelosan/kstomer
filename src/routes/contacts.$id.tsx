@@ -278,13 +278,13 @@ function ContactDetails() {
                 {editing ? (
                   <div className="space-y-2">
                     <Input
-                      value={draft.name}
-                      onChange={(e) => setDraft({ ...draft, name: e.target.value })}
+                      value={profile.name}
+                      onChange={(e) => setProfile({ ...profile, name: e.target.value })}
                       className="text-xl font-bold h-10"
                     />
                     <Input
-                      value={draft.role}
-                      onChange={(e) => setDraft({ ...draft, role: e.target.value })}
+                      value={profile.role}
+                      onChange={(e) => setProfile({ ...profile, role: e.target.value })}
                       className="h-9 text-sm"
                     />
                   </div>
@@ -397,56 +397,56 @@ function ContactDetails() {
                 label={t("contactDetail.workEmail")}
                 value={profile.email}
                 editing={editing}
-                onChange={(v) => setDraft({ ...draft, email: v })}
-                draftValue={draft.email}
+                onChange={(v) => setProfile({ ...profile, email: v })}
+                draftValue={profile.email}
               />
               <InfoField
                 icon={<Phone className="h-4 w-4" />}
                 label={t("contactDetail.phone")}
                 value={profile.phone}
                 editing={editing}
-                onChange={(v) => setDraft({ ...draft, phone: v })}
-                draftValue={draft.phone}
+                onChange={(v) => setProfile({ ...profile, phone: v })}
+                draftValue={profile.phone}
               />
               <InfoField
                 icon={<Briefcase className="h-4 w-4" />}
                 label={t("contactDetail.company")}
                 value={profile.company}
                 editing={editing}
-                onChange={(v) => setDraft({ ...draft, company: v })}
-                draftValue={draft.company}
+                onChange={(v) => setProfile({ ...profile, company: v })}
+                draftValue={profile.company}
               />
               <InfoField
                 icon={<BadgeCheck className="h-4 w-4" />}
                 label={t("contactDetail.position")}
                 value={profile.position}
                 editing={editing}
-                onChange={(v) => setDraft({ ...draft, position: v })}
-                draftValue={draft.position}
+                onChange={(v) => setProfile({ ...profile, position: v })}
+                draftValue={profile.position}
               />
               <InfoField
                 icon={<Globe className="h-4 w-4" />}
                 label={t("contactDetail.website")}
                 value={profile.website}
                 editing={editing}
-                onChange={(v) => setDraft({ ...draft, website: v })}
-                draftValue={draft.website}
+                onChange={(v) => setProfile({ ...profile, website: v })}
+                draftValue={profile.website}
               />
               <InfoField
                 icon={<Linkedin className="h-4 w-4" />}
                 label={t("contactDetail.linkedin")}
                 value={profile.linkedin}
                 editing={editing}
-                onChange={(v) => setDraft({ ...draft, linkedin: v })}
-                draftValue={draft.linkedin}
+                onChange={(v) => setProfile({ ...profile, linkedin: v })}
+                draftValue={profile.linkedin}
               />
               <InfoField
                 icon={<MapPin className="h-4 w-4" />}
                 label={t("contactDetail.address")}
                 value={profile.address}
                 editing={editing}
-                onChange={(v) => setDraft({ ...draft, address: v })}
-                draftValue={draft.address}
+                onChange={(v) => setProfile({ ...profile, address: v })}
+                draftValue={profile.address}
               />
               <div>
                 <div className="k-label mb-2 flex items-center gap-2">
@@ -454,8 +454,8 @@ function ContactDetails() {
                 </div>
                 {editing ? (
                   <Select
-                    value={draft.status}
-                    onValueChange={(v) => setDraft({ ...draft, status: v as Status })}
+                    value={profile.status}
+                    onValueChange={(v) => setProfile({ ...profile, status: v as Status })}
                   >
                     <SelectTrigger className="h-9">
                       <SelectValue />
@@ -482,13 +482,13 @@ function ContactDetails() {
                 <div className="k-label mb-3">{t("contactDetail.confidenceLevel")}</div>
                 <div className="flex gap-2">
                   {[1, 2, 3, 4, 5].map((i) => {
-                    const value = editing ? draft.confidence : profile.confidence;
+                    const value = editing ? profile.confidence : profile.confidence;
                     return (
                       <button
                         key={i}
                         type="button"
                         disabled={!editing}
-                        onClick={() => editing && setDraft({ ...draft, confidence: i })}
+                        onClick={() => editing && setProfile({ ...profile, confidence: i })}
                         className="h-3 flex-1 rounded-full transition-colors"
                         style={{
                           background:
@@ -502,7 +502,7 @@ function ContactDetails() {
                   })}
                 </div>
                 <div className="mt-3 text-secondary font-semibold text-sm">
-                  {(editing ? draft.confidence : profile.confidence)} / 5
+                  {(editing ? profile.confidence : profile.confidence)} / 5
                 </div>
               </div>
             </div>
