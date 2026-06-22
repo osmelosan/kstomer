@@ -474,6 +474,15 @@ export const en = {
     renewalsTitle: "Upcoming renewals",
     renewalsBody: "12 “Premium” subscriptions are due in the next 30 days. Value at risk: <0>€5,400</0>.",
     seeList: "See the list",
+    ai: {
+      title: "AI performance analysis",
+      disclaimer: "AI-generated — verify before acting.",
+      regenerate: "Regenerate",
+      loading: "Analyzing…",
+      errorGeneric: "Could not generate analysis. Try again.",
+      errorRate: "Too many requests. Please wait a moment.",
+      errorCredits: "AI credits exhausted. Top up your workspace.",
+    },
   },
   settings: {
     metaTitle: "Settings — Kstomer",
