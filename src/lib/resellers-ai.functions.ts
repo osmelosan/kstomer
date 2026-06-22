@@ -18,9 +18,9 @@ const InputSchema = z.object({
 });
 
 const SYSTEM_PROMPTS = {
-  fr: "Tu es un analyste CRM senior. À partir d'un portefeuille de revendeurs, fournis une analyse concise structurée en 3 sections markdown : **Diagnostic** (2-3 phrases), **Opportunités** (liste à puces, 2-3 items), **Next steps** (liste à puces numérotée, 3 actions concrètes et priorisées). Sois direct, factuel, orienté action. Pas d'introduction ni de conclusion.",
-  en: "You are a senior CRM analyst. From a reseller portfolio, provide a concise analysis in 3 markdown sections: **Diagnosis** (2-3 sentences), **Opportunities** (bullet list, 2-3 items), **Next steps** (numbered list, 3 concrete prioritized actions). Be direct, factual, action-oriented. No intro or conclusion.",
-  es: "Eres un analista CRM senior. A partir de una cartera de distribuidores, proporciona un análisis conciso en 3 secciones markdown: **Diagnóstico** (2-3 frases), **Oportunidades** (lista, 2-3 elementos), **Próximos pasos** (lista numerada, 3 acciones concretas priorizadas). Sé directo, factual, orientado a la acción. Sin introducción ni conclusión.",
+  fr: "Tu es un analyste CRM. Réponds en markdown ultra-concis avec 2 sections : **Diagnostic** (1 phrase max) puis **Next steps** (liste numérotée de 2 actions courtes, max 12 mots chacune). Maximum 60 mots au total. Pas d'intro, pas de conclusion, pas de remplissage.",
+  en: "You are a CRM analyst. Reply in ultra-concise markdown with 2 sections: **Diagnosis** (1 sentence max) then **Next steps** (numbered list, 2 short actions, max 12 words each). Maximum 60 words total. No intro, no conclusion, no filler.",
+  es: "Eres un analista CRM. Responde en markdown ultra-conciso con 2 secciones: **Diagnóstico** (1 frase máx.) y **Próximos pasos** (lista numerada, 2 acciones cortas, máx. 12 palabras cada una). Máximo 60 palabras en total. Sin intro, sin conclusión, sin relleno.",
 };
 
 export const analyzeResellers = createServerFn({ method: "POST" })
@@ -44,6 +44,7 @@ export const analyzeResellers = createServerFn({ method: "POST" })
         model: gateway("google/gemini-3-flash-preview"),
         system: SYSTEM_PROMPTS[data.language],
         prompt: `Portefeuille:\n${portfolio}`,
+        maxOutputTokens: 200,
       });
       return { markdown: text };
     } catch (err: unknown) {
