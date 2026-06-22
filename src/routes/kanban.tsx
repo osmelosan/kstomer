@@ -606,10 +606,12 @@ function ColumnView({
   onSetWip: (n?: number) => void;
   onCardClick: (id: string) => void;
 }) {
+  const { t } = useTranslation();
   const { setNodeRef, attributes, listeners, transform, transition, isDragging } = useSortable({
     id: column.id,
     data: { type: "column" },
   });
+
   const style = {
     transform: CSS.Translate.toString(transform),
     transition,
@@ -631,7 +633,7 @@ function ColumnView({
           {...attributes}
           {...listeners}
           className="text-muted-foreground hover:text-foreground cursor-grab active:cursor-grabbing"
-          aria-label="Déplacer la colonne"
+          aria-label={t("kanban.moveColumn")}
         >
           <GripVertical className="h-4 w-4" />
         </button>
@@ -647,7 +649,7 @@ function ColumnView({
             </button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-56">
-            <DropdownMenuLabel>Couleur d'accent</DropdownMenuLabel>
+            <DropdownMenuLabel>{t("kanban.accentColor")}</DropdownMenuLabel>
             <div className="flex flex-wrap gap-1 px-2 py-1">
               {ACCENTS.map((a) => (
                 <button
@@ -661,12 +663,12 @@ function ColumnView({
             </div>
             <DropdownMenuSeparator />
             <div className="px-2 py-1.5 text-xs">
-              <label className="block text-muted-foreground mb-1">Limite WIP</label>
+              <label className="block text-muted-foreground mb-1">{t("kanban.wipLimit")}</label>
               <Input
                 type="number"
                 min={0}
                 value={column.wipLimit ?? ""}
-                placeholder="aucune"
+                placeholder={t("kanban.wipNone")}
                 className="h-8"
                 onChange={(e) => {
                   const v = e.target.value;
@@ -676,18 +678,19 @@ function ColumnView({
             </div>
             <DropdownMenuSeparator />
             <DropdownMenuItem onSelect={onAddCard}>
-              <Plus className="h-4 w-4 mr-2" /> Ajouter une carte
+              <Plus className="h-4 w-4 mr-2" /> {t("kanban.addCard")}
             </DropdownMenuItem>
             <DropdownMenuItem onSelect={onDelete} className="text-destructive">
-              <Trash2 className="h-4 w-4 mr-2" /> Supprimer la colonne
+              <Trash2 className="h-4 w-4 mr-2" /> {t("kanban.deleteColumn")}
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
 
       <div className="text-[11px] uppercase tracking-wider text-muted-foreground mb-3 ml-1">
-        Total · {fmtMoneyShort(total)}
+        {t("kanban.columnTotal")} · {fmtMoneyShort(total)}
       </div>
+
 
       <SortableContext items={cardIds} strategy={verticalListSortingStrategy}>
         <div className="space-y-3 flex-1">
@@ -715,26 +718,30 @@ function ColumnView({
         onClick={onAddCard}
         className="mt-3 w-full text-sm text-muted-foreground hover:text-foreground rounded-md border border-dashed border-border py-2 hover:bg-card/60 transition-colors flex items-center justify-center gap-1.5"
       >
-        <Plus className="h-3.5 w-3.5" /> Ajouter une carte
+        <Plus className="h-3.5 w-3.5" /> {t("kanban.addCard")}
       </button>
     </div>
   );
 }
 
+
 function DroppableEmpty({ columnId }: { columnId: string }) {
+  const { t } = useTranslation();
   const { setNodeRef, isOver } = useSortable({ id: `empty-${columnId}`, data: { type: "column", columnId } });
   return (
     <div
       ref={setNodeRef}
       className={`rounded-lg border border-dashed text-muted-foreground text-sm py-10 text-center ${isOver ? "border-secondary bg-secondary/5" : "border-border bg-card/50"}`}
     >
-      Glissez une carte ici
+      {t("kanban.dropHere")}
     </div>
   );
 }
 
+
 // ---------- Editable title ----------
 function EditableTitle({ value, onChange }: { value: string; onChange: (v: string) => void }) {
+  const { t } = useTranslation();
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState(value);
   useEffect(() => setDraft(value), [value]);
@@ -766,12 +773,13 @@ function EditableTitle({ value, onChange }: { value: string; onChange: (v: strin
     <button
       onClick={() => setEditing(true)}
       className="flex-1 min-w-0 text-left text-[11px] font-bold tracking-wider uppercase text-foreground truncate hover:text-secondary"
-      title="Cliquer pour renommer"
+      title={t("kanban.clickToRename")}
     >
       {value}
     </button>
   );
 }
+
 
 // ---------- Card ----------
 function SortableCard({
@@ -876,6 +884,7 @@ function CardEditor({
   onDelete: () => void;
   onClose: () => void;
 }) {
+  const { t, i18n: i18nInst } = useTranslation();
   const [draft, setDraft] = useState<Card>(card);
 
   function save() {
@@ -886,15 +895,15 @@ function CardEditor({
   return (
     <>
       <SheetHeader>
-        <SheetTitle>Modifier la carte</SheetTitle>
+        <SheetTitle>{t("kanban.editCard")}</SheetTitle>
       </SheetHeader>
       <div className="space-y-4 py-4">
         <div className="space-y-1.5">
-          <label className="text-xs font-medium text-muted-foreground">Nom</label>
+          <label className="text-xs font-medium text-muted-foreground">{t("kanban.cardName")}</label>
           <Input value={draft.name} onChange={(e) => setDraft({ ...draft, name: e.target.value })} />
         </div>
         <div className="space-y-1.5">
-          <label className="text-xs font-medium text-muted-foreground">Montant (€)</label>
+          <label className="text-xs font-medium text-muted-foreground">{t("kanban.amount")}</label>
           <Input
             type="number"
             value={draft.amount}
@@ -903,29 +912,29 @@ function CardEditor({
         </div>
         <div className="grid grid-cols-2 gap-3">
           <div className="space-y-1.5">
-            <label className="text-xs font-medium text-muted-foreground">Tag</label>
+            <label className="text-xs font-medium text-muted-foreground">{t("kanban.tag")}</label>
             <Input
               value={draft.tag.label}
               onChange={(e) => setDraft({ ...draft, tag: { ...draft.tag, label: e.target.value.toUpperCase() } })}
             />
           </div>
           <div className="space-y-1.5">
-            <label className="text-xs font-medium text-muted-foreground">Tonalité</label>
+            <label className="text-xs font-medium text-muted-foreground">{t("kanban.tone")}</label>
             <Select
               value={draft.tag.tone}
               onValueChange={(v) => setDraft({ ...draft, tag: { ...draft.tag, tone: v as Tone } })}
             >
               <SelectTrigger><SelectValue /></SelectTrigger>
               <SelectContent>
-                <SelectItem value="success">Succès</SelectItem>
-                <SelectItem value="warning">Attention</SelectItem>
-                <SelectItem value="destructive">Critique</SelectItem>
+                <SelectItem value="success">{t("kanban.toneSuccess")}</SelectItem>
+                <SelectItem value="warning">{t("kanban.toneWarning")}</SelectItem>
+                <SelectItem value="destructive">{t("kanban.toneDestructive")}</SelectItem>
               </SelectContent>
             </Select>
           </div>
         </div>
         <div className="space-y-1.5">
-          <label className="text-xs font-medium text-muted-foreground">Confiance : {draft.confidence}/5</label>
+          <label className="text-xs font-medium text-muted-foreground">{t("kanban.confidence")} : {draft.confidence}/5</label>
           <Slider
             value={[draft.confidence]}
             min={1}
@@ -935,7 +944,7 @@ function CardEditor({
           />
         </div>
         <div className="space-y-1.5">
-          <label className="text-xs font-medium text-muted-foreground">Notes</label>
+          <label className="text-xs font-medium text-muted-foreground">{t("kanban.notes")}</label>
           <Textarea
             rows={4}
             value={draft.meta ?? ""}
@@ -943,25 +952,26 @@ function CardEditor({
           />
         </div>
         <div className="text-xs text-muted-foreground">
-          Créée le {new Date(card.createdAt).toLocaleDateString("fr-FR")}
+          {t("kanban.createdOn", { date: new Date(card.createdAt).toLocaleDateString(i18nInst.language) })}
         </div>
       </div>
       <SheetFooter className="flex flex-row justify-between gap-2 sm:justify-between">
         <Button variant="ghost" className="text-destructive hover:text-destructive" onClick={onDelete}>
-          <Trash2 className="h-4 w-4 mr-1.5" /> Supprimer
+          <Trash2 className="h-4 w-4 mr-1.5" /> {t("kanban.delete")}
         </Button>
         <div className="flex gap-2">
           <Button variant="outline" onClick={onClose}>
-            <X className="h-4 w-4 mr-1.5" /> Annuler
+            <X className="h-4 w-4 mr-1.5" /> {t("kanban.cancel")}
           </Button>
           <Button onClick={save}>
-            <Check className="h-4 w-4 mr-1.5" /> Enregistrer
+            <Check className="h-4 w-4 mr-1.5" /> {t("kanban.save")}
           </Button>
         </div>
       </SheetFooter>
     </>
   );
 }
+
 
 // ---------- Delete column dialog ----------
 function DeleteColumnDialog({
@@ -973,6 +983,7 @@ function DeleteColumnDialog({
   otherColumns: Column[];
   onConfirm: (moveTo?: string) => void;
 }) {
+  const { t } = useTranslation();
   const hasCards = column.cardIds.length > 0;
   const [moveTo, setMoveTo] = useState<string>(otherColumns[0]?.id ?? "");
   const [mode, setMode] = useState<"move" | "delete">(otherColumns.length > 0 ? "move" : "delete");
@@ -980,11 +991,11 @@ function DeleteColumnDialog({
   return (
     <>
       <AlertDialogHeader>
-        <AlertDialogTitle>Supprimer « {column.title} » ?</AlertDialogTitle>
+        <AlertDialogTitle>{t("kanban.deleteTitle", { title: column.title })}</AlertDialogTitle>
         <AlertDialogDescription>
           {hasCards
-            ? `Cette colonne contient ${column.cardIds.length} carte(s). Que faire ?`
-            : "Cette colonne est vide. La suppression est définitive."}
+            ? t("kanban.deleteWithCards", { count: column.cardIds.length })
+            : t("kanban.deleteEmpty")}
         </AlertDialogDescription>
       </AlertDialogHeader>
 
@@ -992,7 +1003,7 @@ function DeleteColumnDialog({
         <div className="space-y-3 py-2">
           <label className="flex items-center gap-2 text-sm cursor-pointer">
             <input type="radio" checked={mode === "move"} onChange={() => setMode("move")} />
-            Déplacer les cartes vers
+            {t("kanban.moveCardsTo")}
             <Select value={moveTo} onValueChange={setMoveTo}>
               <SelectTrigger className="h-8 w-[160px] ml-1">
                 <SelectValue />
@@ -1006,20 +1017,21 @@ function DeleteColumnDialog({
           </label>
           <label className="flex items-center gap-2 text-sm cursor-pointer">
             <input type="radio" checked={mode === "delete"} onChange={() => setMode("delete")} />
-            <Badge variant="destructive">Tout supprimer</Badge>
+            <Badge variant="destructive">{t("kanban.deleteAll")}</Badge>
           </label>
         </div>
       )}
 
       <AlertDialogFooter>
-        <AlertDialogCancel>Annuler</AlertDialogCancel>
+        <AlertDialogCancel>{t("kanban.cancel")}</AlertDialogCancel>
         <AlertDialogAction
           className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
           onClick={() => onConfirm(hasCards && mode === "move" ? moveTo : undefined)}
         >
-          Supprimer
+          {t("kanban.delete")}
         </AlertDialogAction>
       </AlertDialogFooter>
     </>
   );
 }
+
