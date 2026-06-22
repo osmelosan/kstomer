@@ -23,7 +23,7 @@ function Dashboard() {
   return (
     <AppShell
       title="Tableau de bord"
-      subtitle="Bienvenue Julien. Voici vos priorités pour aujourd'hui."
+      subtitle="Bienvenue Thomas. Voici vos priorités pour aujourd'hui."
       actions={
         <Link
           to="/contacts/new"
