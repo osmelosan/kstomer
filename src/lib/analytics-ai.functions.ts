@@ -1,0 +1,74 @@
+import { createServerFn } from "@tanstack/react-start";
+import { generateText } from "ai";
+import { z } from "zod";
+
+const InputSchema = z.object({
+  language: z.enum(["fr", "en", "es"]).default("fr"),
+  kpis: z.object({
+    revenue: z.string(),
+    conversion: z.string(),
+    activeContacts: z.string(),
+    opportunities: z.string(),
+  }),
+  sources: z.array(z.object({ label: z.string(), value: z.number() })),
+  segments: z.array(
+    z.object({
+      name: z.string(),
+      volume: z.number(),
+      conversion: z.string(),
+      avgValue: z.string(),
+      health: z.number(),
+    }),
+  ),
+});
+
+const SYSTEM_PROMPTS = {
+  fr: "Tu es un analyste CRM. Réponds en markdown ultra-concis avec 2 sections : **Diagnostic** (1 phrase max) puis **Next steps** (liste numérotée de 2 actions courtes, max 12 mots chacune). Maximum 60 mots au total. Pas d'intro, pas de conclusion, pas de remplissage.",
+  en: "You are a CRM analyst. Reply in ultra-concise markdown with 2 sections: **Diagnosis** (1 sentence max) then **Next steps** (numbered list, 2 short actions, max 12 words each). Maximum 60 words total. No intro, no conclusion, no filler.",
+  es: "Eres un analista CRM. Responde en markdown ultra-conciso con 2 secciones: **Diagnóstico** (1 frase máx.) y **Próximos pasos** (lista numerada, 2 acciones cortas, máx. 12 palabras cada una). Máximo 60 palabras en total. Sin intro, sin conclusión, sin relleno.",
+};
+
+export const analyzeAnalytics = createServerFn({ method: "POST" })
+  .inputValidator((input: unknown) => InputSchema.parse(input))
+  .handler(async ({ data }) => {
+    const key = process.env.LOVABLE_API_KEY;
+    if (!key) throw new Error("Missing LOVABLE_API_KEY");
+
+    const { createLovableAiGatewayProvider } = await import("./ai-gateway.server");
+    const gateway = createLovableAiGatewayProvider(key);
+
+    const sources = data.sources.map((s) => `- ${s.label}: ${s.value}%`).join("\n");
+    const segments = data.segments
+      .map(
+        (s) =>
+          `- ${s.name} | Vol: ${s.volume} | Conv: ${s.conversion} | Avg: ${s.avgValue} | Health: ${s.health}/5`,
+      )
+      .join("\n");
+
+    const prompt = `KPIs:
+- Revenu: ${data.kpis.revenue}
+- Conversion: ${data.kpis.conversion}
+- Contacts actifs: ${data.kpis.activeContacts}
+- Opportunités: ${data.kpis.opportunities}
+
+Sources:
+${sources}
+
+Segments:
+${segments}`;
+
+    try {
+      const { text } = await generateText({
+        model: gateway("google/gemini-3-flash-preview"),
+        system: SYSTEM_PROMPTS[data.language],
+        prompt,
+        maxOutputTokens: 200,
+      });
+      return { markdown: text };
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : String(err);
+      if (message.includes("429")) throw new Error("RATE_LIMIT");
+      if (message.includes("402")) throw new Error("CREDITS_EXHAUSTED");
+      throw new Error("AI_ERROR");
+    }
+  });
