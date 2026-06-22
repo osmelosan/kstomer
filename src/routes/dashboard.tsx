@@ -96,15 +96,7 @@ function Dashboard() {
               <RefreshCw className="h-3 w-3" /> {t("dashboard.refresh")}
             </button>
           </div>
-          <div className="bg-card rounded-2xl border border-border shadow-card overflow-hidden">
-            <div className="px-4 py-2.5 bg-secondary/5 border-b border-border flex items-center gap-2">
-              <span className="text-[10px] font-bold tracking-wider text-secondary uppercase">
-                {t("dashboard.basedOn")}
-              </span>
-              <span className="text-[11px] text-foreground font-medium">
-                {t("dashboard.basedOnList")}
-              </span>
-            </div>
+            <div className="bg-card rounded-2xl border border-border shadow-card overflow-hidden">
             <div className="divide-y divide-border">
               <ProspectRow
                 company="Studio Maelis"
