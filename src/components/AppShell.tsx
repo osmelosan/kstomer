@@ -7,17 +7,15 @@ import {
   Archive,
   BarChart3,
   UserCircle,
-  Bell,
-  HelpCircle,
-  Search,
   LogOut,
   ChevronDown,
   Building2,
   Check,
 } from "lucide-react";
 import { Logo } from "@/components/Logo";
-import { useState, type ReactNode } from "react";
+import { type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
+import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import {
   DropdownMenu,
@@ -27,6 +25,10 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { NotificationsPopover } from "@/components/NotificationsPopover";
+import { HelpMenu } from "@/components/HelpMenu";
+import { CommandPaletteTrigger } from "@/components/CommandPalette";
+import { useCompany, ALL_COMPANIES, type Company } from "@/lib/company-context";
 
 type NavItem = { to: string; key: string; icon: typeof LayoutGrid };
 
@@ -37,12 +39,6 @@ const NAV: NavItem[] = [
   { to: "/resellers", key: "nav.resellers", icon: Store },
   { to: "/analytics", key: "nav.analytics", icon: BarChart3 },
   { to: "/archives", key: "nav.archives", icon: Archive },
-];
-
-const COMPANIES = [
-  { id: "kstomer", name: "Kstomer" },
-  { id: "acme", name: "Acme Studio" },
-  { id: "northwind", name: "Northwind Co." },
 ];
 
 export function AppShell({
@@ -60,6 +56,11 @@ export function AppShell({
 }) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const { t } = useTranslation();
+  const { current } = useCompany();
+
+  const handleLogout = () => {
+    toast.info(t("common.loggedOut"));
+  };
 
   return (
     <div className="flex min-h-screen bg-background text-foreground">
@@ -122,7 +123,7 @@ export function AppShell({
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
-                <Link to="/" className="flex items-center gap-2">
+                <Link to="/" className="flex items-center gap-2" onClick={handleLogout}>
                   <LogOut className="h-4 w-4" />
                   <span>{t("common.logout")}</span>
                 </Link>
@@ -136,34 +137,24 @@ export function AppShell({
         <header className="sticky top-0 z-20 flex items-center gap-4 border-b border-border bg-background/85 backdrop-blur px-8 h-16">
           <CompanySwitcher />
 
-          {search && (
+          {search ? (
             <div className="flex-1 max-w-xl mx-auto">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                {search.onChange ? (
-                  <input
-                    className="w-full h-10 pl-9 pr-3 rounded-md bg-muted border border-transparent text-sm placeholder:text-muted-foreground focus:outline-none focus:bg-card focus:border-input focus:ring-2 focus:ring-ring/40"
-                    placeholder={search.placeholder ?? t("common.search")}
-                    value={search.value ?? ""}
-                    onChange={(e) => search.onChange?.(e.target.value)}
-                  />
-                ) : (
-                  <input
-                    className="w-full h-10 pl-9 pr-3 rounded-md bg-muted border border-transparent text-sm placeholder:text-muted-foreground focus:outline-none focus:bg-card focus:border-input focus:ring-2 focus:ring-ring/40"
-                    placeholder={search.placeholder ?? t("common.search")}
-                  />
-                )}
-              </div>
+              <input
+                className="w-full h-10 px-3 rounded-md bg-muted border border-transparent text-sm placeholder:text-muted-foreground focus:outline-none focus:bg-card focus:border-input focus:ring-2 focus:ring-ring/40"
+                placeholder={search.placeholder ?? t("common.search")}
+                value={search.value ?? ""}
+                onChange={(e) => search.onChange?.(e.target.value)}
+              />
+            </div>
+          ) : (
+            <div className="flex-1 max-w-xl mx-auto">
+              <CommandPaletteTrigger />
             </div>
           )}
 
           <div className={cn("flex items-center gap-2", !search && "ml-auto")}>
-            <button className="h-9 w-9 grid place-items-center rounded-full hover:bg-muted text-muted-foreground" aria-label={t("common.help")}>
-              <Bell className="h-[18px] w-[18px]" />
-            </button>
-            <button className="h-9 w-9 grid place-items-center rounded-full hover:bg-muted text-muted-foreground" aria-label={t("common.help")}>
-              <HelpCircle className="h-[18px] w-[18px]" />
-            </button>
+            <NotificationsPopover />
+            <HelpMenu />
             {actions}
           </div>
         </header>
@@ -179,6 +170,11 @@ export function AppShell({
               {subtitle && (
                 <p className="mt-2 text-muted-foreground text-[16px]">{subtitle}</p>
               )}
+              {current.id !== "all" && (
+                <p className="mt-2 text-xs text-muted-foreground">
+                  {t("appshell.viewingData")} <span className="font-semibold text-foreground">{current.name}</span>
+                </p>
+              )}
             </div>
           )}
           <div className="max-w-[1280px]">{children}</div>
@@ -190,8 +186,18 @@ export function AppShell({
 
 function CompanySwitcher() {
   const { t } = useTranslation();
-  const ALL = { id: "all", name: t("appshell.allCompanies") };
-  const [current, setCurrent] = useState<{ id: string; name: string }>(COMPANIES[0]);
+  const { current, setCurrent, companies } = useCompany();
+  const ALL = { ...ALL_COMPANIES, name: t("appshell.allCompanies") };
+
+  const select = (c: Company) => {
+    setCurrent(c);
+    if (c.id === "all") {
+      toast.info(t("appshell.viewingAll"));
+    } else {
+      toast.info(`${t("appshell.viewingData")} ${c.name}`);
+    }
+  };
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -205,7 +211,7 @@ function CompanySwitcher() {
         <DropdownMenuLabel>{t("appshell.companies")}</DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuItem
-          onClick={() => setCurrent(ALL)}
+          onClick={() => select(ALL)}
           className="flex items-center justify-between"
         >
           <span className="flex items-center gap-2 font-semibold">
@@ -215,10 +221,10 @@ function CompanySwitcher() {
           {current.id === "all" && <Check className="h-4 w-4" />}
         </DropdownMenuItem>
         <DropdownMenuSeparator />
-        {COMPANIES.map((c) => (
+        {companies.map((c) => (
           <DropdownMenuItem
             key={c.id}
-            onClick={() => setCurrent(c)}
+            onClick={() => select(c)}
             className="flex items-center justify-between"
           >
             <span className="flex items-center gap-2">
