@@ -37,7 +37,7 @@ function ContactDetails() {
               <div className="h-20 w-20 rounded-2xl bg-muted grid place-items-center text-2xl font-bold text-muted-foreground">
                 {display
                   .split(" ")
-                  .map((s) => s[0])
+                  .map((s: string) => s[0])
                   .slice(0, 2)
                   .join("")}
               </div>
