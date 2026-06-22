@@ -104,7 +104,7 @@ function ContactDetails() {
     .map((s: string) => (s[0]?.toUpperCase() ?? "") + s.slice(1))
     .join(" ");
 
-  // ----- Profile state
+  // ----- Profile state (autosaved)
   const [editing, setEditing] = useState(false);
   const [profile, setProfile] = useState({
     name: display,
@@ -120,20 +120,11 @@ function ContactDetails() {
     source: "LinkedIn",
     confidence: 4,
   });
-  const [draft, setDraft] = useState(profile);
 
-  function startEdit() {
-    setDraft(profile);
-    setEditing(true);
-  }
-  function saveEdit() {
-    setProfile(draft);
-    setEditing(false);
-  }
-  function cancelEdit() {
-    setDraft(profile);
-    setEditing(false);
-  }
+  const profileAutosave = useAutosave(profile, async () => {
+    // Simulate latency. Replace with API call when backend is wired.
+    await new Promise((r) => setTimeout(r, 350));
+  });
 
   // ----- Tags
   const [tags, setTags] = useState<string[]>(["VIP", "Premium", "Q4"]);
@@ -144,37 +135,32 @@ function ContactDetails() {
     setNewTag("");
   }
 
-  // ----- Notes & versions
+  // ----- Notes & versions (autosaved)
   const [note, setNote] = useState(t("contactDetail.sampleNote"));
-  const [draftNote, setDraftNote] = useState(note);
   const [versions, setVersions] = useState<NoteVersion[]>([]);
   const [versionsOpen, setVersionsOpen] = useState(false);
+  const lastSavedNoteRef = useRef(note);
 
-  function saveNote() {
-    if (draftNote === note) return;
-    setVersions((prev) => [
-      {
-        id: crypto.randomUUID(),
-        content: note,
-        author: "Thomas Melo",
-        date: new Date().toLocaleString(i18n.language),
-      },
-      ...prev,
-    ]);
-    setNote(draftNote);
-  }
+  const noteAutosave = useAutosave(note, async (next) => {
+    await new Promise((r) => setTimeout(r, 350));
+    const prevContent = lastSavedNoteRef.current;
+    if (prevContent !== next) {
+      setVersions((prev) => [
+        {
+          id: crypto.randomUUID(),
+          content: prevContent,
+          author: "Thomas Melo",
+          date: new Date().toLocaleString(i18n.language),
+        },
+        ...prev,
+      ]);
+      lastSavedNoteRef.current = next;
+    }
+  });
+
   function restoreVersion(v: NoteVersion) {
-    setVersions((prev) => [
-      {
-        id: crypto.randomUUID(),
-        content: note,
-        author: "Thomas Melo",
-        date: new Date().toLocaleString(i18n.language),
-      },
-      ...prev.filter((x) => x.id !== v.id),
-    ]);
+    setVersions((prev) => prev.filter((x) => x.id !== v.id));
     setNote(v.content);
-    setDraftNote(v.content);
     setVersionsOpen(false);
   }
 
