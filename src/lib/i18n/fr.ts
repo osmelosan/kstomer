@@ -474,6 +474,15 @@ export const fr = {
     renewalsTitle: "Renouvellements en approche",
     renewalsBody: "12 abonnements « Premium » arrivent à échéance dans les 30 prochains jours. Valeur à risque : <0>5 400 €</0>.",
     seeList: "Voir la liste",
+    ai: {
+      title: "Analyse IA des performances",
+      disclaimer: "Généré par IA — vérifiez avant action.",
+      regenerate: "Régénérer",
+      loading: "Analyse en cours…",
+      errorGeneric: "Impossible de générer l'analyse. Réessayez.",
+      errorRate: "Trop de requêtes. Patientez un instant.",
+      errorCredits: "Crédits IA épuisés. Rechargez votre espace.",
+    },
   },
   settings: {
     metaTitle: "Paramètres — Kstomer",
