@@ -133,11 +133,18 @@ function RootShell({ children }: { children: ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+  const { i18n } = useTranslation();
+
+  useEffect(() => {
+    if (typeof document !== "undefined") {
+      document.documentElement.lang = i18n.language.split("-")[0];
+    }
+  }, [i18n.language]);
 
   return (
     <QueryClientProvider client={queryClient}>
-      {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
       <Outlet />
     </QueryClientProvider>
   );
 }
+
