@@ -24,7 +24,7 @@ function WelcomePage() {
           variant="horizontal"
           theme="on-light"
           priority
-          className="h-20 md:h-24 mx-auto mb-10"
+          className="h-36 md:h-44 mx-auto mb-10"
         />
 
         <h1 className="text-[40px] leading-[1.1] font-extrabold tracking-tight">
