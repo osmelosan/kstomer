@@ -43,9 +43,9 @@ function Dashboard() {
           footer="Objectif : 16 000 € ce mois"
         />
         <MetricCard
-          label="Opportunités actives"
+          label="Clients actifs"
           value="24"
-          accent={{ tone: "info", label: "8 nouvelles" }}
+          accent={{ tone: "info", label: "8 NOUVEAUX" }}
           footer={
             <span className="inline-flex items-center gap-1">
               <TrendingUp className="h-3 w-3 text-success" />
