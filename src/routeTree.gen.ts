@@ -9,38 +9,221 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as SettingsRouteImport } from './routes/settings'
+import { Route as ResellersRouteImport } from './routes/resellers'
+import { Route as OnboardingRouteImport } from './routes/onboarding'
+import { Route as KanbanRouteImport } from './routes/kanban'
+import { Route as DashboardRouteImport } from './routes/dashboard'
+import { Route as ArchivesRouteImport } from './routes/archives'
+import { Route as AnalyticsRouteImport } from './routes/analytics'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ContactsIndexRouteImport } from './routes/contacts.index'
+import { Route as ContactsNewRouteImport } from './routes/contacts.new'
+import { Route as ContactsIdRouteImport } from './routes/contacts.$id'
 
+const SettingsRoute = SettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ResellersRoute = ResellersRouteImport.update({
+  id: '/resellers',
+  path: '/resellers',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OnboardingRoute = OnboardingRouteImport.update({
+  id: '/onboarding',
+  path: '/onboarding',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const KanbanRoute = KanbanRouteImport.update({
+  id: '/kanban',
+  path: '/kanban',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DashboardRoute = DashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ArchivesRoute = ArchivesRouteImport.update({
+  id: '/archives',
+  path: '/archives',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AnalyticsRoute = AnalyticsRouteImport.update({
+  id: '/analytics',
+  path: '/analytics',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ContactsIndexRoute = ContactsIndexRouteImport.update({
+  id: '/contacts/',
+  path: '/contacts/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ContactsNewRoute = ContactsNewRouteImport.update({
+  id: '/contacts/new',
+  path: '/contacts/new',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ContactsIdRoute = ContactsIdRouteImport.update({
+  id: '/contacts/$id',
+  path: '/contacts/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/analytics': typeof AnalyticsRoute
+  '/archives': typeof ArchivesRoute
+  '/dashboard': typeof DashboardRoute
+  '/kanban': typeof KanbanRoute
+  '/onboarding': typeof OnboardingRoute
+  '/resellers': typeof ResellersRoute
+  '/settings': typeof SettingsRoute
+  '/contacts/$id': typeof ContactsIdRoute
+  '/contacts/new': typeof ContactsNewRoute
+  '/contacts/': typeof ContactsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/analytics': typeof AnalyticsRoute
+  '/archives': typeof ArchivesRoute
+  '/dashboard': typeof DashboardRoute
+  '/kanban': typeof KanbanRoute
+  '/onboarding': typeof OnboardingRoute
+  '/resellers': typeof ResellersRoute
+  '/settings': typeof SettingsRoute
+  '/contacts/$id': typeof ContactsIdRoute
+  '/contacts/new': typeof ContactsNewRoute
+  '/contacts': typeof ContactsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/analytics': typeof AnalyticsRoute
+  '/archives': typeof ArchivesRoute
+  '/dashboard': typeof DashboardRoute
+  '/kanban': typeof KanbanRoute
+  '/onboarding': typeof OnboardingRoute
+  '/resellers': typeof ResellersRoute
+  '/settings': typeof SettingsRoute
+  '/contacts/$id': typeof ContactsIdRoute
+  '/contacts/new': typeof ContactsNewRoute
+  '/contacts/': typeof ContactsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/analytics'
+    | '/archives'
+    | '/dashboard'
+    | '/kanban'
+    | '/onboarding'
+    | '/resellers'
+    | '/settings'
+    | '/contacts/$id'
+    | '/contacts/new'
+    | '/contacts/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/analytics'
+    | '/archives'
+    | '/dashboard'
+    | '/kanban'
+    | '/onboarding'
+    | '/resellers'
+    | '/settings'
+    | '/contacts/$id'
+    | '/contacts/new'
+    | '/contacts'
+  id:
+    | '__root__'
+    | '/'
+    | '/analytics'
+    | '/archives'
+    | '/dashboard'
+    | '/kanban'
+    | '/onboarding'
+    | '/resellers'
+    | '/settings'
+    | '/contacts/$id'
+    | '/contacts/new'
+    | '/contacts/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AnalyticsRoute: typeof AnalyticsRoute
+  ArchivesRoute: typeof ArchivesRoute
+  DashboardRoute: typeof DashboardRoute
+  KanbanRoute: typeof KanbanRoute
+  OnboardingRoute: typeof OnboardingRoute
+  ResellersRoute: typeof ResellersRoute
+  SettingsRoute: typeof SettingsRoute
+  ContactsIdRoute: typeof ContactsIdRoute
+  ContactsNewRoute: typeof ContactsNewRoute
+  ContactsIndexRoute: typeof ContactsIndexRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/settings': {
+      id: '/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof SettingsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/resellers': {
+      id: '/resellers'
+      path: '/resellers'
+      fullPath: '/resellers'
+      preLoaderRoute: typeof ResellersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/onboarding': {
+      id: '/onboarding'
+      path: '/onboarding'
+      fullPath: '/onboarding'
+      preLoaderRoute: typeof OnboardingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/kanban': {
+      id: '/kanban'
+      path: '/kanban'
+      fullPath: '/kanban'
+      preLoaderRoute: typeof KanbanRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dashboard': {
+      id: '/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof DashboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/archives': {
+      id: '/archives'
+      path: '/archives'
+      fullPath: '/archives'
+      preLoaderRoute: typeof ArchivesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/analytics': {
+      id: '/analytics'
+      path: '/analytics'
+      fullPath: '/analytics'
+      preLoaderRoute: typeof AnalyticsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -48,22 +231,43 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/contacts/': {
+      id: '/contacts/'
+      path: '/contacts'
+      fullPath: '/contacts/'
+      preLoaderRoute: typeof ContactsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/contacts/new': {
+      id: '/contacts/new'
+      path: '/contacts/new'
+      fullPath: '/contacts/new'
+      preLoaderRoute: typeof ContactsNewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/contacts/$id': {
+      id: '/contacts/$id'
+      path: '/contacts/$id'
+      fullPath: '/contacts/$id'
+      preLoaderRoute: typeof ContactsIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AnalyticsRoute: AnalyticsRoute,
+  ArchivesRoute: ArchivesRoute,
+  DashboardRoute: DashboardRoute,
+  KanbanRoute: KanbanRoute,
+  OnboardingRoute: OnboardingRoute,
+  ResellersRoute: ResellersRoute,
+  SettingsRoute: SettingsRoute,
+  ContactsIdRoute: ContactsIdRoute,
+  ContactsNewRoute: ContactsNewRoute,
+  ContactsIndexRoute: ContactsIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
