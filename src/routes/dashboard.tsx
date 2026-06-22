@@ -4,6 +4,7 @@ import {
   Plus,
   Mail,
   Phone,
+  Globe,
   FileText,
   MoreHorizontal,
   TrendingUp,
@@ -107,6 +108,7 @@ function Dashboard() {
                 contactName="Camille Roux — Directrice"
                 email="camille@studiomaelis.fr"
                 phone="+33 6 12 34 56 78"
+                website="https://studiomaelis.fr"
               />
               <ProspectRow
                 company="Northgate Logistics"
@@ -117,6 +119,7 @@ function Dashboard() {
                 contactName="Marc Delvaux — Head of Design"
                 email="m.delvaux@northgate.io"
                 phone="+33 6 98 76 54 32"
+                website="https://northgate.io"
               />
               <ProspectRow
                 company="Boulangerie Lumen"
@@ -127,6 +130,7 @@ function Dashboard() {
                 contactName="Inès Marchand — Fondatrice"
                 email="ines@lumen-bakery.fr"
                 phone="+33 7 22 11 33 44"
+                website="https://lumen-bakery.fr"
               />
 
             </div>
