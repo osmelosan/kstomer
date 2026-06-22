@@ -55,10 +55,11 @@ export function AppShell({
   children: ReactNode;
   title?: string;
   subtitle?: string;
-  search?: { placeholder?: string };
+  search?: { placeholder?: string; value?: string; onChange?: (v: string) => void };
   actions?: ReactNode;
 }) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
+
 
   return (
     <div className="flex min-h-screen bg-background text-foreground">
