@@ -45,13 +45,16 @@ export function AppShell({
   return (
     <div className="flex min-h-screen bg-background text-foreground">
       <aside className="fixed inset-y-0 left-0 z-30 flex w-60 flex-col bg-sidebar text-sidebar-foreground">
-        <div className="flex items-start shrink-0 h-[96px] px-3 pt-0">
+        <div
+          className="flex shrink-0 px-3"
+          style={{ height: "96px", minHeight: "96px", maxHeight: "96px", alignItems: "flex-start", paddingTop: "0px" }}
+        >
           <Link to="/dashboard" className="block w-full">
             <Logo
               variant="horizontal"
               theme="on-dark"
               priority
-              className="h-[88px] w-full max-w-[216px]"
+              className="w-full max-w-[216px]"
             />
           </Link>
         </div>
