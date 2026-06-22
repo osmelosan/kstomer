@@ -3,12 +3,12 @@ import { AppShell } from "@/components/AppShell";
 import {
   Plus,
   Mail,
+  Phone,
   FileText,
   MoreHorizontal,
   TrendingUp,
   Sparkles,
   Building2,
-  ArrowUpRight,
   RefreshCw,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
