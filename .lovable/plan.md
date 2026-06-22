@@ -1,49 +1,64 @@
-## Lot 1 — Logos transparents + dimensionnement augmenté partout
+## Objectif
 
-### Assets (via `lovable-assets`, transparents)
+Transformer le Kanban en board pleinement interactif et utilisable au quotidien, avec drag & drop, gestion complète des colonnes et des cartes, tri, recherche, filtres, et persistance.
 
-- **`src/assets/kstomer-horizontal-on-light.png.asset.json`** — nouveau logo uploadé (texte navy, X bleu, fond transparent). Fonds clairs.
-- **`src/assets/kstomer-horizontal-on-dark.png.asset.json`** — logo blanc déjà uploadé (`Kstomer-light-transparent.png`). Fonds foncés ; le « I » navy disparaît visuellement, le mot Kstomer reste blanc lisible (contraste ≈ 16:1, WCAG AAA).
-- **`src/assets/kstomer-isotipo.svg.asset.json`** — icône X seule (favicon, sidebar collapsée).
+## Fonctionnalités demandées
 
-Suppression des anciens `kstomer-on-dark.png` / `kstomer-dark-on-light.png` non transparents.
+### 1. Drag & drop des cartes
+- Cartes déplaçables entre colonnes et réordonnables au sein d'une colonne.
+- Lib : `@dnd-kit/core` + `@dnd-kit/sortable` + `@dnd-kit/utilities` (accessible clavier, léger).
 
-### Composant `src/components/Logo.tsx`
+### 2. Gestion des colonnes
+- **Renommer** : clic sur le titre → input inline (Entrée / blur pour valider, Échap pour annuler).
+- **Créer** : bouton "+ Ajouter une colonne" en fin de board.
+- **Supprimer** : menu `MoreHorizontal` → "Supprimer". Si la colonne contient des cartes, `AlertDialog` avec deux options : "Déplacer vers…" (Select des autres colonnes) ou "Tout supprimer".
 
-```tsx
-<Logo variant="horizontal" | "icon"
-      theme="on-dark" | "on-light"
-      className?: string />   // pilote la taille via Tailwind
-```
+### 3. Tri
+- Sélecteur en haut : **Manuel** (défaut, ordre du drag), **Nom (A→Z)**, **Date de création (récent / ancien)**.
+- Tri appliqué via `useMemo` au rendu, sans muter le state (l'ordre manuel est préservé).
 
-`alt="Kstomer Smart CRM"`, `loading="lazy"`, `decoding="async"`, `object-contain`, `w-auto`. Pas de taille codée en dur dans le composant : la taille vient toujours de `className` côté appelant.
+### 4. Nettoyage
+- Suppression de la ligne "Système opérationnel · Dernière synchro: 14:02".
 
-### Tailles appliquées (logo plus grand partout)
+## Améliorations incluses (toutes)
 
-| Emplacement | Taille actuelle | Nouvelle taille | Justification |
-|---|---|---|---|
-| **Sidebar header** (240 px de large, padding 16 px → 208 px utiles) | `h-10` (40 px) sur fond non-transparent | `h-12 max-w-[200px]` (48 px, 200 px max) | Remplit l'en-tête `h-16`, marge verticale ≈ 8 px, ratio préservé, le plus grand possible sans toucher les bords |
-| **Page de bienvenue / `index.tsx`** (auth, splash) | `h-12 w-12` icône | `h-20 md:h-24` horizontal (80 → 96 px) | Hero centré, le logo devient un véritable point focal |
-| **Onboarding header** | `h-12` icône | `h-14` horizontal (56 px) | Plus présent, équilibre la hiérarchie h1 |
-| **États vides / footer / modales** | n/a | `h-8` horizontal | Discret mais lisible |
-| **Favicon / `apple-touch-icon`** | 32 px | conservé | Standard navigateur |
-| **`og:image`** | absent | 1200×630 dérivé de l'horizontal on-light | Partage social |
+1. **Persistance localStorage** — l'état du board survit aux rechargements (clé `kstomer.kanban.v1`).
+2. **CRUD des cartes** — bouton "+" dans chaque colonne pour ajouter, clic sur une carte pour ouvrir un panneau latéral (`Sheet` shadcn) d'édition : nom, montant, tag, tonalité, confiance, meta/notes ; bouton supprimer.
+3. **Filtres rapides** — chips au-dessus du board : par tag, par confiance min (slider 1–5), par plage de montant.
+4. **Recherche live** — la barre de recherche AppShell filtre les cartes en temps réel (nom, montant, meta).
+5. **Couleur d'accent par colonne** — pastille éditable dans le header de colonne ; colore le bandeau gauche des cartes.
+6. **Totaux par colonne** — somme des montants affichée à côté du compteur (ex. `Proposition · 3 · €11.2k`).
+7. **Drag des colonnes** — réordonnables par drag du header (même `DndContext`).
+8. **Limite WIP** — option par colonne ; badge rouge quand dépassée.
+9. **Vue compacte** — toggle global qui réduit la hauteur des cartes.
+10. **Export CSV** — bouton "Exporter" qui télécharge l'état courant du pipeline.
 
-### Fichiers modifiés
+## Détails techniques
 
-- `src/components/Logo.tsx` *(nouveau)*
-- `src/components/AppShell.tsx` — header sidebar : `h-16 px-4`, `<Logo variant="horizontal" theme="on-dark" className="h-12 w-auto max-w-[200px]" />`
-- `src/routes/index.tsx` — `<Logo variant="horizontal" theme="on-light" className="h-20 md:h-24 w-auto" />`
-- `src/routes/onboarding.tsx` — `<Logo variant="horizontal" theme="on-light" className="h-14 w-auto" />`
-- `src/routes/__root.tsx` — `<html lang="fr">`, `apple-touch-icon`, `og:image`, `twitter:image`
-- Suppression `src/assets/kstomer-on-dark.png`, `src/assets/kstomer-dark-on-light.png`
+- Tout reste frontend dans `src/routes/kanban.tsx`, avec extraction de sous-composants si nécessaire :
+  - `KanbanBoard`, `KanbanColumn`, `KanbanCard`, `CardEditor` (Sheet), `BoardToolbar`, `EditableTitle`.
+- Types :
+  ```ts
+  type Card = {
+    id: string; name: string; amount: number;
+    tag: { label: string; tone: "success" | "warning" | "destructive" };
+    confidence: number; meta?: string; createdAt: string;
+  }
+  type Column = { id: string; title: string; cardIds: string[]; accent?: string; wipLimit?: number }
+  type Board = { columns: Column[]; cards: Record<string, Card> }
+  ```
+- IDs : `crypto.randomUUID()`.
+- Montants stockés en `number`, formatés à l'affichage (`€4,500`) — sinon tri et totaux deviennent fragiles.
+- Persistance : `useEffect` qui sérialise `board` dans `localStorage`, hydratation au mount avec fallback sur le mock initial.
+- DnD : un seul `DndContext` enveloppe colonnes + cartes ; `SortableContext` horizontal pour les colonnes, vertical pour les cartes de chaque colonne.
+- Tri non-manuel : on dérive `displayedCardIds` par colonne via `useMemo` ; on ne réécrit jamais `cardIds` quand un tri est actif (sinon le retour à "Manuel" perdrait l'ordre).
+- Toolbar : `Select` (tri), `Input` recherche (déjà côté AppShell — on lit via callback `onSearch`), chips filtres, switch "Vue compacte", boutons "Exporter CSV" et "Ajouter colonne".
+- Sheet d'édition de carte : composants shadcn `Sheet`, `Input`, `Textarea`, `Select`, `Slider`, `Button`.
+- Suppression colonne avec cartes : `AlertDialog` shadcn.
+- Aucun changement backend, aucun appel réseau.
 
-### Lots suivants (non exécutés ici)
+## Hors scope
 
-2. SEO — `makeHead`, meta par route, OG/Twitter.
-3. A11y — `aria-label`, `<label>` recherche, focus ring, hiérarchie h1.
-4. UX shell — avatar à droite, ⌘K, barre 2 px item actif, sidebar responsive, badge notifications.
-5. Cohérence — sparkline MetricCard, barre urgence kanban, tags unifiés, états vides.
-6. Perf — tous PNG via `lovable-assets`, `loading="lazy"`, préchargement logo sidebar.
-
-J'exécute le **Lot 1** maintenant ?
+- Pas d'historique / undo.
+- Pas de partage multi-utilisateurs (nécessiterait Lovable Cloud — à proposer plus tard si besoin).
+- Pas d'intégration avec les contacts existants (les cartes restent indépendantes pour ce lot).
