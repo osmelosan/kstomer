@@ -200,7 +200,7 @@ function CompanySwitcher() {
             <Building2 className="h-4 w-4 text-secondary" />
             Toutes
             <span className="text-[10px] uppercase tracking-wider text-muted-foreground font-bold ml-1">
-              Admin
+              {"\n"}
             </span>
           </span>
           {current.id === ALL_COMPANIES.id && <Check className="h-4 w-4" />}
