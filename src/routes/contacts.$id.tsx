@@ -24,6 +24,9 @@ import {
   Paperclip,
   TrendingUp,
   RotateCcw,
+  Check,
+  Loader2,
+  CloudUpload,
 } from "lucide-react";
 import { useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -52,6 +55,7 @@ import {
   SheetTitle,
   SheetDescription,
 } from "@/components/ui/sheet";
+import { useAutosave, type AutosaveStatus } from "@/hooks/use-autosave";
 
 export const Route = createFileRoute("/contacts/$id")({
   head: () => ({ meta: [{ title: i18n.t("contactDetail.metaTitle") }] }),
@@ -100,7 +104,7 @@ function ContactDetails() {
     .map((s: string) => (s[0]?.toUpperCase() ?? "") + s.slice(1))
     .join(" ");
 
-  // ----- Profile state
+  // ----- Profile state (autosaved)
   const [editing, setEditing] = useState(false);
   const [profile, setProfile] = useState({
     name: display,
@@ -116,20 +120,11 @@ function ContactDetails() {
     source: "LinkedIn",
     confidence: 4,
   });
-  const [draft, setDraft] = useState(profile);
 
-  function startEdit() {
-    setDraft(profile);
-    setEditing(true);
-  }
-  function saveEdit() {
-    setProfile(draft);
-    setEditing(false);
-  }
-  function cancelEdit() {
-    setDraft(profile);
-    setEditing(false);
-  }
+  const profileAutosave = useAutosave(profile, async () => {
+    // Simulate latency. Replace with API call when backend is wired.
+    await new Promise((r) => setTimeout(r, 350));
+  });
 
   // ----- Tags
   const [tags, setTags] = useState<string[]>(["VIP", "Premium", "Q4"]);
@@ -140,37 +135,32 @@ function ContactDetails() {
     setNewTag("");
   }
 
-  // ----- Notes & versions
+  // ----- Notes & versions (autosaved)
   const [note, setNote] = useState(t("contactDetail.sampleNote"));
-  const [draftNote, setDraftNote] = useState(note);
   const [versions, setVersions] = useState<NoteVersion[]>([]);
   const [versionsOpen, setVersionsOpen] = useState(false);
+  const lastSavedNoteRef = useRef(note);
 
-  function saveNote() {
-    if (draftNote === note) return;
-    setVersions((prev) => [
-      {
-        id: crypto.randomUUID(),
-        content: note,
-        author: "Thomas Melo",
-        date: new Date().toLocaleString(i18n.language),
-      },
-      ...prev,
-    ]);
-    setNote(draftNote);
-  }
+  const noteAutosave = useAutosave(note, async (next) => {
+    await new Promise((r) => setTimeout(r, 350));
+    const prevContent = lastSavedNoteRef.current;
+    if (prevContent !== next) {
+      setVersions((prev) => [
+        {
+          id: crypto.randomUUID(),
+          content: prevContent,
+          author: "Thomas Melo",
+          date: new Date().toLocaleString(i18n.language),
+        },
+        ...prev,
+      ]);
+      lastSavedNoteRef.current = next;
+    }
+  });
+
   function restoreVersion(v: NoteVersion) {
-    setVersions((prev) => [
-      {
-        id: crypto.randomUUID(),
-        content: note,
-        author: "Thomas Melo",
-        date: new Date().toLocaleString(i18n.language),
-      },
-      ...prev.filter((x) => x.id !== v.id),
-    ]);
+    setVersions((prev) => prev.filter((x) => x.id !== v.id));
     setNote(v.content);
-    setDraftNote(v.content);
     setVersionsOpen(false);
   }
 
@@ -288,13 +278,13 @@ function ContactDetails() {
                 {editing ? (
                   <div className="space-y-2">
                     <Input
-                      value={draft.name}
-                      onChange={(e) => setDraft({ ...draft, name: e.target.value })}
+                      value={profile.name}
+                      onChange={(e) => setProfile({ ...profile, name: e.target.value })}
                       className="text-xl font-bold h-10"
                     />
                     <Input
-                      value={draft.role}
-                      onChange={(e) => setDraft({ ...draft, role: e.target.value })}
+                      value={profile.role}
+                      onChange={(e) => setProfile({ ...profile, role: e.target.value })}
                       className="h-9 text-sm"
                     />
                   </div>
@@ -313,30 +303,21 @@ function ContactDetails() {
               </div>
 
               <div className="flex items-center gap-2">
-                {editing ? (
+                <AutosaveIndicator status={profileAutosave.status} savedAt={profileAutosave.savedAt} />
+                <button
+                  onClick={() => setEditing((e) => !e)}
+                  className={`inline-flex items-center gap-2 h-10 px-4 rounded-md text-sm font-semibold ${
+                    editing
+                      ? "border border-input bg-card hover:bg-muted"
+                      : "bg-primary text-primary-foreground hover:bg-primary/90"
+                  }`}
+                >
+                  {editing ? <Check className="h-4 w-4" /> : <Pencil className="h-4 w-4" />}
+                  {editing ? t("contactDetail.save") : t("contactDetail.editProfile")}
+                </button>
+                {!editing && (
                   <>
-                    <button
-                      onClick={cancelEdit}
-                      className="h-10 px-3 rounded-md border border-input bg-card text-sm font-medium hover:bg-muted"
-                    >
-                      {t("contactDetail.cancel")}
-                    </button>
-                    <button
-                      onClick={saveEdit}
-                      className="h-10 px-4 rounded-md bg-primary text-primary-foreground text-sm font-semibold hover:bg-primary/90"
-                    >
-                      {t("contactDetail.save")}
-                    </button>
-                  </>
-                ) : (
-                  <>
-                    <button
-                      onClick={startEdit}
-                      className="inline-flex items-center gap-2 h-10 px-4 rounded-md bg-primary text-primary-foreground text-sm font-semibold hover:bg-primary/90"
-                    >
-                      <Pencil className="h-4 w-4" />
-                      {t("contactDetail.editProfile")}
-                    </button>
+
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
                         <button
@@ -407,56 +388,56 @@ function ContactDetails() {
                 label={t("contactDetail.workEmail")}
                 value={profile.email}
                 editing={editing}
-                onChange={(v) => setDraft({ ...draft, email: v })}
-                draftValue={draft.email}
+                onChange={(v) => setProfile({ ...profile, email: v })}
+                draftValue={profile.email}
               />
               <InfoField
                 icon={<Phone className="h-4 w-4" />}
                 label={t("contactDetail.phone")}
                 value={profile.phone}
                 editing={editing}
-                onChange={(v) => setDraft({ ...draft, phone: v })}
-                draftValue={draft.phone}
+                onChange={(v) => setProfile({ ...profile, phone: v })}
+                draftValue={profile.phone}
               />
               <InfoField
                 icon={<Briefcase className="h-4 w-4" />}
                 label={t("contactDetail.company")}
                 value={profile.company}
                 editing={editing}
-                onChange={(v) => setDraft({ ...draft, company: v })}
-                draftValue={draft.company}
+                onChange={(v) => setProfile({ ...profile, company: v })}
+                draftValue={profile.company}
               />
               <InfoField
                 icon={<BadgeCheck className="h-4 w-4" />}
                 label={t("contactDetail.position")}
                 value={profile.position}
                 editing={editing}
-                onChange={(v) => setDraft({ ...draft, position: v })}
-                draftValue={draft.position}
+                onChange={(v) => setProfile({ ...profile, position: v })}
+                draftValue={profile.position}
               />
               <InfoField
                 icon={<Globe className="h-4 w-4" />}
                 label={t("contactDetail.website")}
                 value={profile.website}
                 editing={editing}
-                onChange={(v) => setDraft({ ...draft, website: v })}
-                draftValue={draft.website}
+                onChange={(v) => setProfile({ ...profile, website: v })}
+                draftValue={profile.website}
               />
               <InfoField
                 icon={<Linkedin className="h-4 w-4" />}
                 label={t("contactDetail.linkedin")}
                 value={profile.linkedin}
                 editing={editing}
-                onChange={(v) => setDraft({ ...draft, linkedin: v })}
-                draftValue={draft.linkedin}
+                onChange={(v) => setProfile({ ...profile, linkedin: v })}
+                draftValue={profile.linkedin}
               />
               <InfoField
                 icon={<MapPin className="h-4 w-4" />}
                 label={t("contactDetail.address")}
                 value={profile.address}
                 editing={editing}
-                onChange={(v) => setDraft({ ...draft, address: v })}
-                draftValue={draft.address}
+                onChange={(v) => setProfile({ ...profile, address: v })}
+                draftValue={profile.address}
               />
               <div>
                 <div className="k-label mb-2 flex items-center gap-2">
@@ -464,8 +445,8 @@ function ContactDetails() {
                 </div>
                 {editing ? (
                   <Select
-                    value={draft.status}
-                    onValueChange={(v) => setDraft({ ...draft, status: v as Status })}
+                    value={profile.status}
+                    onValueChange={(v) => setProfile({ ...profile, status: v as Status })}
                   >
                     <SelectTrigger className="h-9">
                       <SelectValue />
@@ -492,13 +473,13 @@ function ContactDetails() {
                 <div className="k-label mb-3">{t("contactDetail.confidenceLevel")}</div>
                 <div className="flex gap-2">
                   {[1, 2, 3, 4, 5].map((i) => {
-                    const value = editing ? draft.confidence : profile.confidence;
+                    const value = editing ? profile.confidence : profile.confidence;
                     return (
                       <button
                         key={i}
                         type="button"
                         disabled={!editing}
-                        onClick={() => editing && setDraft({ ...draft, confidence: i })}
+                        onClick={() => editing && setProfile({ ...profile, confidence: i })}
                         className="h-3 flex-1 rounded-full transition-colors"
                         style={{
                           background:
@@ -512,7 +493,7 @@ function ContactDetails() {
                   })}
                 </div>
                 <div className="mt-3 text-secondary font-semibold text-sm">
-                  {(editing ? draft.confidence : profile.confidence)} / 5
+                  {(editing ? profile.confidence : profile.confidence)} / 5
                 </div>
               </div>
             </div>
@@ -527,42 +508,32 @@ function ContactDetails() {
 
           {/* Notes */}
           <div className="k-card p-8">
-            <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center justify-between mb-4 gap-3 flex-wrap">
               <h3 className="flex items-center gap-2 text-[20px] font-semibold">
                 <FileText className="h-5 w-5 text-secondary" />
                 {t("contactDetail.projectNotes")}
-                {draftNote !== note && (
-                  <span className="ml-2 inline-flex items-center text-[10px] font-bold rounded-full px-2 py-0.5 bg-success-soft text-success">
-                    {t("contactDetail.modified")}
-                  </span>
-                )}
               </h3>
-              <button
-                onClick={() => setVersionsOpen(true)}
-                className="inline-flex items-center gap-2 h-10 px-3 rounded-md border border-input bg-card text-sm hover:bg-muted"
-              >
-                <History className="h-4 w-4" /> {t("contactDetail.versionHistory")}
-                {versions.length > 0 && (
-                  <span className="ml-1 text-xs text-muted-foreground">({versions.length})</span>
-                )}
-              </button>
+              <div className="flex items-center gap-2">
+                <AutosaveIndicator status={noteAutosave.status} savedAt={noteAutosave.savedAt} />
+                <button
+                  onClick={() => setVersionsOpen(true)}
+                  className="inline-flex items-center gap-2 h-10 px-3 rounded-md border border-input bg-card text-sm hover:bg-muted"
+                >
+                  <History className="h-4 w-4" /> {t("contactDetail.versionHistory")}
+                  {versions.length > 0 && (
+                    <span className="ml-1 text-xs text-muted-foreground">({versions.length})</span>
+                  )}
+                </button>
+              </div>
             </div>
             <Textarea
-              value={draftNote}
-              onChange={(e) => setDraftNote(e.target.value)}
+              value={note}
+              onChange={(e) => setNote(e.target.value)}
               rows={7}
               className="text-sm"
             />
-            <div className="flex justify-end mt-4">
-              <button
-                onClick={saveNote}
-                disabled={draftNote === note}
-                className="h-10 px-5 rounded-md bg-primary text-primary-foreground text-sm font-semibold hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {t("contactDetail.saveNote")}
-              </button>
-            </div>
           </div>
+
 
           {/* Activity */}
           <div className="k-card p-8">
@@ -871,4 +842,40 @@ function ActivityIcon({ type }: { type: ActivityItem["type"] }) {
     case "document":
       return <Paperclip className={cls} />;
   }
+}
+
+function AutosaveIndicator({
+  status,
+  savedAt,
+}: {
+  status: AutosaveStatus;
+  savedAt: Date | null;
+}) {
+  const { t, i18n: i18nInst } = useTranslation();
+  if (status === "idle") return null;
+  if (status === "pending") {
+    return (
+      <span className="inline-flex items-center gap-1.5 text-xs text-muted-foreground">
+        <CloudUpload className="h-3.5 w-3.5" />
+        {t("contactDetail.autosave.pending")}
+      </span>
+    );
+  }
+  if (status === "saving") {
+    return (
+      <span className="inline-flex items-center gap-1.5 text-xs text-muted-foreground">
+        <Loader2 className="h-3.5 w-3.5 animate-spin" />
+        {t("contactDetail.autosave.saving")}
+      </span>
+    );
+  }
+  const time = savedAt
+    ? savedAt.toLocaleTimeString(i18nInst.language, { hour: "2-digit", minute: "2-digit" })
+    : "";
+  return (
+    <span className="inline-flex items-center gap-1.5 text-xs text-success">
+      <Check className="h-3.5 w-3.5" />
+      {savedAt ? t("contactDetail.autosave.savedAt", { time }) : t("contactDetail.autosave.saved")}
+    </span>
+  );
 }
