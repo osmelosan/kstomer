@@ -843,3 +843,39 @@ function ActivityIcon({ type }: { type: ActivityItem["type"] }) {
       return <Paperclip className={cls} />;
   }
 }
+
+function AutosaveIndicator({
+  status,
+  savedAt,
+}: {
+  status: AutosaveStatus;
+  savedAt: Date | null;
+}) {
+  const { t, i18n: i18nInst } = useTranslation();
+  if (status === "idle") return null;
+  if (status === "pending") {
+    return (
+      <span className="inline-flex items-center gap-1.5 text-xs text-muted-foreground">
+        <CloudUpload className="h-3.5 w-3.5" />
+        {t("contactDetail.autosave.pending")}
+      </span>
+    );
+  }
+  if (status === "saving") {
+    return (
+      <span className="inline-flex items-center gap-1.5 text-xs text-muted-foreground">
+        <Loader2 className="h-3.5 w-3.5 animate-spin" />
+        {t("contactDetail.autosave.saving")}
+      </span>
+    );
+  }
+  const time = savedAt
+    ? savedAt.toLocaleTimeString(i18nInst.language, { hour: "2-digit", minute: "2-digit" })
+    : "";
+  return (
+    <span className="inline-flex items-center gap-1.5 text-xs text-success">
+      <Check className="h-3.5 w-3.5" />
+      {savedAt ? t("contactDetail.autosave.savedAt", { time }) : t("contactDetail.autosave.saved")}
+    </span>
+  );
+}
