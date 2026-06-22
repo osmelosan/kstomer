@@ -363,7 +363,16 @@ export const fr = {
     searchPlaceholder: "Rechercher un partenaire…",
     activePartners: "Partenaires actifs",
     partnerRevenue: "CA partenaires (M)",
-    goldTier: "Tier Gold",
+    ai: {
+      title: "Analyse IA du portefeuille",
+      cta: "Analyser mon portefeuille",
+      regenerate: "Régénérer",
+      loading: "Analyse en cours…",
+      errorGeneric: "Impossible de générer l'analyse. Réessayez.",
+      errorRate: "Trop de requêtes. Patientez un instant.",
+      errorCredits: "Crédits IA épuisés. Rechargez votre espace.",
+      disclaimer: "Généré par IA — vérifiez avant action.",
+    },
     th: {
       partner: "Partenaire",
       tier: "Niveau",

@@ -1,64 +1,51 @@
-# Améliorer la fiche contact (`/contacts/$id`)
+# Page Revendeurs — Analyse IA du portefeuille
 
-L'objectif : transformer la page actuelle (statique, en lecture seule) en véritable fiche CRM riche et éditable, sans backend (état local pour le moment, prêt à brancher Lovable Cloud plus tard).
+## Objectif
+- Supprimer la carte KPI "Tier Gold" (sans valeur analytique).
+- Ajouter, à sa place, un **cadre IA** qui analyse le portefeuille de revendeurs et propose des recommandations / next steps actionnables.
 
-## 1. Édition en ligne (inline editing)
-- Champs cliquables : nom, rôle, email, téléphone, niveau de confiance.
-- Au clic → l'élément devient un input/select ; `Entrée` valide, `Échap` annule.
-- Le bouton **« Modifier le profil »** bascule toute la fiche en mode édition (tous les champs en même temps) avec actions « Enregistrer » / « Annuler ».
-- Ajout de nouveaux champs éditables : entreprise, poste, site web, LinkedIn, adresse, statut (Client actif / Prospect chaud / Inactif), source.
+## Changements UI (`src/routes/resellers.tsx`)
+1. Retirer le `<Kpi label={t("resellers.goldTier")} ... />` et l'icône `Award`.
+2. Garder les 2 KPI restants ("Partenaires actifs", "CA partenaires") sur une ligne plus compacte (`md:grid-cols-2`).
+3. Ajouter sous les KPI un nouveau composant `AIInsightsCard` :
+   - En-tête : icône Sparkles + titre "Analyse IA du portefeuille" + bouton "Régénérer".
+   - États : `idle` (CTA "Analyser mon portefeuille"), `loading` (skeleton + texte "Analyse en cours…"), `ready` (markdown rendu), `error` (message + retry).
+   - Contenu attendu de l'IA : 3 sections courtes — **Diagnostic**, **Opportunités**, **Next steps** (liste à puces).
+   - Styling cohérent avec `k-card`, bordure douce, accent `secondary`.
 
-## 2. Tags & statut
-- Ligne de tags colorés sous le nom (ex. « VIP », « Premium », « Renouvellement »), ajout/suppression inline.
-- Badge de statut à côté du nom avec couleur sémantique (success / warning / muted).
+## Backend — Lovable AI Gateway
+- Créer `src/lib/resellers-ai.functions.ts` avec un `createServerFn({ method: "POST" })` :
+  - Input : liste des revendeurs `{ name, tier, deals, revenue, health }[]` validée par Zod.
+  - Handler : appelle `streamText`/`generateText` via le helper `createLovableAiGatewayProvider` (`src/lib/ai-gateway.server.ts`) avec le modèle `google/gemini-3-flash-preview`.
+  - System prompt : "Tu es un analyste CRM. Analyse le portefeuille de revendeurs et propose un diagnostic concis, des opportunités, et 3 next steps actionnables. Réponds en {langue} en markdown."
+  - Retourne `{ markdown: string }`.
+- Si `LOVABLE_API_KEY` n'existe pas, le provisionner via `ai_gateway--create`.
+- Si le helper provider n'existe pas encore dans le projet, le créer (pattern standard Lovable AI Gateway).
 
-## 3. Historique d'activité (timeline)
-Nouvelle section « Activité » sous les notes :
-- Timeline verticale avec icônes par type : email envoyé, appel, réunion, note ajoutée, statut modifié, document partagé.
-- Chaque entrée : icône + titre + sous-titre + date relative.
-- Bouton « + Ajouter une activité » → petit formulaire (type, description).
-- Données mock initiales (4-5 entrées) pour montrer le rendu.
+## Client
+- Appel via `useServerFn` + `useMutation` (TanStack Query déjà présent).
+- Auto-lancement au montage de la carte, avec possibilité de "Régénérer".
+- Passer `i18n.language` pour que la réponse soit en FR/EN/ES.
+- Rendu markdown via `react-markdown` (à ajouter si absent).
 
-## 4. Documents joints
-Nouvelle section « Documents » :
-- Liste de fichiers (nom, type, taille, date) avec icône par extension (PDF, DOCX, image…).
-- Bouton « Téléverser » (zone drop, UI seulement pour l'instant — pas de Cloud encore).
-- Actions par fichier : télécharger, supprimer.
-- Données mock (devis.pdf, contrat.docx, brief.pdf).
+## i18n (`fr.ts`, `en.ts`, `es.ts`)
+- Supprimer `resellers.goldTier`.
+- Ajouter :
+  - `resellers.ai.title`
+  - `resellers.ai.cta`
+  - `resellers.ai.regenerate`
+  - `resellers.ai.loading`
+  - `resellers.ai.error`
+  - `resellers.ai.disclaimer` ("Généré par IA — vérifiez avant action.")
 
-## 5. Notes versionnées
-Améliorer le bloc notes existant :
-- Lors de « Sauvegarder », pousser la version précédente dans un historique local.
-- Le bouton **« Historique des versions »** ouvre un `Sheet` listant les versions (auteur, date, diff visuel simple ou texte complet).
-- Possibilité de restaurer une version antérieure.
+## Gestion d'erreurs
+- 429 (rate limit) : toast + message inline "Réessayez dans un instant".
+- 402 (crédits) : message indiquant d'ajouter des crédits.
+- Autres : message générique + bouton retry.
 
-## 6. Opportunités liées
-Sidebar enrichie sous « Partenaires & contacts associés » :
-- Nouvelle carte « Opportunités » : 2-3 deals associés au contact (titre, montant, étape Kanban, badge de confiance).
-- Lien vers le Kanban.
-
-## 7. Actions rapides en en-tête
-À côté de « Modifier le profil », ajouter un menu d'actions rapides (`DropdownMenu`) :
-- Envoyer un email (mailto:)
-- Appeler (tel:)
-- Programmer une relance
-- Archiver le contact
-- Supprimer
-
-## 8. Métadonnées en pied d'en-tête
-Petite ligne discrète : créé le, dernière interaction, propriétaire (utilisateur assigné).
-
-## Détails techniques
-
-- **Fichier principal** : `src/routes/contacts.$id.tsx` (refonte du composant en sections).
-- **Sous-composants** locaux au même fichier ou nouveaux dans `src/components/contact/` :
-  - `ContactHeader`, `ContactInfoCard`, `ActivityTimeline`, `DocumentsList`, `NotesEditor`, `RelatedOpportunities`, `QuickActionsMenu`.
-- **État** : `useState` (mock) pour cette itération — pas de Lovable Cloud activé. Structure prête à devenir des hooks de requête plus tard.
-- **i18n** : ajouter toutes les nouvelles clés dans `src/lib/i18n/fr.ts`, `en.ts`, `es.ts` sous `contactDetail.*` (activity, documents, opportunities, quickActions, versionHistory…). Aucun texte en dur.
-- **Composants shadcn déjà dispo** : `Input`, `Select`, `Sheet`, `DropdownMenu`, `Badge`, `Dialog`, `Textarea`, `Switch`. Vérifier leur présence avant import.
-- **Design tokens** : respecter Kstomer (deep navy, surface white, `k-card`, `k-label`, success/warning soft). Pas de couleurs en dur.
-- **Pas de nouvelle route d'édition séparée** — l'édition se fait sur la même page (UX moderne type Notion/Linear). Le bouton existant reste mais déclenche le mode édition global.
-
-## Hors scope (à confirmer)
-- Pas d'upload réel de fichier (pas de Cloud activé). Si tu veux un vrai upload + persistance, on activera Lovable Cloud dans une étape suivante.
-- Pas encore de page de modification distincte : on garde tout sur `/contacts/$id` en mode édition inline.
+## Fichiers touchés
+- `src/routes/resellers.tsx` (modifié)
+- `src/lib/resellers-ai.functions.ts` (créé)
+- `src/lib/ai-gateway.server.ts` (créé si absent)
+- `src/lib/i18n/{fr,en,es}.ts` (modifiés)
+- `package.json` : ajout `ai`, `@ai-sdk/openai-compatible`, `react-markdown` si absents.
