@@ -6,6 +6,7 @@ import {
   Store,
   Archive,
   BarChart3,
+  CheckSquare,
   UserCircle,
   LogOut,
   ChevronDown,
@@ -35,6 +36,7 @@ type NavItem = { to: string; key: string; icon: typeof LayoutGrid };
 const NAV: NavItem[] = [
   { to: "/dashboard", key: "nav.dashboard", icon: LayoutGrid },
   { to: "/kanban", key: "nav.kanban", icon: KanbanSquare },
+  { to: "/tasks", key: "nav.tasks", icon: CheckSquare },
   { to: "/contacts", key: "nav.contacts", icon: Contact2 },
   { to: "/resellers", key: "nav.resellers", icon: Store },
   { to: "/analytics", key: "nav.analytics", icon: BarChart3 },

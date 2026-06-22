@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as TasksRouteImport } from './routes/tasks'
 import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as ResellersRouteImport } from './routes/resellers'
 import { Route as OnboardingRouteImport } from './routes/onboarding'
@@ -21,6 +22,11 @@ import { Route as ContactsIndexRouteImport } from './routes/contacts.index'
 import { Route as ContactsNewRouteImport } from './routes/contacts.new'
 import { Route as ContactsIdRouteImport } from './routes/contacts.$id'
 
+const TasksRoute = TasksRouteImport.update({
+  id: '/tasks',
+  path: '/tasks',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SettingsRoute = SettingsRouteImport.update({
   id: '/settings',
   path: '/settings',
@@ -86,6 +92,7 @@ export interface FileRoutesByFullPath {
   '/onboarding': typeof OnboardingRoute
   '/resellers': typeof ResellersRoute
   '/settings': typeof SettingsRoute
+  '/tasks': typeof TasksRoute
   '/contacts/$id': typeof ContactsIdRoute
   '/contacts/new': typeof ContactsNewRoute
   '/contacts/': typeof ContactsIndexRoute
@@ -99,6 +106,7 @@ export interface FileRoutesByTo {
   '/onboarding': typeof OnboardingRoute
   '/resellers': typeof ResellersRoute
   '/settings': typeof SettingsRoute
+  '/tasks': typeof TasksRoute
   '/contacts/$id': typeof ContactsIdRoute
   '/contacts/new': typeof ContactsNewRoute
   '/contacts': typeof ContactsIndexRoute
@@ -113,6 +121,7 @@ export interface FileRoutesById {
   '/onboarding': typeof OnboardingRoute
   '/resellers': typeof ResellersRoute
   '/settings': typeof SettingsRoute
+  '/tasks': typeof TasksRoute
   '/contacts/$id': typeof ContactsIdRoute
   '/contacts/new': typeof ContactsNewRoute
   '/contacts/': typeof ContactsIndexRoute
@@ -128,6 +137,7 @@ export interface FileRouteTypes {
     | '/onboarding'
     | '/resellers'
     | '/settings'
+    | '/tasks'
     | '/contacts/$id'
     | '/contacts/new'
     | '/contacts/'
@@ -141,6 +151,7 @@ export interface FileRouteTypes {
     | '/onboarding'
     | '/resellers'
     | '/settings'
+    | '/tasks'
     | '/contacts/$id'
     | '/contacts/new'
     | '/contacts'
@@ -154,6 +165,7 @@ export interface FileRouteTypes {
     | '/onboarding'
     | '/resellers'
     | '/settings'
+    | '/tasks'
     | '/contacts/$id'
     | '/contacts/new'
     | '/contacts/'
@@ -168,6 +180,7 @@ export interface RootRouteChildren {
   OnboardingRoute: typeof OnboardingRoute
   ResellersRoute: typeof ResellersRoute
   SettingsRoute: typeof SettingsRoute
+  TasksRoute: typeof TasksRoute
   ContactsIdRoute: typeof ContactsIdRoute
   ContactsNewRoute: typeof ContactsNewRoute
   ContactsIndexRoute: typeof ContactsIndexRoute
@@ -175,6 +188,13 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/tasks': {
+      id: '/tasks'
+      path: '/tasks'
+      fullPath: '/tasks'
+      preLoaderRoute: typeof TasksRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/settings': {
       id: '/settings'
       path: '/settings'
@@ -264,6 +284,7 @@ const rootRouteChildren: RootRouteChildren = {
   OnboardingRoute: OnboardingRoute,
   ResellersRoute: ResellersRoute,
   SettingsRoute: SettingsRoute,
+  TasksRoute: TasksRoute,
   ContactsIdRoute: ContactsIdRoute,
   ContactsNewRoute: ContactsNewRoute,
   ContactsIndexRoute: ContactsIndexRoute,
