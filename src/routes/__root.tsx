@@ -81,17 +81,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Kstomer — Smart CRM pour solopreneurs" },
-      {
-        name: "description",
-        content:
-          "Kstomer est le CRM efficace, précis et sans bruit conçu pour les solopreneurs. Pipeline, contacts, relances et analytics en un seul outil.",
-      },
-      { property: "og:title", content: "Kstomer — Smart CRM" },
-      {
-        property: "og:description",
-        content: "Le CRM efficace, précis et sans bruit pour solopreneurs.",
-      },
+      { property: "og:site_name", content: "Kstomer" },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
@@ -113,12 +103,34 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         href: "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap",
       },
     ],
+    scripts: [
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@graph": [
+            {
+              "@type": "Organization",
+              name: "Kstomer",
+              url: "https://kstomer.lovable.app",
+              logo: "https://kstomer.lovable.app/favicon.svg",
+            },
+            {
+              "@type": "WebSite",
+              name: "Kstomer",
+              url: "https://kstomer.lovable.app",
+            },
+          ],
+        }),
+      },
+    ],
   }),
   shellComponent: RootShell,
   component: RootComponent,
   notFoundComponent: NotFoundComponent,
   errorComponent: ErrorComponent,
 });
+
 
 function RootShell({ children }: { children: ReactNode }) {
   return (
