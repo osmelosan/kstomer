@@ -1,3 +1,4 @@
+import { pageHead } from "@/lib/route-seo";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { AppShell } from "@/components/AppShell";
 import { useState } from "react";

@@ -1,3 +1,4 @@
+import { pageHead } from "@/lib/route-seo";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";

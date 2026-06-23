@@ -1,3 +1,4 @@
+import { pageHead } from "@/lib/route-seo";
 import { createFileRoute } from "@tanstack/react-router";
 import { AppShell } from "@/components/AppShell";
 import { Filter, ChevronDown, Building2, User2, DollarSign, History } from "lucide-react";

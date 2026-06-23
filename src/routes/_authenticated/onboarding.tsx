@@ -1,3 +1,4 @@
+import { pageHead } from "@/lib/route-seo";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { ArrowRight, HelpCircle } from "lucide-react";
 import { useState } from "react";
