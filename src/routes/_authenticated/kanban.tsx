@@ -74,7 +74,7 @@ import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 
-export const Route = createFileRoute("/kanban")({
+export const Route = createFileRoute("/_authenticated/kanban")({
   head: () => ({ meta: [{ title: i18n.t("kanban.metaTitle") }] }),
   component: KanbanPage,
 });

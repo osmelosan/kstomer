@@ -15,7 +15,7 @@ import {
 import { useTranslation } from "react-i18next";
 import i18n from "@/lib/i18n";
 
-export const Route = createFileRoute("/dashboard")({
+export const Route = createFileRoute("/_authenticated/dashboard")({
   head: () => ({ meta: [{ title: i18n.t("dashboard.metaTitle") }] }),
   component: Dashboard,
 });
