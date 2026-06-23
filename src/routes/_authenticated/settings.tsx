@@ -29,6 +29,13 @@ import { cn } from "@/lib/utils";
 
 
 export const Route = createFileRoute("/_authenticated/settings")({
+  head: () =>
+    pageHead({
+      routeKey: "settings",
+      title: i18nGlobal.t("settings.metaTitle"),
+      path: "/settings",
+      noindex: true,
+    }),
   component: SettingsPage,
 });
 

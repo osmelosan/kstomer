@@ -5,7 +5,13 @@ import { useTranslation, Trans } from "react-i18next";
 import i18n from "@/lib/i18n";
 
 export const Route = createFileRoute("/_authenticated/archives")({
-  head: () => ({ meta: [{ title: i18n.t("archives.metaTitle") }] }),
+  head: () =>
+    pageHead({
+      routeKey: "archives",
+      title: i18n.t("archives.metaTitle"),
+      path: "/archives",
+      noindex: true,
+    }),
   component: Archives,
 });
 

@@ -36,7 +36,13 @@ import { analyzeAnalytics } from "@/lib/analytics-ai.functions";
 import ReactMarkdown from "react-markdown";
 
 export const Route = createFileRoute("/_authenticated/analytics")({
-  head: () => ({ meta: [{ title: i18n.t("analytics.metaTitle") }] }),
+  head: () =>
+    pageHead({
+      routeKey: "analytics",
+      title: i18n.t("analytics.metaTitle"),
+      path: "/analytics",
+      noindex: true,
+    }),
   component: Analytics,
 });
 

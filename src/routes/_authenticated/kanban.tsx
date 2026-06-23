@@ -75,7 +75,13 @@ import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 
 export const Route = createFileRoute("/_authenticated/kanban")({
-  head: () => ({ meta: [{ title: i18n.t("kanban.metaTitle") }] }),
+  head: () =>
+    pageHead({
+      routeKey: "kanban",
+      title: i18n.t("kanban.metaTitle"),
+      path: "/kanban",
+      noindex: true,
+    }),
   component: KanbanPage,
 });
 
@@ -644,7 +650,11 @@ function ColumnView({
         </span>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <button className="text-muted-foreground hover:text-foreground">
+            <button
+              type="button"
+              aria-label="Column actions"
+              className="text-muted-foreground hover:text-foreground"
+            >
               <MoreHorizontal className="h-4 w-4" />
             </button>
           </DropdownMenuTrigger>

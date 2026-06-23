@@ -22,12 +22,13 @@ import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/tasks")({
-  head: () => ({
-    meta: [
-      { title: i18n.t("tasks.metaTitle") },
-      { name: "description", content: i18n.t("tasks.subtitle") },
-    ],
-  }),
+  head: () =>
+    pageHead({
+      routeKey: "tasks",
+      title: i18n.t("tasks.metaTitle"),
+      path: "/tasks",
+      noindex: true,
+    }),
   component: TasksPage,
 });
 
