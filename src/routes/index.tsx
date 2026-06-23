@@ -62,7 +62,7 @@ function WelcomePage() {
         </div>
 
         <Link
-          to="/onboarding"
+          to="/auth"
           className="mt-10 flex items-center justify-center gap-3 w-full h-14 rounded-lg bg-primary text-primary-foreground text-[16px] font-semibold hover:bg-primary/90 transition-colors"
         >
           {t("welcome.cta")}

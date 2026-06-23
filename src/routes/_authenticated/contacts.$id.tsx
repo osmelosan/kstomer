@@ -57,7 +57,7 @@ import {
 } from "@/components/ui/sheet";
 import { useAutosave, type AutosaveStatus } from "@/hooks/use-autosave";
 
-export const Route = createFileRoute("/contacts/$id")({
+export const Route = createFileRoute("/_authenticated/contacts/$id")({
   head: () => ({ meta: [{ title: i18n.t("contactDetail.metaTitle") }] }),
   component: ContactDetails,
 });

@@ -9,57 +9,34 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as TasksRouteImport } from './routes/tasks'
-import { Route as SettingsRouteImport } from './routes/settings'
-import { Route as ResellersRouteImport } from './routes/resellers'
-import { Route as OnboardingRouteImport } from './routes/onboarding'
-import { Route as KanbanRouteImport } from './routes/kanban'
-import { Route as DashboardRouteImport } from './routes/dashboard'
-import { Route as ArchivesRouteImport } from './routes/archives'
-import { Route as AnalyticsRouteImport } from './routes/analytics'
+import { Route as ResetPasswordRouteImport } from './routes/reset-password'
+import { Route as AuthRouteImport } from './routes/auth'
+import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as ContactsIndexRouteImport } from './routes/contacts.index'
-import { Route as ContactsNewRouteImport } from './routes/contacts.new'
-import { Route as ContactsIdRouteImport } from './routes/contacts.$id'
+import { Route as AuthenticatedTasksRouteImport } from './routes/_authenticated/tasks'
+import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
+import { Route as AuthenticatedResellersRouteImport } from './routes/_authenticated/resellers'
+import { Route as AuthenticatedOnboardingRouteImport } from './routes/_authenticated/onboarding'
+import { Route as AuthenticatedKanbanRouteImport } from './routes/_authenticated/kanban'
+import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
+import { Route as AuthenticatedArchivesRouteImport } from './routes/_authenticated/archives'
+import { Route as AuthenticatedAnalyticsRouteImport } from './routes/_authenticated/analytics'
+import { Route as AuthenticatedContactsIndexRouteImport } from './routes/_authenticated/contacts.index'
+import { Route as AuthenticatedContactsNewRouteImport } from './routes/_authenticated/contacts.new'
+import { Route as AuthenticatedContactsIdRouteImport } from './routes/_authenticated/contacts.$id'
 
-const TasksRoute = TasksRouteImport.update({
-  id: '/tasks',
-  path: '/tasks',
+const ResetPasswordRoute = ResetPasswordRouteImport.update({
+  id: '/reset-password',
+  path: '/reset-password',
   getParentRoute: () => rootRouteImport,
 } as any)
-const SettingsRoute = SettingsRouteImport.update({
-  id: '/settings',
-  path: '/settings',
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ResellersRoute = ResellersRouteImport.update({
-  id: '/resellers',
-  path: '/resellers',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const OnboardingRoute = OnboardingRouteImport.update({
-  id: '/onboarding',
-  path: '/onboarding',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const KanbanRoute = KanbanRouteImport.update({
-  id: '/kanban',
-  path: '/kanban',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const DashboardRoute = DashboardRouteImport.update({
-  id: '/dashboard',
-  path: '/dashboard',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ArchivesRoute = ArchivesRouteImport.update({
-  id: '/archives',
-  path: '/archives',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AnalyticsRoute = AnalyticsRouteImport.update({
-  id: '/analytics',
-  path: '/analytics',
+const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
+  id: '/_authenticated',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -67,69 +44,120 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ContactsIndexRoute = ContactsIndexRouteImport.update({
-  id: '/contacts/',
-  path: '/contacts/',
-  getParentRoute: () => rootRouteImport,
+const AuthenticatedTasksRoute = AuthenticatedTasksRouteImport.update({
+  id: '/tasks',
+  path: '/tasks',
+  getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
-const ContactsNewRoute = ContactsNewRouteImport.update({
-  id: '/contacts/new',
-  path: '/contacts/new',
-  getParentRoute: () => rootRouteImport,
+const AuthenticatedSettingsRoute = AuthenticatedSettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
-const ContactsIdRoute = ContactsIdRouteImport.update({
+const AuthenticatedResellersRoute = AuthenticatedResellersRouteImport.update({
+  id: '/resellers',
+  path: '/resellers',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedOnboardingRoute = AuthenticatedOnboardingRouteImport.update({
+  id: '/onboarding',
+  path: '/onboarding',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedKanbanRoute = AuthenticatedKanbanRouteImport.update({
+  id: '/kanban',
+  path: '/kanban',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedArchivesRoute = AuthenticatedArchivesRouteImport.update({
+  id: '/archives',
+  path: '/archives',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedAnalyticsRoute = AuthenticatedAnalyticsRouteImport.update({
+  id: '/analytics',
+  path: '/analytics',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedContactsIndexRoute =
+  AuthenticatedContactsIndexRouteImport.update({
+    id: '/contacts/',
+    path: '/contacts/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedContactsNewRoute =
+  AuthenticatedContactsNewRouteImport.update({
+    id: '/contacts/new',
+    path: '/contacts/new',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedContactsIdRoute = AuthenticatedContactsIdRouteImport.update({
   id: '/contacts/$id',
   path: '/contacts/$id',
-  getParentRoute: () => rootRouteImport,
+  getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/analytics': typeof AnalyticsRoute
-  '/archives': typeof ArchivesRoute
-  '/dashboard': typeof DashboardRoute
-  '/kanban': typeof KanbanRoute
-  '/onboarding': typeof OnboardingRoute
-  '/resellers': typeof ResellersRoute
-  '/settings': typeof SettingsRoute
-  '/tasks': typeof TasksRoute
-  '/contacts/$id': typeof ContactsIdRoute
-  '/contacts/new': typeof ContactsNewRoute
-  '/contacts/': typeof ContactsIndexRoute
+  '/auth': typeof AuthRoute
+  '/reset-password': typeof ResetPasswordRoute
+  '/analytics': typeof AuthenticatedAnalyticsRoute
+  '/archives': typeof AuthenticatedArchivesRoute
+  '/dashboard': typeof AuthenticatedDashboardRoute
+  '/kanban': typeof AuthenticatedKanbanRoute
+  '/onboarding': typeof AuthenticatedOnboardingRoute
+  '/resellers': typeof AuthenticatedResellersRoute
+  '/settings': typeof AuthenticatedSettingsRoute
+  '/tasks': typeof AuthenticatedTasksRoute
+  '/contacts/$id': typeof AuthenticatedContactsIdRoute
+  '/contacts/new': typeof AuthenticatedContactsNewRoute
+  '/contacts/': typeof AuthenticatedContactsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/analytics': typeof AnalyticsRoute
-  '/archives': typeof ArchivesRoute
-  '/dashboard': typeof DashboardRoute
-  '/kanban': typeof KanbanRoute
-  '/onboarding': typeof OnboardingRoute
-  '/resellers': typeof ResellersRoute
-  '/settings': typeof SettingsRoute
-  '/tasks': typeof TasksRoute
-  '/contacts/$id': typeof ContactsIdRoute
-  '/contacts/new': typeof ContactsNewRoute
-  '/contacts': typeof ContactsIndexRoute
+  '/auth': typeof AuthRoute
+  '/reset-password': typeof ResetPasswordRoute
+  '/analytics': typeof AuthenticatedAnalyticsRoute
+  '/archives': typeof AuthenticatedArchivesRoute
+  '/dashboard': typeof AuthenticatedDashboardRoute
+  '/kanban': typeof AuthenticatedKanbanRoute
+  '/onboarding': typeof AuthenticatedOnboardingRoute
+  '/resellers': typeof AuthenticatedResellersRoute
+  '/settings': typeof AuthenticatedSettingsRoute
+  '/tasks': typeof AuthenticatedTasksRoute
+  '/contacts/$id': typeof AuthenticatedContactsIdRoute
+  '/contacts/new': typeof AuthenticatedContactsNewRoute
+  '/contacts': typeof AuthenticatedContactsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/analytics': typeof AnalyticsRoute
-  '/archives': typeof ArchivesRoute
-  '/dashboard': typeof DashboardRoute
-  '/kanban': typeof KanbanRoute
-  '/onboarding': typeof OnboardingRoute
-  '/resellers': typeof ResellersRoute
-  '/settings': typeof SettingsRoute
-  '/tasks': typeof TasksRoute
-  '/contacts/$id': typeof ContactsIdRoute
-  '/contacts/new': typeof ContactsNewRoute
-  '/contacts/': typeof ContactsIndexRoute
+  '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
+  '/auth': typeof AuthRoute
+  '/reset-password': typeof ResetPasswordRoute
+  '/_authenticated/analytics': typeof AuthenticatedAnalyticsRoute
+  '/_authenticated/archives': typeof AuthenticatedArchivesRoute
+  '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
+  '/_authenticated/kanban': typeof AuthenticatedKanbanRoute
+  '/_authenticated/onboarding': typeof AuthenticatedOnboardingRoute
+  '/_authenticated/resellers': typeof AuthenticatedResellersRoute
+  '/_authenticated/settings': typeof AuthenticatedSettingsRoute
+  '/_authenticated/tasks': typeof AuthenticatedTasksRoute
+  '/_authenticated/contacts/$id': typeof AuthenticatedContactsIdRoute
+  '/_authenticated/contacts/new': typeof AuthenticatedContactsNewRoute
+  '/_authenticated/contacts/': typeof AuthenticatedContactsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/auth'
+    | '/reset-password'
     | '/analytics'
     | '/archives'
     | '/dashboard'
@@ -144,6 +172,8 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/auth'
+    | '/reset-password'
     | '/analytics'
     | '/archives'
     | '/dashboard'
@@ -158,90 +188,50 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
-    | '/analytics'
-    | '/archives'
-    | '/dashboard'
-    | '/kanban'
-    | '/onboarding'
-    | '/resellers'
-    | '/settings'
-    | '/tasks'
-    | '/contacts/$id'
-    | '/contacts/new'
-    | '/contacts/'
+    | '/_authenticated'
+    | '/auth'
+    | '/reset-password'
+    | '/_authenticated/analytics'
+    | '/_authenticated/archives'
+    | '/_authenticated/dashboard'
+    | '/_authenticated/kanban'
+    | '/_authenticated/onboarding'
+    | '/_authenticated/resellers'
+    | '/_authenticated/settings'
+    | '/_authenticated/tasks'
+    | '/_authenticated/contacts/$id'
+    | '/_authenticated/contacts/new'
+    | '/_authenticated/contacts/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  AnalyticsRoute: typeof AnalyticsRoute
-  ArchivesRoute: typeof ArchivesRoute
-  DashboardRoute: typeof DashboardRoute
-  KanbanRoute: typeof KanbanRoute
-  OnboardingRoute: typeof OnboardingRoute
-  ResellersRoute: typeof ResellersRoute
-  SettingsRoute: typeof SettingsRoute
-  TasksRoute: typeof TasksRoute
-  ContactsIdRoute: typeof ContactsIdRoute
-  ContactsNewRoute: typeof ContactsNewRoute
-  ContactsIndexRoute: typeof ContactsIndexRoute
+  AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
+  AuthRoute: typeof AuthRoute
+  ResetPasswordRoute: typeof ResetPasswordRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/tasks': {
-      id: '/tasks'
-      path: '/tasks'
-      fullPath: '/tasks'
-      preLoaderRoute: typeof TasksRouteImport
+    '/reset-password': {
+      id: '/reset-password'
+      path: '/reset-password'
+      fullPath: '/reset-password'
+      preLoaderRoute: typeof ResetPasswordRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/settings': {
-      id: '/settings'
-      path: '/settings'
-      fullPath: '/settings'
-      preLoaderRoute: typeof SettingsRouteImport
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/resellers': {
-      id: '/resellers'
-      path: '/resellers'
-      fullPath: '/resellers'
-      preLoaderRoute: typeof ResellersRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/onboarding': {
-      id: '/onboarding'
-      path: '/onboarding'
-      fullPath: '/onboarding'
-      preLoaderRoute: typeof OnboardingRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/kanban': {
-      id: '/kanban'
-      path: '/kanban'
-      fullPath: '/kanban'
-      preLoaderRoute: typeof KanbanRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/dashboard': {
-      id: '/dashboard'
-      path: '/dashboard'
-      fullPath: '/dashboard'
-      preLoaderRoute: typeof DashboardRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/archives': {
-      id: '/archives'
-      path: '/archives'
-      fullPath: '/archives'
-      preLoaderRoute: typeof ArchivesRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/analytics': {
-      id: '/analytics'
-      path: '/analytics'
-      fullPath: '/analytics'
-      preLoaderRoute: typeof AnalyticsRouteImport
+    '/_authenticated': {
+      id: '/_authenticated'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthenticatedRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -251,54 +241,123 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/contacts/': {
-      id: '/contacts/'
+    '/_authenticated/tasks': {
+      id: '/_authenticated/tasks'
+      path: '/tasks'
+      fullPath: '/tasks'
+      preLoaderRoute: typeof AuthenticatedTasksRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/settings': {
+      id: '/_authenticated/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof AuthenticatedSettingsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/resellers': {
+      id: '/_authenticated/resellers'
+      path: '/resellers'
+      fullPath: '/resellers'
+      preLoaderRoute: typeof AuthenticatedResellersRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/onboarding': {
+      id: '/_authenticated/onboarding'
+      path: '/onboarding'
+      fullPath: '/onboarding'
+      preLoaderRoute: typeof AuthenticatedOnboardingRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/kanban': {
+      id: '/_authenticated/kanban'
+      path: '/kanban'
+      fullPath: '/kanban'
+      preLoaderRoute: typeof AuthenticatedKanbanRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/dashboard': {
+      id: '/_authenticated/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof AuthenticatedDashboardRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/archives': {
+      id: '/_authenticated/archives'
+      path: '/archives'
+      fullPath: '/archives'
+      preLoaderRoute: typeof AuthenticatedArchivesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/analytics': {
+      id: '/_authenticated/analytics'
+      path: '/analytics'
+      fullPath: '/analytics'
+      preLoaderRoute: typeof AuthenticatedAnalyticsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/contacts/': {
+      id: '/_authenticated/contacts/'
       path: '/contacts'
       fullPath: '/contacts/'
-      preLoaderRoute: typeof ContactsIndexRouteImport
-      parentRoute: typeof rootRouteImport
+      preLoaderRoute: typeof AuthenticatedContactsIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/contacts/new': {
-      id: '/contacts/new'
+    '/_authenticated/contacts/new': {
+      id: '/_authenticated/contacts/new'
       path: '/contacts/new'
       fullPath: '/contacts/new'
-      preLoaderRoute: typeof ContactsNewRouteImport
-      parentRoute: typeof rootRouteImport
+      preLoaderRoute: typeof AuthenticatedContactsNewRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/contacts/$id': {
-      id: '/contacts/$id'
+    '/_authenticated/contacts/$id': {
+      id: '/_authenticated/contacts/$id'
       path: '/contacts/$id'
       fullPath: '/contacts/$id'
-      preLoaderRoute: typeof ContactsIdRouteImport
-      parentRoute: typeof rootRouteImport
+      preLoaderRoute: typeof AuthenticatedContactsIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
   }
 }
 
+interface AuthenticatedRouteRouteChildren {
+  AuthenticatedAnalyticsRoute: typeof AuthenticatedAnalyticsRoute
+  AuthenticatedArchivesRoute: typeof AuthenticatedArchivesRoute
+  AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
+  AuthenticatedKanbanRoute: typeof AuthenticatedKanbanRoute
+  AuthenticatedOnboardingRoute: typeof AuthenticatedOnboardingRoute
+  AuthenticatedResellersRoute: typeof AuthenticatedResellersRoute
+  AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
+  AuthenticatedTasksRoute: typeof AuthenticatedTasksRoute
+  AuthenticatedContactsIdRoute: typeof AuthenticatedContactsIdRoute
+  AuthenticatedContactsNewRoute: typeof AuthenticatedContactsNewRoute
+  AuthenticatedContactsIndexRoute: typeof AuthenticatedContactsIndexRoute
+}
+
+const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedAnalyticsRoute: AuthenticatedAnalyticsRoute,
+  AuthenticatedArchivesRoute: AuthenticatedArchivesRoute,
+  AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
+  AuthenticatedKanbanRoute: AuthenticatedKanbanRoute,
+  AuthenticatedOnboardingRoute: AuthenticatedOnboardingRoute,
+  AuthenticatedResellersRoute: AuthenticatedResellersRoute,
+  AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
+  AuthenticatedTasksRoute: AuthenticatedTasksRoute,
+  AuthenticatedContactsIdRoute: AuthenticatedContactsIdRoute,
+  AuthenticatedContactsNewRoute: AuthenticatedContactsNewRoute,
+  AuthenticatedContactsIndexRoute: AuthenticatedContactsIndexRoute,
+}
+
+const AuthenticatedRouteRouteWithChildren =
+  AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  AnalyticsRoute: AnalyticsRoute,
-  ArchivesRoute: ArchivesRoute,
-  DashboardRoute: DashboardRoute,
-  KanbanRoute: KanbanRoute,
-  OnboardingRoute: OnboardingRoute,
-  ResellersRoute: ResellersRoute,
-  SettingsRoute: SettingsRoute,
-  TasksRoute: TasksRoute,
-  ContactsIdRoute: ContactsIdRoute,
-  ContactsNewRoute: ContactsNewRoute,
-  ContactsIndexRoute: ContactsIndexRoute,
+  AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
+  AuthRoute: AuthRoute,
+  ResetPasswordRoute: ResetPasswordRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

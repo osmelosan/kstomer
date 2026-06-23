@@ -21,7 +21,7 @@ import { Plus, CheckSquare, Calendar as CalendarIcon, User2 } from "lucide-react
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 
-export const Route = createFileRoute("/tasks")({
+export const Route = createFileRoute("/_authenticated/tasks")({
   head: () => ({
     meta: [
       { title: i18n.t("tasks.metaTitle") },

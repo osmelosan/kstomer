@@ -35,7 +35,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { analyzeAnalytics } from "@/lib/analytics-ai.functions";
 import ReactMarkdown from "react-markdown";
 
-export const Route = createFileRoute("/analytics")({
+export const Route = createFileRoute("/_authenticated/analytics")({
   head: () => ({ meta: [{ title: i18n.t("analytics.metaTitle") }] }),
   component: Analytics,
 });

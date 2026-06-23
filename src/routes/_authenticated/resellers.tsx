@@ -8,7 +8,7 @@ import ReactMarkdown from "react-markdown";
 import i18n from "@/lib/i18n";
 import { analyzeResellers } from "@/lib/resellers-ai.functions";
 
-export const Route = createFileRoute("/resellers")({
+export const Route = createFileRoute("/_authenticated/resellers")({
   head: () => ({ meta: [{ title: i18n.t("resellers.metaTitle") }] }),
   component: Resellers,
 });

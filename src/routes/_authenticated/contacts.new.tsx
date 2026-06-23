@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import i18n from "@/lib/i18n";
 
-export const Route = createFileRoute("/contacts/new")({
+export const Route = createFileRoute("/_authenticated/contacts/new")({
   head: () => ({ meta: [{ title: i18n.t("newContact.metaTitle") }] }),
   component: NewContact,
 });
