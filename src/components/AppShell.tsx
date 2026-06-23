@@ -1,4 +1,5 @@
-import { Link, useRouterState } from "@tanstack/react-router";
+import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
+import { useQueryClient } from "@tanstack/react-query";
 import {
   LayoutGrid,
   KanbanSquare,
@@ -30,6 +31,8 @@ import { NotificationsPopover } from "@/components/NotificationsPopover";
 import { HelpMenu } from "@/components/HelpMenu";
 import { CommandPaletteTrigger } from "@/components/CommandPalette";
 import { useCompany, ALL_COMPANIES, type Company } from "@/lib/company-context";
+import { useCurrentUser } from "@/hooks/use-current-user";
+import { supabase } from "@/integrations/supabase/client";
 
 type NavItem = { to: string; key: string; icon: typeof LayoutGrid };
 
@@ -59,9 +62,28 @@ export function AppShell({
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const { t } = useTranslation();
   const { current } = useCompany();
+  const { user, profile } = useCurrentUser();
+  const navigate = useNavigate();
+  const queryClient = useQueryClient();
 
-  const handleLogout = () => {
+  const displayName =
+    profile?.full_name ||
+    (user?.user_metadata?.full_name as string | undefined) ||
+    user?.email?.split("@")[0] ||
+    "—";
+  const initials = displayName
+    .split(/\s+/)
+    .map((p) => p[0])
+    .slice(0, 2)
+    .join("")
+    .toUpperCase();
+
+  const handleLogout = async () => {
+    await queryClient.cancelQueries();
+    queryClient.clear();
+    await supabase.auth.signOut();
     toast.info(t("common.loggedOut"));
+    navigate({ to: "/auth", replace: true });
   };
 
   return (
@@ -105,18 +127,21 @@ export function AppShell({
         <div className="px-3 pb-6 space-y-1 border-t border-sidebar-border pt-4 mt-4">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <button
-                className="flex w-full items-center gap-3 rounded-md px-3 py-2 text-[14px] text-sidebar-muted hover:text-white hover:bg-white/5 transition-colors"
-              >
+              <button className="flex w-full items-center gap-3 rounded-md px-3 py-2 text-[14px] text-sidebar-muted hover:text-white hover:bg-white/5 transition-colors">
                 <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-secondary text-secondary-foreground text-[11px] font-semibold">
-                  TM
+                  {initials || "?"}
                 </div>
-                <span className="flex-1 text-left text-white">Thomas Melo</span>
+                <span className="flex-1 text-left text-white truncate">{displayName}</span>
                 <ChevronDown className="h-4 w-4 opacity-70" />
               </button>
             </DropdownMenuTrigger>
             <DropdownMenuContent side="top" align="start" className="w-56">
-              <DropdownMenuLabel>Thomas Melo</DropdownMenuLabel>
+              <DropdownMenuLabel className="truncate">{displayName}</DropdownMenuLabel>
+              {user?.email && (
+                <div className="px-2 pb-1 text-[11px] text-muted-foreground truncate">
+                  {user.email}
+                </div>
+              )}
               <DropdownMenuSeparator />
               <DropdownMenuItem asChild>
                 <Link to="/settings" className="flex items-center gap-2">
@@ -124,11 +149,9 @@ export function AppShell({
                   <span>{t("common.settings")}</span>
                 </Link>
               </DropdownMenuItem>
-              <DropdownMenuItem asChild>
-                <Link to="/" className="flex items-center gap-2" onClick={handleLogout}>
-                  <LogOut className="h-4 w-4" />
-                  <span>{t("common.logout")}</span>
-                </Link>
+              <DropdownMenuItem onClick={handleLogout} className="flex items-center gap-2">
+                <LogOut className="h-4 w-4" />
+                <span>{t("common.logout")}</span>
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
