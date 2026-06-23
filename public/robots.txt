@@ -1,0 +1,14 @@
+User-agent: *
+Allow: /
+Disallow: /dashboard
+Disallow: /contacts
+Disallow: /kanban
+Disallow: /tasks
+Disallow: /analytics
+Disallow: /archives
+Disallow: /resellers
+Disallow: /settings
+Disallow: /onboarding
+Disallow: /reset-password
+
+Sitemap: https://kstomer.lovable.app/sitemap.xml

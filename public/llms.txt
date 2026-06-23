@@ -1,0 +1,10 @@
+# Kstomer
+
+> Kstomer is the efficient, precise and no-noise CRM built for solopreneurs: pipeline, contacts, follow-ups and analytics in one tool.
+
+Kstomer helps solo founders and consultants take control of their sales in minutes, with a Kanban pipeline, unified contact book, task reminders and lightweight analytics. Built for speed, clarity and trust.
+
+## Pages
+
+- [Home](/): Product overview and value proposition for solopreneurs.
+- [Sign in](/auth): Create an account or sign in to Kstomer.
