@@ -1,3 +1,4 @@
+import { pageHead } from "@/lib/route-seo";
 import { createFileRoute } from "@tanstack/react-router";
 import { AppShell } from "@/components/AppShell";
 import { Store, TrendingUp, Sparkles, RefreshCw, AlertCircle } from "lucide-react";
@@ -9,7 +10,13 @@ import i18n from "@/lib/i18n";
 import { analyzeResellers } from "@/lib/resellers-ai.functions";
 
 export const Route = createFileRoute("/_authenticated/resellers")({
-  head: () => ({ meta: [{ title: i18n.t("resellers.metaTitle") }] }),
+  head: () =>
+    pageHead({
+      routeKey: "resellers",
+      title: i18n.t("resellers.metaTitle"),
+      path: "/resellers",
+      noindex: true,
+    }),
   component: Resellers,
 });
 

@@ -1,3 +1,4 @@
+import { pageHead } from "@/lib/route-seo";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { ArrowRight, HelpCircle } from "lucide-react";
 import { useState } from "react";
@@ -7,7 +8,13 @@ import { Logo } from "@/components/Logo";
 import i18n from "@/lib/i18n";
 
 export const Route = createFileRoute("/_authenticated/onboarding")({
-  head: () => ({ meta: [{ title: i18n.t("onboarding.metaTitle") }] }),
+  head: () =>
+    pageHead({
+      routeKey: "onboarding",
+      title: i18n.t("onboarding.metaTitle"),
+      path: "/onboarding",
+      noindex: true,
+    }),
   component: Onboarding,
 });
 

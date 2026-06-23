@@ -1,3 +1,4 @@
+import { pageHead } from "@/lib/route-seo";
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -22,12 +23,13 @@ import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/tasks")({
-  head: () => ({
-    meta: [
-      { title: i18n.t("tasks.metaTitle") },
-      { name: "description", content: i18n.t("tasks.subtitle") },
-    ],
-  }),
+  head: () =>
+    pageHead({
+      routeKey: "tasks",
+      title: i18n.t("tasks.metaTitle"),
+      path: "/tasks",
+      noindex: true,
+    }),
   component: TasksPage,
 });
 

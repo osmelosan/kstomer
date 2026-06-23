@@ -1,3 +1,4 @@
+import { pageHead } from "@/lib/route-seo";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -12,7 +13,13 @@ import { Label } from "@/components/ui/label";
 import i18n from "@/lib/i18n";
 
 export const Route = createFileRoute("/reset-password")({
-  head: () => ({ meta: [{ title: i18n.t("auth.resetMetaTitle") }] }),
+  head: () =>
+    pageHead({
+      routeKey: "reset",
+      title: i18n.t("auth.resetMetaTitle"),
+      path: "/reset-password",
+      noindex: true,
+    }),
   component: ResetPasswordPage,
 });
 

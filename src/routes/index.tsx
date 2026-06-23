@@ -3,16 +3,18 @@ import { Logo } from "@/components/Logo";
 import { ArrowRight, BadgeCheck } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import i18n from "@/lib/i18n";
+import { pageHead } from "@/lib/route-seo";
 
 export const Route = createFileRoute("/")({
-  head: () => ({
-    meta: [
-      { title: i18n.t("welcome.metaTitle") },
-      { name: "description", content: i18n.t("welcome.metaDescription") },
-    ],
-  }),
+  head: () =>
+    pageHead({
+      routeKey: "home",
+      title: i18n.t("welcome.metaTitle"),
+      path: "/",
+    }),
   component: WelcomePage,
 });
+
 
 function WelcomePage() {
   const { t } = useTranslation();

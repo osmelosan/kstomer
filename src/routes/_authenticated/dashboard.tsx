@@ -1,3 +1,4 @@
+import { pageHead } from "@/lib/route-seo";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { AppShell } from "@/components/AppShell";
 import {
@@ -16,7 +17,13 @@ import { useTranslation } from "react-i18next";
 import i18n from "@/lib/i18n";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
-  head: () => ({ meta: [{ title: i18n.t("dashboard.metaTitle") }] }),
+  head: () =>
+    pageHead({
+      routeKey: "dashboard",
+      title: i18n.t("dashboard.metaTitle"),
+      path: "/dashboard",
+      noindex: true,
+    }),
   component: Dashboard,
 });
 
@@ -233,7 +240,11 @@ function ActionRow({
         <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold tracking-wider border ${toneClasses(tag.tone)}`}>
           {tag.label}
         </span>
-        <button className="opacity-0 group-hover:opacity-100 p-1 hover:bg-border rounded transition-all text-muted-foreground">
+        <button
+          type="button"
+          aria-label="Actions"
+          className="opacity-0 group-hover:opacity-100 p-1 hover:bg-border rounded transition-all text-muted-foreground"
+        >
           <MoreHorizontal className="h-4 w-4" />
         </button>
       </div>

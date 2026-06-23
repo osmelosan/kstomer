@@ -1,3 +1,5 @@
+import { pageHead } from "@/lib/route-seo";
+import i18nGlobal from "@/lib/i18n";
 import { createFileRoute } from "@tanstack/react-router";
 import { AppShell } from "@/components/AppShell";
 import { Switch } from "@/components/ui/switch";
@@ -29,6 +31,13 @@ import { cn } from "@/lib/utils";
 
 
 export const Route = createFileRoute("/_authenticated/settings")({
+  head: () =>
+    pageHead({
+      routeKey: "settings",
+      title: i18nGlobal.t("settings.metaTitle"),
+      path: "/settings",
+      noindex: true,
+    }),
   component: SettingsPage,
 });
 

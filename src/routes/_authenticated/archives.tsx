@@ -1,3 +1,4 @@
+import { pageHead } from "@/lib/route-seo";
 import { createFileRoute } from "@tanstack/react-router";
 import { AppShell } from "@/components/AppShell";
 import { Filter, ChevronDown, Building2, User2, DollarSign, History } from "lucide-react";
@@ -5,7 +6,13 @@ import { useTranslation, Trans } from "react-i18next";
 import i18n from "@/lib/i18n";
 
 export const Route = createFileRoute("/_authenticated/archives")({
-  head: () => ({ meta: [{ title: i18n.t("archives.metaTitle") }] }),
+  head: () =>
+    pageHead({
+      routeKey: "archives",
+      title: i18n.t("archives.metaTitle"),
+      path: "/archives",
+      noindex: true,
+    }),
   component: Archives,
 });
 

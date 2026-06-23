@@ -1,3 +1,4 @@
+import { pageHead } from "@/lib/route-seo";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { AppShell } from "@/components/AppShell";
 import { useState } from "react";
@@ -5,7 +6,13 @@ import { useTranslation } from "react-i18next";
 import i18n from "@/lib/i18n";
 
 export const Route = createFileRoute("/_authenticated/contacts/new")({
-  head: () => ({ meta: [{ title: i18n.t("newContact.metaTitle") }] }),
+  head: () =>
+    pageHead({
+      routeKey: "newContact",
+      title: i18n.t("newContact.metaTitle"),
+      path: "/contacts/new",
+      noindex: true,
+    }),
   component: NewContact,
 });
 

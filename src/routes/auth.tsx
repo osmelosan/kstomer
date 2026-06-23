@@ -12,11 +12,18 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import i18n from "@/lib/i18n";
+import { pageHead } from "@/lib/route-seo";
 
 export const Route = createFileRoute("/auth")({
-  head: () => ({ meta: [{ title: i18n.t("auth.metaTitle") }] }),
+  head: () =>
+    pageHead({
+      routeKey: "auth",
+      title: i18n.t("auth.metaTitle"),
+      path: "/auth",
+    }),
   component: AuthPage,
 });
+
 
 const emailSchema = z.string().email();
 const passwordSchema = z.string().min(8);
@@ -39,7 +46,9 @@ function AuthPage() {
         <Link to="/" className="block mb-8">
           <Logo variant="horizontal" theme="on-light" className="h-12 mx-auto" />
         </Link>
+        <h1 className="sr-only">{t("auth.metaTitle")}</h1>
         <div className="rounded-xl bg-card border border-border shadow-[0_1px_3px_rgba(15,27,61,0.05)] p-8">
+
           <Tabs value={tab} onValueChange={(v) => setTab(v as typeof tab)}>
             <TabsList className="grid grid-cols-3 w-full mb-6">
               <TabsTrigger value="signin">{t("auth.signIn")}</TabsTrigger>

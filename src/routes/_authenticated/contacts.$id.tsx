@@ -1,3 +1,4 @@
+import { pageHead } from "@/lib/route-seo";
 import { createFileRoute, useParams, Link } from "@tanstack/react-router";
 import { AppShell } from "@/components/AppShell";
 import {
@@ -58,7 +59,13 @@ import {
 import { useAutosave, type AutosaveStatus } from "@/hooks/use-autosave";
 
 export const Route = createFileRoute("/_authenticated/contacts/$id")({
-  head: () => ({ meta: [{ title: i18n.t("contactDetail.metaTitle") }] }),
+  head: ({ params }) =>
+    pageHead({
+      routeKey: "contactDetail",
+      title: i18n.t("contactDetail.metaTitle"),
+      path: `/contacts/${params.id}`,
+      noindex: true,
+    }),
   component: ContactDetails,
 });
 
