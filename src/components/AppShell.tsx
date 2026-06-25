@@ -356,10 +356,7 @@ export function AppShell({
                   </p>
                 )}
                 {current.id !== "all" && (
-                  <p className="mt-2 text-xs text-muted-foreground">
-                    {t("appshell.viewingData")}{" "}
-                    <span className="font-semibold text-foreground">{current.name}</span>
-                  </p>
+                  <p className="mt-2 text-xs text-muted-foreground">{"\n"}</p>
                 )}
               </div>
             )}
