@@ -33,6 +33,7 @@ import { CommandPaletteTrigger } from "@/components/CommandPalette";
 import { useCompany, ALL_COMPANIES, type Company } from "@/lib/company-context";
 import { useCurrentUser } from "@/hooks/use-current-user";
 import { supabase } from "@/integrations/supabase/client";
+import { PaymentTestModeBanner } from "@/components/PaymentTestModeBanner";
 
 type NavItem = { to: string; key: string; icon: typeof LayoutGrid };
 
@@ -159,6 +160,7 @@ export function AppShell({
       </aside>
 
       <div className="flex-1 ml-60 flex flex-col min-w-0">
+        <PaymentTestModeBanner />
         <header className="sticky top-0 z-20 flex items-center gap-4 border-b border-border bg-background/85 backdrop-blur px-8 h-16">
           <CompanySwitcher />
 
