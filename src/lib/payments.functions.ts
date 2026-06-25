@@ -6,8 +6,8 @@ import {
   getStripeErrorMessage,
 } from "@/lib/stripe.server";
 
-type CheckoutSessionResult = { clientSecret: string } | { error: string };
-type PortalSessionResult = { url: string } | { error: string };
+type CheckoutResult = { clientSecret: string } | { error: string };
+type PortalResult = { url: string } | { error: string };
 
 async function resolveOrCreateCustomer(
   stripe: ReturnType<typeof createStripeClient>,
@@ -55,7 +55,7 @@ export const createCheckoutSession = createServerFn({ method: "POST" })
       return data;
     },
   )
-  .handler(async ({ data, context }): Promise<CheckoutSessionResult> => {
+  .handler(async ({ data, context }): Promise<CheckoutResult> => {
     try {
       const stripe = createStripeClient(data.environment);
       const { userId, supabase } = context;
@@ -81,13 +81,10 @@ export const createCheckoutSession = createServerFn({ method: "POST" })
         ...(isRecurring && {
           subscription_data: {
             metadata: { userId },
-            ...(data.trialDays && data.trialDays > 0
-              ? { trial_period_days: data.trialDays }
-              : {}),
+            ...(data.trialDays && { trial_period_days: data.trialDays }),
           },
         }),
-        managed_payments: { enabled: true },
-      } as any);
+      });
 
       return { clientSecret: session.client_secret ?? "" };
     } catch (error) {
@@ -98,7 +95,7 @@ export const createCheckoutSession = createServerFn({ method: "POST" })
 export const createPortalSession = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((data: { returnUrl?: string; environment: StripeEnv }) => data)
-  .handler(async ({ data, context }): Promise<PortalSessionResult> => {
+  .handler(async ({ data, context }): Promise<PortalResult> => {
     const { supabase, userId } = context;
 
     const { data: sub, error: subError } = await supabase
