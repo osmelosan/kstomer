@@ -1,10 +1,15 @@
 import { Bell, MessageCircle, TrendingUp, AlertTriangle, UserPlus } from "lucide-react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
+import { Link } from "@tanstack/react-router";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
 
 type NotifType = "message" | "deal" | "alert" | "contact";
+
+type NotifLink =
+  | { kind: "contact"; id: string }
+  | { kind: "task"; id: string };
 
 type Notif = {
   id: string;
@@ -13,6 +18,7 @@ type Notif = {
   bodyKey: string;
   time: string;
   read: boolean;
+  link: NotifLink;
 };
 
 const ICONS: Record<NotifType, typeof Bell> = {
@@ -23,20 +29,26 @@ const ICONS: Record<NotifType, typeof Bell> = {
 };
 
 const SEED: Notif[] = [
-  { id: "1", type: "deal", titleKey: "notif.items.dealWon.title", bodyKey: "notif.items.dealWon.body", time: "5m", read: false },
-  { id: "2", type: "message", titleKey: "notif.items.newMessage.title", bodyKey: "notif.items.newMessage.body", time: "1h", read: false },
-  { id: "3", type: "alert", titleKey: "notif.items.overdue.title", bodyKey: "notif.items.overdue.body", time: "3h", read: false },
-  { id: "4", type: "contact", titleKey: "notif.items.newContact.title", bodyKey: "notif.items.newContact.body", time: "1d", read: true },
-  { id: "5", type: "deal", titleKey: "notif.items.renewal.title", bodyKey: "notif.items.renewal.body", time: "2d", read: true },
+  { id: "1", type: "deal", titleKey: "notif.items.dealWon.title", bodyKey: "notif.items.dealWon.body", time: "5m", read: false, link: { kind: "contact", id: "marie-lefebvre" } },
+  { id: "2", type: "message", titleKey: "notif.items.newMessage.title", bodyKey: "notif.items.newMessage.body", time: "1h", read: false, link: { kind: "contact", id: "marie-lefebvre" } },
+  { id: "3", type: "alert", titleKey: "notif.items.overdue.title", bodyKey: "notif.items.overdue.body", time: "3h", read: false, link: { kind: "task", id: "t3" } },
+  { id: "4", type: "contact", titleKey: "notif.items.newContact.title", bodyKey: "notif.items.newContact.body", time: "1d", read: true, link: { kind: "contact", id: "pierre-durand" } },
+  { id: "5", type: "deal", titleKey: "notif.items.renewal.title", bodyKey: "notif.items.renewal.body", time: "2d", read: true, link: { kind: "contact", id: "jean-dupont" } },
 ];
 
 export function NotificationsPopover() {
   const { t } = useTranslation();
   const [items, setItems] = useState(SEED);
+  const [open, setOpen] = useState(false);
   const unread = items.filter((i) => !i.read).length;
 
+  const handleClick = (id: string) => {
+    setItems((arr) => arr.map((i) => (i.id === id ? { ...i, read: true } : i)));
+    setOpen(false);
+  };
+
   return (
-    <Popover>
+    <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
         <button
           className="relative h-9 w-9 grid place-items-center rounded-full hover:bg-muted text-muted-foreground"
@@ -63,15 +75,12 @@ export function NotificationsPopover() {
         <ul className="max-h-[380px] overflow-y-auto">
           {items.map((n) => {
             const Icon = ICONS[n.type];
-            return (
-              <li
-                key={n.id}
-                className={cn(
-                  "flex gap-3 px-4 py-3 border-b border-border last:border-0 hover:bg-muted/40 cursor-pointer",
-                  !n.read && "bg-secondary/5",
-                )}
-                onClick={() => setItems((arr) => arr.map((i) => (i.id === n.id ? { ...i, read: true } : i)))}
-              >
+            const className = cn(
+              "flex gap-3 px-4 py-3 border-b border-border last:border-0 hover:bg-muted/40 cursor-pointer",
+              !n.read && "bg-secondary/5",
+            );
+            const inner = (
+              <>
                 <div className="h-8 w-8 shrink-0 rounded-full bg-muted grid place-items-center text-foreground">
                   <Icon className="h-4 w-4" />
                 </div>
@@ -83,6 +92,29 @@ export function NotificationsPopover() {
                   <p className="text-xs text-muted-foreground truncate">{t(n.bodyKey)}</p>
                   <p className="text-[11px] text-muted-foreground mt-0.5">{n.time}</p>
                 </div>
+              </>
+            );
+            return (
+              <li key={n.id}>
+                {n.link.kind === "contact" ? (
+                  <Link
+                    to="/contacts/$id"
+                    params={{ id: n.link.id }}
+                    className={className}
+                    onClick={() => handleClick(n.id)}
+                  >
+                    {inner}
+                  </Link>
+                ) : (
+                  <Link
+                    to="/tasks"
+                    search={{ focus: n.link.id }}
+                    className={className}
+                    onClick={() => handleClick(n.id)}
+                  >
+                    {inner}
+                  </Link>
+                )}
               </li>
             );
           })}
