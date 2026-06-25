@@ -28,7 +28,9 @@ export const PRICING_PLANS: PricingPlan[] = [
       "Dashboard IA personnalisé",
       "Import / export CSV",
       "Support communautaire",
+      "Essai gratuit 14 jours",
     ],
+    trialDays: 14,
   },
   {
     id: "expansion",
@@ -64,7 +66,9 @@ export const PRICING_PLANS: PricingPlan[] = [
       "Jusqu'à 5 utilisateurs inclus",
       "Permissions et audit log",
       "Support prioritaire",
+      "Essai gratuit 14 jours",
     ],
+    trialDays: 14,
   },
 ];
 

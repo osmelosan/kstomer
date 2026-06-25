@@ -101,7 +101,7 @@ function PricingPage() {
             Choisissez votre plan
           </h1>
           <p className="mt-4 text-muted-foreground text-[16px] max-w-xl mx-auto">
-            Essai gratuit 14 jours sur Expansion. Sans engagement, annulez à tout moment.
+            Essai gratuit 14 jours sur tous les plans. Sans engagement, annulez à tout moment.
           </p>
 
           <div className="mt-8 inline-flex items-center rounded-full border border-border bg-card p-1">
