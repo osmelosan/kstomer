@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
-import { Plus, KanbanSquare, MessageSquare, X } from "lucide-react";
+import { Plus, KanbanSquare, MessageSquare } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
