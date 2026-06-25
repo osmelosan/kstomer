@@ -226,12 +226,14 @@ function ActionRow({
   subtitle,
   tag,
   to,
+  taskId,
 }: {
   icon: React.ReactNode;
   title: string;
   subtitle: string;
   tag: { label: string; tone: Tone };
   to?: string;
+  taskId?: string;
 }) {
   const content = (
     <>
@@ -250,6 +252,13 @@ function ActionRow({
 
   const className = "p-4 hover:bg-muted/50 transition-colors flex items-center gap-4 group cursor-pointer";
 
+  if (taskId) {
+    return (
+      <Link to="/tasks" search={{ focus: taskId }} className={className}>
+        {content}
+      </Link>
+    );
+  }
   if (to) {
     return (
       <Link to={to} className={className}>
