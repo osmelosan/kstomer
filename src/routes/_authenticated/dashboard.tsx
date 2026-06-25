@@ -7,7 +7,6 @@ import {
   Phone,
   Globe,
   FileText,
-  MoreHorizontal,
   TrendingUp,
   Sparkles,
   Building2,
@@ -74,18 +73,21 @@ function Dashboard() {
           <SectionHeader title={t("dashboard.priorityActions")} cta={t("dashboard.seeAll")} ctaTo="/tasks" />
           <div className="bg-card rounded-2xl border border-border divide-y divide-border overflow-hidden shadow-card">
             <ActionRow
+              to="/tasks"
               icon={<Mail className="h-5 w-5 text-muted-foreground" />}
               title={t("dashboard.actions.followUp")}
               subtitle={t("dashboard.actions.followUpSub")}
               tag={{ label: t("dashboard.tags.urgent"), tone: "warning" }}
             />
             <ActionRow
+              to="/tasks"
               icon={<FileText className="h-5 w-5 text-muted-foreground" />}
               title={t("dashboard.actions.finalize")}
               subtitle={t("dashboard.actions.finalizeSub")}
               tag={{ label: t("dashboard.tags.todo"), tone: "info" }}
             />
             <ActionRow
+              to="/tasks"
               icon={<Mail className="h-5 w-5 text-muted-foreground" />}
               title={t("dashboard.actions.late")}
               subtitle={t("dashboard.actions.lateSub")}
@@ -223,14 +225,16 @@ function ActionRow({
   title,
   subtitle,
   tag,
+  to,
 }: {
   icon: React.ReactNode;
   title: string;
   subtitle: string;
   tag: { label: string; tone: Tone };
+  to?: string;
 }) {
-  return (
-    <div className="p-4 hover:bg-muted/50 transition-colors flex items-center gap-4 group">
+  const content = (
+    <>
       <div className="h-10 w-10 rounded-full bg-muted flex items-center justify-center shrink-0">{icon}</div>
       <div className="flex-1 min-w-0">
         <p className="text-sm font-semibold truncate">{title}</p>
@@ -240,16 +244,20 @@ function ActionRow({
         <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold tracking-wider border ${toneClasses(tag.tone)}`}>
           {tag.label}
         </span>
-        <button
-          type="button"
-          aria-label="Actions"
-          className="opacity-0 group-hover:opacity-100 p-1 hover:bg-border rounded transition-all text-muted-foreground"
-        >
-          <MoreHorizontal className="h-4 w-4" />
-        </button>
       </div>
-    </div>
+    </>
   );
+
+  const className = "p-4 hover:bg-muted/50 transition-colors flex items-center gap-4 group cursor-pointer";
+
+  if (to) {
+    return (
+      <Link to={to} className={className}>
+        {content}
+      </Link>
+    );
+  }
+  return <div className={className}>{content}</div>;
 }
 
 function ProspectRow({

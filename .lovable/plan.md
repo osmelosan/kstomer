@@ -1,30 +1,16 @@
-## Objectif
-Étendre l'essai gratuit 14 jours aux 3 plans (Starter, Expansion, Empire) et supprimer la page d'écran "Choisissez un plan pour continuer" : les utilisateurs non abonnés sont envoyés directement sur `/pricing`.
+## Goal
+Turn the "Actions prioritaires" rows on the Dashboard into clickable links that navigate to the Tasks page.
 
-## Changements
+## Plan
+1. **Update `ActionRow` in `dashboard.tsx`**
+   - Add an optional `to` prop.
+   - If `to` is provided, render the row as a `<Link>` (from `@tanstack/react-router`) instead of a plain `<div>`.
+   - Remove or move the non-functional `MoreHorizontal` button so it does not nest inside the link.
+   - Add `cursor-pointer` and ensure hover states remain consistent.
 
-### 1. `src/lib/pricing-plans.ts`
-- Ajouter `trialDays: 14` sur **Starter** et **Empire** (Expansion l'a déjà).
-- Mettre à jour la liste `features` de Starter et Empire pour inclure "Essai gratuit 14 jours" (déjà présent sur Expansion).
+2. **Wire the three action rows**
+   - Pass `to="/tasks"` to each `<ActionRow>` instance so clicking any priority action navigates to the Tasks list.
 
-### 2. Suppression de l'étape Paywall
-- `src/components/AppShell.tsx` : remplacer le rendu de `<Paywall />` par une redirection immédiate via `<Navigate to="/pricing" replace />` lorsque l'utilisateur n'a pas d'entitlement (et n'est pas sur `/settings`).
-- Supprimer le fichier `src/components/Paywall.tsx` (plus utilisé).
-- Supprimer l'import de `Paywall` dans `AppShell.tsx`.
-
-### 3. `src/routes/pricing.tsx`
-- Mettre à jour le sous-titre : remplacer "Essai gratuit 14 jours sur Expansion" par "Essai gratuit 14 jours sur tous les plans, sans engagement".
-- Le badge "Essai gratuit X jours" sur chaque carte fonctionnera automatiquement via `plan.trialDays`.
-
-### 4. i18n (FR/EN/ES)
-- Ajuster la clé de sous-titre `/pricing` si elle est traduite (sinon le texte inline ci-dessus suffit).
-
-## Comportement final
-- Inscription → arrivée directe sur `/pricing` (au lieu de l'écran intermédiaire).
-- Les 3 cartes affichent le badge "Essai gratuit 14 jours" et déclenchent un checkout Stripe avec `trial_period_days: 14`.
-- `/settings` reste accessible sans abonnement pour gérer son compte.
-
-## Test
-1. Nouveau compte → redirigé sur `/pricing` (plus de page intermédiaire).
-2. Cliquer n'importe quel plan → checkout Stripe avec essai 14j (carte `4242 4242 4242 4242`).
-3. Retour `/dashboard` accessible immédiatement (statut `trialing`).
+3. **Verify**
+   - Run the type check to confirm no router type errors.
+   - Confirm clicking a row navigates to `/tasks` in the preview.
