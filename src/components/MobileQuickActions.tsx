@@ -189,7 +189,7 @@ export function MobileQuickActions() {
                   onClick={() => setMode("note")}
                   className="flex items-center gap-3 p-4 rounded-xl border border-border bg-card text-left hover:bg-muted/50 transition-colors"
                 >
-                  <div className="h-10 w-10 rounded-full bg-tertiary-container text-on-tertiary-container flex items-center justify-center shrink-0">
+                  <div className="h-10 w-10 rounded-full bg-success-soft text-success flex items-center justify-center shrink-0">
                     <MessageSquare className="h-5 w-5" />
                   </div>
                   <div className="min-w-0">
