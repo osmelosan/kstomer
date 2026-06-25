@@ -82,6 +82,7 @@ export function MobileQuickActions() {
     setOppAmount("");
     setOppTag("normal");
     setNoteContent("");
+    setContactQuery("");
   }
 
   function close() {
