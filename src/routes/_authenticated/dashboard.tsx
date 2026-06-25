@@ -73,21 +73,21 @@ function Dashboard() {
           <SectionHeader title={t("dashboard.priorityActions")} cta={t("dashboard.seeAll")} ctaTo="/tasks" />
           <div className="bg-card rounded-2xl border border-border divide-y divide-border overflow-hidden shadow-card">
             <ActionRow
-              to="/tasks"
+              taskId="t1"
               icon={<Mail className="h-5 w-5 text-muted-foreground" />}
               title={t("dashboard.actions.followUp")}
               subtitle={t("dashboard.actions.followUpSub")}
               tag={{ label: t("dashboard.tags.urgent"), tone: "warning" }}
             />
             <ActionRow
-              to="/tasks"
+              taskId="t2"
               icon={<FileText className="h-5 w-5 text-muted-foreground" />}
               title={t("dashboard.actions.finalize")}
               subtitle={t("dashboard.actions.finalizeSub")}
               tag={{ label: t("dashboard.tags.todo"), tone: "info" }}
             />
             <ActionRow
-              to="/tasks"
+              taskId="t3"
               icon={<Mail className="h-5 w-5 text-muted-foreground" />}
               title={t("dashboard.actions.late")}
               subtitle={t("dashboard.actions.lateSub")}
