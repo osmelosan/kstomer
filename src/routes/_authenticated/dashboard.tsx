@@ -35,7 +35,7 @@ function Dashboard() {
       actions={
         <Link
           to="/contacts/new"
-          className="ml-2 inline-flex items-center gap-2 h-10 px-4 rounded-md bg-secondary text-secondary-foreground text-sm font-semibold shadow-sm hover:bg-secondary/90 active:scale-[0.98] transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50"
+          className="hidden md:inline-flex ml-2 items-center gap-2 h-10 px-4 rounded-md bg-secondary text-secondary-foreground text-sm font-semibold shadow-sm hover:bg-secondary/90 active:scale-[0.98] transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50"
         >
           <Plus className="h-4 w-4" /> {t("dashboard.newOpportunity")}
         </Link>
