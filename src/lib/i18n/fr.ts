@@ -323,6 +323,7 @@ export const fr = {
         callMadeSub: "Discussion du périmètre et des délais",
         meetingHeld: "Réunion de découverte",
         meetingHeldSub: "Visio avec l'équipe — 4 participants",
+        quickNote: "Note ajoutée depuis mobile",
         statusChanged: "Statut passé à Prospect chaud",
         statusChangedSub: "Par Thomas Melo",
       },
