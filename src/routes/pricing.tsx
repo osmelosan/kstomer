@@ -126,7 +126,7 @@ function PricingPage() {
               )}
             >
               Annuel
-              <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-tertiary/20 text-tertiary">
+              <span className="text-sm font-bold px-2 py-0.5 rounded bg-tertiary/20 text-tertiary">
                 -25%
               </span>
             </button>
