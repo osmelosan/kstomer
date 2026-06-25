@@ -181,7 +181,7 @@ export function AppShell({
             <Link to="/dashboard" className="block w-full">
               {collapsed ? (
                 <Logo
-                  variant="mark"
+                  variant="icon"
                   theme="on-dark"
                   priority
                   className="h-8 w-8 mx-auto"
