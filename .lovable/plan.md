@@ -1,16 +1,27 @@
-## Goal
-Turn the "Actions prioritaires" rows on the Dashboard into clickable links that navigate to the Tasks page.
+## Notifications cliquables
 
-## Plan
-1. **Update `ActionRow` in `dashboard.tsx`**
-   - Add an optional `to` prop.
-   - If `to` is provided, render the row as a `<Link>` (from `@tanstack/react-router`) instead of a plain `<div>`.
-   - Remove or move the non-functional `MoreHorizontal` button so it does not nest inside the link.
-   - Add `cursor-pointer` and ensure hover states remain consistent.
+Chaque notification du popover (header) redirige vers la fiche/page la plus pertinente, et le popover se ferme après le clic.
 
-2. **Wire the three action rows**
-   - Pass `to="/tasks"` to each `<ActionRow>` instance so clicking any priority action navigates to the Tasks list.
+### Mapping notification → destination
 
-3. **Verify**
-   - Run the type check to confirm no router type errors.
-   - Confirm clicking a row navigates to `/tasks` in the preview.
+| # | Notification | Destination |
+|---|---|---|
+| 1 | Affaire gagnée : StartUp Vision | `/contacts/$id` du contact lié à StartUp Vision |
+| 2 | Nouveau message de Maelis B. | `/contacts/$id` de Maelis |
+| 3 | Relance en retard | `/tasks?focus=t3` (réutilise le focus existant) |
+| 4 | Nouveau contact ajouté | `/contacts/$id` du nouveau contact |
+| 5 | Renouvellement à venir | `/contacts/$id` du contact concerné |
+
+### Implémentation
+
+Dans `src/components/NotificationsPopover.tsx` :
+- Étendre le type `Notif` avec un champ `link: { to: string; params?: Record<string, string>; search?: Record<string, unknown> }`.
+- Mettre à jour chaque item du `SEED` avec une destination (IDs réels tirés de la mock data contacts pour les 4 notifs orientées contact, et `/tasks` + `focus: "t3"` pour la relance).
+- Contrôler l'ouverture du `Popover` (`open` / `setOpen`) pour pouvoir le fermer programmatiquement.
+- Remplacer le `<li onClick>` par un `<Link>` (de `@tanstack/react-router`) qui :
+  - marque la notification comme lue,
+  - ferme le popover,
+  - navigue vers `link.to` avec `params` / `search` typés.
+- Le bouton "Voir tout" garde son comportement actuel.
+
+Aucun changement de logique métier hors de ce composant.
