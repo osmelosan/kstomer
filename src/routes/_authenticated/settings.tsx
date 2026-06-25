@@ -9,7 +9,7 @@ import { getStripeEnvironment } from "@/lib/stripe";
 import { getPlanByPriceId } from "@/lib/pricing-plans";
 import { AppShell } from "@/components/AppShell";
 import { Switch } from "@/components/ui/switch";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import {
