@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import i18n from "@/lib/i18n";
+import { useRevenueGoal } from "@/hooks/use-revenue-goal";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
   head: () =>
@@ -27,7 +28,16 @@ export const Route = createFileRoute("/_authenticated/dashboard")({
 });
 
 function Dashboard() {
-  const { t } = useTranslation();
+  const { t, i18n: i18nInstance } = useTranslation();
+  const { goal } = useRevenueGoal();
+  const currentRevenue = 12450;
+  const locale = i18nInstance.language || "fr";
+  const goalFormatted = new Intl.NumberFormat(locale, {
+    style: "currency",
+    currency: "EUR",
+    maximumFractionDigits: 0,
+  }).format(goal);
+  const progress = Math.min(100, Math.round((currentRevenue / goal) * 100));
   return (
     <AppShell
       title={t("dashboard.title")}
@@ -46,8 +56,8 @@ function Dashboard() {
           label={t("dashboard.revenue")}
           value="12 450,00 €"
           accent={{ tone: "success", label: t("dashboard.revenueDelta") }}
-          progress={75}
-          footer={t("dashboard.revenueGoal")}
+          progress={progress}
+          footer={t("dashboard.revenueGoal", { goal: goalFormatted })}
         />
         <MetricCard
           label={t("dashboard.activeClients")}

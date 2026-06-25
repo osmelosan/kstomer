@@ -34,6 +34,7 @@ import {
   Check,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useRevenueGoal } from "@/hooks/use-revenue-goal";
 
 
 export const Route = createFileRoute("/_authenticated/settings")({
@@ -47,7 +48,7 @@ export const Route = createFileRoute("/_authenticated/settings")({
   component: SettingsPage,
 });
 
-type SectionKey = "profile" | "notifications" | "language" | "billing" | "security" | "integrations" | "admin";
+type SectionKey = "profile" | "preferences" | "notifications" | "language" | "billing" | "security" | "integrations" | "admin";
 
 function SettingsPage() {
   const { t, i18n } = useTranslation();
@@ -61,6 +62,7 @@ function SettingsPage() {
 
   const sections: { key: SectionKey; label: string }[] = [
     { key: "profile", label: t("settings.sections.profile") },
+    { key: "preferences", label: t("settings.sections.preferences") },
     { key: "notifications", label: t("settings.sections.notifications") },
     { key: "language", label: t("settings.sections.language") },
     { key: "billing", label: t("settings.sections.billing") },
@@ -97,6 +99,7 @@ function SettingsPage() {
 
         <div className="space-y-6">
           {activeSection === "profile" && <ProfileSection />}
+          {activeSection === "preferences" && <PreferencesSection />}
           {activeSection === "language" && (
             <LanguageSection
               value={i18n.language.split("-")[0]}
@@ -155,6 +158,60 @@ function ProfileSection() {
     </div>
   );
 }
+
+function PreferencesSection() {
+  const { t } = useTranslation();
+  const { goal, setGoal } = useRevenueGoal();
+  const [value, setValue] = useState<string>(String(goal));
+
+  useEffect(() => {
+    setValue(String(goal));
+  }, [goal]);
+
+  const onSave = () => {
+    const n = Number(value);
+    if (!Number.isFinite(n) || n <= 0) {
+      toast.error("—");
+      return;
+    }
+    setGoal(Math.round(n));
+    toast.success(t("settings.preferences.saved"));
+  };
+
+  return (
+    <div className="k-card p-7">
+      <h3 className="text-[18px] font-semibold tracking-tight mb-4">
+        {t("settings.preferences.title")}
+      </h3>
+      <div className="max-w-sm space-y-2">
+        <label className="text-xs font-medium text-muted-foreground">
+          {t("settings.preferences.revenueGoalLabel")}
+        </label>
+        <div className="flex gap-2">
+          <input
+            type="number"
+            min={1}
+            step={100}
+            value={value}
+            onChange={(e) => setValue(e.target.value)}
+            className="flex-1 h-10 px-3 rounded-md border border-border bg-card text-sm focus:outline-none focus:ring-2 focus:ring-ring/50"
+          />
+          <button
+            onClick={onSave}
+            className="h-10 px-4 rounded-md bg-primary text-primary-foreground text-sm font-semibold"
+          >
+            {t("settings.preferences.save")}
+          </button>
+        </div>
+        <p className="text-xs text-muted-foreground">
+          {t("settings.preferences.revenueGoalHelp")}
+        </p>
+      </div>
+    </div>
+  );
+}
+
+
 
 function LanguageSection({ value, onChange }: { value: string; onChange: (v: string) => void }) {
   const { t } = useTranslation();
