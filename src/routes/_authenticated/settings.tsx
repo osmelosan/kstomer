@@ -45,7 +45,7 @@ export const Route = createFileRoute("/_authenticated/settings")({
   component: SettingsPage,
 });
 
-type SectionKey = "profile" | "notifications" | "language" | "billing" | "security" | "integrations";
+type SectionKey = "profile" | "notifications" | "language" | "billing" | "security" | "integrations" | "admin";
 
 function SettingsPage() {
   const { t, i18n } = useTranslation();
@@ -55,6 +55,7 @@ function SettingsPage() {
   const [twoFA, setTwoFA] = useState(false);
   const [activeSection, setActiveSection] = useState<SectionKey>("profile");
   const [saving, setSaving] = useState(false);
+  const { isAdmin } = useEntitlement();
 
   const sections: { key: SectionKey; label: string }[] = [
     { key: "profile", label: t("settings.sections.profile") },
@@ -63,7 +64,9 @@ function SettingsPage() {
     { key: "billing", label: t("settings.sections.billing") },
     { key: "security", label: t("settings.sections.security") },
     { key: "integrations", label: t("settings.sections.integrations") },
+    ...(isAdmin ? [{ key: "admin" as SectionKey, label: "Administration" }] : []),
   ];
+
 
   const handleSave = async () => {
     setSaving(true);
