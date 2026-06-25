@@ -40,11 +40,32 @@ export const Route = createFileRoute("/_authenticated/tasks")({
 
 function TasksPage() {
   const { t } = useTranslation();
+  const { focus } = Route.useSearch();
   const [tasks, setTasks] = useState<Task[]>(MOCK_TASKS);
   const [status, setStatus] = useState<TaskStatus | "all">("all");
   const [priority, setPriority] = useState<TaskPriority | "all">("all");
   const [query, setQuery] = useState("");
   const [open, setOpen] = useState(false);
+  const [highlight, setHighlight] = useState<string | undefined>(focus);
+  const rowRefs = useRef<Record<string, HTMLDivElement | null>>({});
+
+  // Reset filters when arriving with a focus param so the row is visible
+  useEffect(() => {
+    if (!focus) return;
+    setStatus("all");
+    setPriority("all");
+    setQuery("");
+    setHighlight(focus);
+    const id = window.setTimeout(() => {
+      rowRefs.current[focus]?.scrollIntoView({ behavior: "smooth", block: "center" });
+    }, 50);
+    const clear = window.setTimeout(() => setHighlight(undefined), 2400);
+    return () => {
+      window.clearTimeout(id);
+      window.clearTimeout(clear);
+    };
+  }, [focus]);
+
 
   const filtered = useMemo(() => {
     return tasks.filter((task) => {
