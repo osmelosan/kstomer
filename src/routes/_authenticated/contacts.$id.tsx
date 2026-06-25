@@ -29,7 +29,7 @@ import {
   Loader2,
   CloudUpload,
 } from "lucide-react";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import i18n from "@/lib/i18n";
 import { Input } from "@/components/ui/input";
