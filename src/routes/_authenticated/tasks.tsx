@@ -1,6 +1,6 @@
 import { pageHead } from "@/lib/route-seo";
 import { createFileRoute } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { AppShell } from "@/components/AppShell";
 import i18n from "@/lib/i18n";
@@ -22,7 +22,12 @@ import { Plus, CheckSquare, Calendar as CalendarIcon, User2 } from "lucide-react
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 
+type TasksSearch = { focus?: string };
+
 export const Route = createFileRoute("/_authenticated/tasks")({
+  validateSearch: (search: Record<string, unknown>): TasksSearch => ({
+    focus: typeof search.focus === "string" ? search.focus : undefined,
+  }),
   head: () =>
     pageHead({
       routeKey: "tasks",
@@ -35,11 +40,32 @@ export const Route = createFileRoute("/_authenticated/tasks")({
 
 function TasksPage() {
   const { t } = useTranslation();
+  const { focus } = Route.useSearch();
   const [tasks, setTasks] = useState<Task[]>(MOCK_TASKS);
   const [status, setStatus] = useState<TaskStatus | "all">("all");
   const [priority, setPriority] = useState<TaskPriority | "all">("all");
   const [query, setQuery] = useState("");
   const [open, setOpen] = useState(false);
+  const [highlight, setHighlight] = useState<string | undefined>(focus);
+  const rowRefs = useRef<Record<string, HTMLDivElement | null>>({});
+
+  // Reset filters when arriving with a focus param so the row is visible
+  useEffect(() => {
+    if (!focus) return;
+    setStatus("all");
+    setPriority("all");
+    setQuery("");
+    setHighlight(focus);
+    const id = window.setTimeout(() => {
+      rowRefs.current[focus]?.scrollIntoView({ behavior: "smooth", block: "center" });
+    }, 50);
+    const clear = window.setTimeout(() => setHighlight(undefined), 2400);
+    return () => {
+      window.clearTimeout(id);
+      window.clearTimeout(clear);
+    };
+  }, [focus]);
+
 
   const filtered = useMemo(() => {
     return tasks.filter((task) => {
@@ -132,7 +158,15 @@ function TasksPage() {
       ) : (
         <div className="bg-card rounded-2xl border border-border divide-y divide-border overflow-hidden shadow-card">
           {filtered.map((task) => (
-            <TaskRow key={task.id} task={task} onToggle={() => toggleDone(task.id)} />
+            <TaskRow
+              key={task.id}
+              task={task}
+              onToggle={() => toggleDone(task.id)}
+              highlighted={highlight === task.id}
+              rowRef={(el) => {
+                rowRefs.current[task.id] = el;
+              }}
+            />
           ))}
         </div>
       )}
@@ -140,7 +174,17 @@ function TasksPage() {
   );
 }
 
-function TaskRow({ task, onToggle }: { task: Task; onToggle: () => void }) {
+function TaskRow({
+  task,
+  onToggle,
+  highlighted,
+  rowRef,
+}: {
+  task: Task;
+  onToggle: () => void;
+  highlighted?: boolean;
+  rowRef?: (el: HTMLDivElement | null) => void;
+}) {
   const { t, i18n: i18nInst } = useTranslation();
   const done = task.status === "done";
   const due = new Date(task.dueDate);
@@ -159,7 +203,14 @@ function TaskRow({ task, onToggle }: { task: Task; onToggle: () => void }) {
   };
 
   return (
-    <div className={cn("flex items-center gap-4 p-4 hover:bg-muted/40 transition-colors group", done && "opacity-60")}>
+    <div
+      ref={rowRef}
+      className={cn(
+        "flex items-center gap-4 p-4 hover:bg-muted/40 transition-colors group",
+        done && "opacity-60",
+        highlighted && "bg-secondary/10 ring-2 ring-secondary/40 animate-pulse",
+      )}
+    >
       <div className={cn("w-1 self-stretch rounded-full", accentBar[task.priority])} />
       <Checkbox checked={done} onCheckedChange={onToggle} aria-label="Toggle task" />
       <div className="flex-1 min-w-0">
