@@ -34,6 +34,8 @@ import { useCompany, ALL_COMPANIES, type Company } from "@/lib/company-context";
 import { useCurrentUser } from "@/hooks/use-current-user";
 import { supabase } from "@/integrations/supabase/client";
 import { PaymentTestModeBanner } from "@/components/PaymentTestModeBanner";
+import { useEntitlement } from "@/hooks/use-entitlement";
+import { Paywall } from "@/components/Paywall";
 
 type NavItem = { to: string; key: string; icon: typeof LayoutGrid };
 
@@ -66,6 +68,13 @@ export function AppShell({
   const { user, profile } = useCurrentUser();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const { entitled, loading: entLoading } = useEntitlement();
+  // Paywall: gate everything except /settings (so users can manage billing / get out).
+  const onSettings = pathname.startsWith("/settings");
+  if (!entLoading && !entitled && !onSettings) {
+    return <Paywall />;
+  }
+
 
   const displayName =
     profile?.full_name ||

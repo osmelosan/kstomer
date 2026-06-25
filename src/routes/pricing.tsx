@@ -1,12 +1,16 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
-import { Check, Sparkles, ArrowLeft } from "lucide-react";
-import { PRICING_PLANS, type BillingInterval, type PricingPlan } from "@/lib/pricing-plans";
+import { Check, Sparkles, ArrowLeft, BadgeCheck, Loader2 } from "lucide-react";
+import { toast } from "sonner";
+import { PRICING_PLANS, type BillingInterval, type PricingPlan, getPlanByPriceId } from "@/lib/pricing-plans";
 import { StripeEmbeddedCheckout } from "@/components/StripeEmbeddedCheckout";
 import { supabase } from "@/integrations/supabase/client";
 import { useEffect } from "react";
 import { cn } from "@/lib/utils";
 import { pageHead } from "@/lib/route-seo";
+import { useSubscription } from "@/hooks/use-subscription";
+import { createPortalSession } from "@/lib/payments.functions";
+import { getStripeEnvironment } from "@/lib/stripe";
 
 export const Route = createFileRoute("/pricing")({
   head: () =>
@@ -23,18 +27,43 @@ function PricingPage() {
   const [interval, setInterval] = useState<BillingInterval>("monthly");
   const [checkoutPlan, setCheckoutPlan] = useState<PricingPlan | null>(null);
   const [authed, setAuthed] = useState<boolean | null>(null);
+  const { subscription, isActive } = useSubscription();
+  const [portalLoading, setPortalLoading] = useState(false);
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => setAuthed(!!data.user));
   }, []);
+
+  const currentPlanId = isActive && subscription
+    ? getPlanByPriceId(subscription.price_id)?.id
+    : undefined;
+
+  const openPortal = async () => {
+    setPortalLoading(true);
+    try {
+      const result = await createPortalSession({
+        data: { environment: getStripeEnvironment(), returnUrl: `${window.location.origin}/settings` },
+      });
+      if ("error" in result) toast.error(result.error);
+      else window.open(result.url, "_blank");
+    } finally {
+      setPortalLoading(false);
+    }
+  };
 
   const handleSelect = (plan: PricingPlan) => {
     if (authed === false) {
       navigate({ to: "/auth", search: { redirect: "/pricing" } as never });
       return;
     }
+    if (currentPlanId && currentPlanId !== plan.id) {
+      // Switching plans → Stripe portal handles proration.
+      openPortal();
+      return;
+    }
     setCheckoutPlan(plan);
   };
+
 
   if (checkoutPlan) {
     const priceId =
@@ -150,18 +179,31 @@ function PricingPage() {
                   ))}
                 </ul>
 
-                <button
-                  onClick={() => handleSelect(plan)}
-                  disabled={authed === null}
-                  className={cn(
-                    "mt-7 h-11 rounded-lg text-sm font-semibold transition-colors",
-                    plan.highlighted
-                      ? "bg-secondary text-secondary-foreground hover:bg-secondary/90"
-                      : "bg-primary text-primary-foreground hover:bg-primary/90",
-                  )}
-                >
-                  {plan.trialDays ? "Démarrer l'essai gratuit" : "Choisir ce plan"}
-                </button>
+                {currentPlanId === plan.id ? (
+                  <div className="mt-7 h-11 rounded-lg text-sm font-semibold inline-flex items-center justify-center gap-2 bg-tertiary/10 text-tertiary border border-tertiary/30">
+                    <BadgeCheck className="h-4 w-4" />
+                    Votre plan actuel
+                  </div>
+                ) : (
+                  <button
+                    onClick={() => handleSelect(plan)}
+                    disabled={authed === null || portalLoading}
+                    className={cn(
+                      "mt-7 h-11 rounded-lg text-sm font-semibold transition-colors inline-flex items-center justify-center gap-2",
+                      plan.highlighted
+                        ? "bg-secondary text-secondary-foreground hover:bg-secondary/90"
+                        : "bg-primary text-primary-foreground hover:bg-primary/90",
+                    )}
+                  >
+                    {portalLoading && currentPlanId && <Loader2 className="h-4 w-4 animate-spin" />}
+                    {currentPlanId
+                      ? "Changer pour ce plan"
+                      : plan.trialDays
+                        ? "Démarrer l'essai gratuit"
+                        : "Choisir ce plan"}
+                  </button>
+                )}
+
               </div>
             );
           })}

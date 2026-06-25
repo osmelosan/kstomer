@@ -2,12 +2,14 @@ import { pageHead } from "@/lib/route-seo";
 import i18nGlobal from "@/lib/i18n";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useSubscription } from "@/hooks/use-subscription";
+import { useEntitlement } from "@/hooks/use-entitlement";
+import { listUsersWithRoles, setTesterRole } from "@/lib/admin.functions";
 import { createPortalSession } from "@/lib/payments.functions";
 import { getStripeEnvironment } from "@/lib/stripe";
 import { getPlanByPriceId } from "@/lib/pricing-plans";
 import { AppShell } from "@/components/AppShell";
 import { Switch } from "@/components/ui/switch";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import {
@@ -45,7 +47,7 @@ export const Route = createFileRoute("/_authenticated/settings")({
   component: SettingsPage,
 });
 
-type SectionKey = "profile" | "notifications" | "language" | "billing" | "security" | "integrations";
+type SectionKey = "profile" | "notifications" | "language" | "billing" | "security" | "integrations" | "admin";
 
 function SettingsPage() {
   const { t, i18n } = useTranslation();
@@ -55,6 +57,7 @@ function SettingsPage() {
   const [twoFA, setTwoFA] = useState(false);
   const [activeSection, setActiveSection] = useState<SectionKey>("profile");
   const [saving, setSaving] = useState(false);
+  const { isAdmin } = useEntitlement();
 
   const sections: { key: SectionKey; label: string }[] = [
     { key: "profile", label: t("settings.sections.profile") },
@@ -63,7 +66,9 @@ function SettingsPage() {
     { key: "billing", label: t("settings.sections.billing") },
     { key: "security", label: t("settings.sections.security") },
     { key: "integrations", label: t("settings.sections.integrations") },
+    ...(isAdmin ? [{ key: "admin" as SectionKey, label: "Administration" }] : []),
   ];
+
 
   const handleSave = async () => {
     setSaving(true);
@@ -116,6 +121,8 @@ function SettingsPage() {
             <SecuritySection twoFA={twoFA} setTwoFA={setTwoFA} />
           )}
           {activeSection === "integrations" && <IntegrationsSection />}
+          {activeSection === "admin" && isAdmin && <AdminSection />}
+
 
           <div className="flex justify-end">
             <button
@@ -474,3 +481,95 @@ function Toggle({
 
 
 
+
+function AdminSection() {
+  const [users, setUsers] = useState<Array<{ id: string; email: string | null; full_name: string | null; is_tester: boolean; is_admin: boolean }>>([]);
+  const [loading, setLoading] = useState(true);
+  const [filter, setFilter] = useState("");
+  const [busy, setBusy] = useState<string | null>(null);
+
+  const reload = async () => {
+    setLoading(true);
+    const res = await listUsersWithRoles();
+    if ("error" in res) {
+      toast.error(res.error);
+      setUsers([]);
+    } else {
+      setUsers(res.users);
+    }
+    setLoading(false);
+  };
+
+  useEffect(() => { reload(); }, []);
+
+
+  const toggle = async (u: { id: string; is_tester: boolean }) => {
+    setBusy(u.id);
+    const res = await setTesterRole({ data: { targetUserId: u.id, enabled: !u.is_tester } });
+    setBusy(null);
+    if ("error" in res) {
+      toast.error(res.error);
+      return;
+    }
+    setUsers((prev) => prev.map((x) => (x.id === u.id ? { ...x, is_tester: !u.is_tester } : x)));
+    toast.success(!u.is_tester ? "Rôle Tester accordé" : "Rôle Tester retiré");
+  };
+
+  const filtered = users.filter((u) => {
+    const q = filter.toLowerCase();
+    return !q || (u.email ?? "").toLowerCase().includes(q) || (u.full_name ?? "").toLowerCase().includes(q);
+  });
+
+  return (
+    <div className="k-card p-7">
+      <h3 className="text-[18px] font-semibold tracking-tight">Administration — Testeurs</h3>
+      <p className="text-sm text-muted-foreground mt-1">
+        Les comptes testeurs ont accès complet à l'application sans abonnement actif.
+      </p>
+      <div className="mt-5 flex items-center gap-3">
+        <input
+          value={filter}
+          onChange={(e) => setFilter(e.target.value)}
+          placeholder="Rechercher email ou nom…"
+          className="flex-1 h-10 px-3 rounded-md bg-muted border border-transparent text-sm focus:outline-none focus:bg-card focus:border-input"
+        />
+        <button onClick={reload} className="h-10 px-4 rounded-md border border-border text-sm font-semibold">
+          Rafraîchir
+        </button>
+      </div>
+      <div className="mt-5 divide-y divide-border border border-border rounded-lg overflow-hidden">
+        {loading ? (
+          <div className="p-6 text-sm text-muted-foreground text-center">Chargement…</div>
+        ) : filtered.length === 0 ? (
+          <div className="p-6 text-sm text-muted-foreground text-center">Aucun utilisateur.</div>
+        ) : (
+          filtered.map((u) => (
+            <div key={u.id} className="flex items-center gap-4 p-4 bg-card">
+              <div className="flex-1 min-w-0">
+                <div className="text-sm font-semibold truncate">{u.full_name || u.email || u.id}</div>
+                <div className="text-xs text-muted-foreground truncate">{u.email}</div>
+                <div className="mt-1 flex gap-1.5">
+                  {u.is_admin && (
+                    <span className="text-[10px] font-bold uppercase px-1.5 py-0.5 rounded bg-primary text-primary-foreground">Admin</span>
+                  )}
+                  {u.is_tester && (
+                    <span className="text-[10px] font-bold uppercase px-1.5 py-0.5 rounded bg-tertiary/15 text-tertiary">Tester</span>
+                  )}
+                </div>
+              </div>
+              <Switch
+                checked={u.is_tester}
+                disabled={busy === u.id || u.is_admin}
+                onCheckedChange={() => toggle(u)}
+              />
+            </div>
+          ))
+        )}
+      </div>
+      <p className="mt-4 text-xs text-muted-foreground">
+        Astuce : pour vous accorder le rôle admin la première fois, utilisez la console de la base de données :
+        <code className="ml-1 px-1.5 py-0.5 rounded bg-muted">INSERT INTO public.user_roles (user_id, role) VALUES ('VOTRE_UUID', 'admin');</code>
+      </p>
+    </div>
+  );
+}
