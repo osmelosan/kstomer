@@ -134,6 +134,7 @@ export const fr = {
     noteAdded: "Note ajoutée à {{name}}",
     viewContact: "Voir le contact",
     kanbanInitNeeded: "Ouvrez le Kanban une première fois pour initialiser le pipeline.",
+  },
   notFound: {
     title: "Page introuvable",
     message: "La page que vous cherchez n'existe pas ou a été déplacée.",
