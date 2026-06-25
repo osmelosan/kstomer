@@ -71,6 +71,13 @@ function WelcomePage() {
           <ArrowRight className="h-5 w-5" />
         </Link>
 
+        <Link
+          to="/pricing"
+          className="mt-3 inline-block text-sm text-secondary hover:underline font-medium"
+        >
+          Voir les tarifs →
+        </Link>
+
         <p className="mt-4 text-xs text-muted-foreground">{t("welcome.fastSetup")}</p>
       </div>
     </main>

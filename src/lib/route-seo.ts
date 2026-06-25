@@ -18,6 +18,7 @@ type RouteKey =
   | "archives"
   | "resellers"
   | "onboarding"
+  | "pricing"
   | "settings";
 
 const DESCRIPTIONS: Record<RouteKey, Record<Lang, string>> = {
@@ -85,6 +86,11 @@ const DESCRIPTIONS: Record<RouteKey, Record<Lang, string>> = {
     fr: "Configurez votre profil Kstomer en quelques étapes.",
     en: "Set up your Kstomer profile in a few steps.",
     es: "Configura tu perfil de Kstomer en unos pasos.",
+  },
+  pricing: {
+    fr: "Choisissez votre plan Kstomer : Starter, Expansion ou Empire. Essai gratuit 14 jours.",
+    en: "Choose your Kstomer plan: Starter, Expansion or Empire. 14-day free trial.",
+    es: "Elige tu plan Kstomer: Starter, Expansion o Empire. Prueba gratis de 14 días.",
   },
   settings: {
     fr: "Préférences de compte, équipe et notifications.",

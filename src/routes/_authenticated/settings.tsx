@@ -1,6 +1,10 @@
 import { pageHead } from "@/lib/route-seo";
 import i18nGlobal from "@/lib/i18n";
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { useSubscription } from "@/hooks/use-subscription";
+import { createPortalSession } from "@/lib/payments.functions";
+import { getStripeEnvironment } from "@/lib/stripe";
+import { getPlanByPriceId } from "@/lib/pricing-plans";
 import { AppShell } from "@/components/AppShell";
 import { Switch } from "@/components/ui/switch";
 import { useState } from "react";
@@ -207,68 +211,92 @@ function NotificationsSection(props: {
 
 function BillingSection() {
   const { t } = useTranslation();
-  const invoices = [
-    { date: "01 Jun 2026", amount: "€29.00", id: "INV-2026-006" },
-    { date: "01 May 2026", amount: "€29.00", id: "INV-2026-005" },
-    { date: "01 Apr 2026", amount: "€29.00", id: "INV-2026-004" },
-  ];
+  const { subscription, loading, isActive } = useSubscription();
+  const [opening, setOpening] = useState(false);
+
+  const planName = subscription
+    ? (getPlanByPriceId(subscription.price_id)?.name ?? subscription.price_id)
+    : null;
+
+  const openPortal = async () => {
+    setOpening(true);
+    try {
+      const result = await createPortalSession({
+        data: {
+          environment: getStripeEnvironment(),
+          returnUrl: `${window.location.origin}/settings`,
+        },
+      });
+      if ("error" in result) {
+        toast.error(result.error);
+      } else {
+        window.open(result.url, "_blank");
+      }
+    } catch (e: any) {
+      toast.error(e?.message ?? "Erreur");
+    } finally {
+      setOpening(false);
+    }
+  };
+
   return (
-    <>
-      <div className="k-card p-7">
-        <div className="flex items-start justify-between gap-4 flex-wrap">
-          <div>
-            <h3 className="text-[18px] font-semibold tracking-tight">
-              {t("settings.billing.currentPlan")}
-            </h3>
-            <div className="mt-2 flex items-center gap-2">
-              <span className="px-2.5 py-0.5 rounded-full bg-secondary text-secondary-foreground text-xs font-bold">PRO</span>
-              <span className="text-sm text-muted-foreground">€29 / {t("settings.billing.month")}</span>
-            </div>
-            <p className="mt-2 text-sm text-muted-foreground">
-              {t("settings.billing.nextCharge")}: <span className="font-semibold text-foreground">01 Jul 2026</span>
+    <div className="k-card p-7">
+      <h3 className="text-[18px] font-semibold tracking-tight">
+        {t("settings.billing.currentPlan")}
+      </h3>
+
+      {loading ? (
+        <p className="mt-3 text-sm text-muted-foreground">…</p>
+      ) : isActive && subscription ? (
+        <>
+          <div className="mt-3 flex items-center gap-2 flex-wrap">
+            <span className="px-2.5 py-0.5 rounded-full bg-secondary text-secondary-foreground text-xs font-bold uppercase">
+              {planName}
+            </span>
+            <span className="px-2 py-0.5 rounded-full bg-muted text-xs font-medium">
+              {subscription.status}
+            </span>
+          </div>
+          {subscription.current_period_end && (
+            <p className="mt-3 text-sm text-muted-foreground">
+              {subscription.cancel_at_period_end
+                ? "Accès jusqu'au "
+                : `${t("settings.billing.nextCharge")} : `}
+              <span className="font-semibold text-foreground">
+                {new Date(subscription.current_period_end).toLocaleDateString()}
+              </span>
             </p>
+          )}
+          <div className="mt-6 flex flex-wrap gap-3">
+            <button
+              onClick={openPortal}
+              disabled={opening}
+              className="h-9 px-4 rounded-md bg-primary text-primary-foreground text-sm font-semibold disabled:opacity-60"
+            >
+              {opening ? "…" : "Gérer la facturation"}
+            </button>
+            <Link
+              to="/pricing"
+              className="h-9 px-4 rounded-md border border-border text-sm font-semibold inline-flex items-center"
+            >
+              {t("settings.billing.changePlan")}
+            </Link>
           </div>
-          <button className="h-9 px-4 rounded-md bg-primary text-primary-foreground text-sm font-semibold">
-            {t("settings.billing.changePlan")}
-          </button>
-        </div>
-
-        <div className="mt-6 pt-6 border-t border-border">
-          <div className="text-sm font-semibold mb-3">{t("settings.billing.paymentMethod")}</div>
-          <div className="flex items-center gap-3 p-3 rounded-md border border-border">
-            <CreditCard className="h-5 w-5 text-muted-foreground" />
-            <div className="flex-1 text-sm">
-              <div className="font-medium">Visa •••• 4242</div>
-              <div className="text-xs text-muted-foreground">{t("settings.billing.expires")} 08/28</div>
-            </div>
-            <button className="text-sm text-secondary font-medium hover:underline">{t("common.edit")}</button>
-          </div>
-        </div>
-      </div>
-
-      <div className="k-card p-7">
-        <h3 className="text-[18px] font-semibold tracking-tight mb-4">
-          {t("settings.billing.invoices")}
-        </h3>
-        <div className="divide-y divide-border">
-          {invoices.map((inv) => (
-            <div key={inv.id} className="flex items-center justify-between py-3 text-sm">
-              <div>
-                <div className="font-medium">{inv.id}</div>
-                <div className="text-xs text-muted-foreground">{inv.date}</div>
-              </div>
-              <div className="flex items-center gap-4">
-                <span className="font-semibold">{inv.amount}</span>
-                <button className="flex items-center gap-1.5 text-secondary hover:underline">
-                  <Download className="h-4 w-4" />
-                  {t("settings.billing.download")}
-                </button>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-    </>
+        </>
+      ) : (
+        <>
+          <p className="mt-3 text-sm text-muted-foreground">
+            Aucun abonnement actif. Choisissez un plan pour débloquer toutes les fonctionnalités.
+          </p>
+          <Link
+            to="/pricing"
+            className="mt-5 inline-flex items-center h-10 px-5 rounded-md bg-secondary text-secondary-foreground text-sm font-semibold hover:bg-secondary/90"
+          >
+            Voir les tarifs
+          </Link>
+        </>
+      )}
+    </div>
   );
 }
 
