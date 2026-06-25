@@ -500,8 +500,8 @@ function AdminSection() {
     setLoading(false);
   };
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  useState(() => { reload(); return 0; });
+  useEffect(() => { reload(); }, []);
+
 
   const toggle = async (u: { id: string; is_tester: boolean }) => {
     setBusy(u.id);
