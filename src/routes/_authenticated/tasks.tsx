@@ -158,7 +158,15 @@ function TasksPage() {
       ) : (
         <div className="bg-card rounded-2xl border border-border divide-y divide-border overflow-hidden shadow-card">
           {filtered.map((task) => (
-            <TaskRow key={task.id} task={task} onToggle={() => toggleDone(task.id)} />
+            <TaskRow
+              key={task.id}
+              task={task}
+              onToggle={() => toggleDone(task.id)}
+              highlighted={highlight === task.id}
+              rowRef={(el) => {
+                rowRefs.current[task.id] = el;
+              }}
+            />
           ))}
         </div>
       )}
