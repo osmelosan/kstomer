@@ -47,7 +47,7 @@ export const Route = createFileRoute("/_authenticated/settings")({
   component: SettingsPage,
 });
 
-type SectionKey = "profile" | "notifications" | "language" | "billing" | "security" | "integrations" | "admin";
+type SectionKey = "profile" | "preferences" | "notifications" | "language" | "billing" | "security" | "integrations" | "admin";
 
 function SettingsPage() {
   const { t, i18n } = useTranslation();
@@ -61,6 +61,7 @@ function SettingsPage() {
 
   const sections: { key: SectionKey; label: string }[] = [
     { key: "profile", label: t("settings.sections.profile") },
+    { key: "preferences", label: t("settings.sections.preferences") },
     { key: "notifications", label: t("settings.sections.notifications") },
     { key: "language", label: t("settings.sections.language") },
     { key: "billing", label: t("settings.sections.billing") },
@@ -97,6 +98,7 @@ function SettingsPage() {
 
         <div className="space-y-6">
           {activeSection === "profile" && <ProfileSection />}
+          {activeSection === "preferences" && <PreferencesSection />}
           {activeSection === "language" && (
             <LanguageSection
               value={i18n.language.split("-")[0]}
