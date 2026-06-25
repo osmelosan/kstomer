@@ -43,7 +43,7 @@ function AuthPage() {
   return (
     <main className="min-h-screen bg-background flex items-center justify-center px-4 py-12">
       <div className="w-full max-w-[420px]">
-        <Link to="/" className="block mb-8">
+        <Link to="/" className="block mb-4">
           <Logo variant="horizontal" theme="on-light" className="h-48 mx-auto" />
         </Link>
         <h1 className="sr-only">{t("auth.metaTitle")}</h1>
