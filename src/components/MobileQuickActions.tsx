@@ -283,11 +283,36 @@ export function MobileQuickActions() {
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      {CONTACT_OPTIONS.map((c) => (
-                        <SelectItem key={c.id} value={c.id}>
-                          {c.name}
-                        </SelectItem>
-                      ))}
+                      <div className="p-2 sticky top-0 bg-popover z-10 border-b border-border">
+                        <Input
+                          autoFocus
+                          value={contactQuery}
+                          onChange={(e) => setContactQuery(e.target.value)}
+                          onKeyDown={(e) => e.stopPropagation()}
+                          placeholder={t("quickActions.searchContact")}
+                          className="h-8 text-sm"
+                        />
+                      </div>
+                      {(() => {
+                        const q = contactQuery.trim().toLowerCase();
+                        const filtered = q
+                          ? CONTACT_OPTIONS.filter((c) =>
+                              c.name.toLowerCase().includes(q),
+                            )
+                          : CONTACT_OPTIONS;
+                        if (!filtered.length) {
+                          return (
+                            <div className="px-3 py-4 text-xs text-muted-foreground text-center">
+                              {t("quickActions.noContactFound")}
+                            </div>
+                          );
+                        }
+                        return filtered.map((c) => (
+                          <SelectItem key={c.id} value={c.id}>
+                            {c.name}
+                          </SelectItem>
+                        ));
+                      })()}
                     </SelectContent>
                   </Select>
                 </label>
