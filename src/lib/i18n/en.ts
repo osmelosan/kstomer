@@ -129,6 +129,8 @@ export const en = {
     selectContact: "Contact",
     noteContent: "Note",
     notePlaceholder: "Idea, follow-up, key point…",
+    searchContact: "Search a contact…",
+    noContactFound: "No contact",
     opportunityCreated: "Opportunity created",
     viewInPipeline: "View in pipeline",
     noteAdded: "Note added to {{name}}",

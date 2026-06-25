@@ -129,6 +129,8 @@ export const fr = {
     selectContact: "Contact",
     noteContent: "Note",
     notePlaceholder: "Idée, suivi, point à creuser…",
+    searchContact: "Rechercher un contact…",
+    noContactFound: "Aucun contact",
     opportunityCreated: "Opportunité créée",
     viewInPipeline: "Voir dans le pipeline",
     noteAdded: "Note ajoutée à {{name}}",
