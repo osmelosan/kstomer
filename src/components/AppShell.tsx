@@ -1,4 +1,4 @@
-import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
+import { Link, Navigate, useNavigate, useRouterState } from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
 import {
   LayoutGrid,
@@ -35,7 +35,6 @@ import { useCurrentUser } from "@/hooks/use-current-user";
 import { supabase } from "@/integrations/supabase/client";
 import { PaymentTestModeBanner } from "@/components/PaymentTestModeBanner";
 import { useEntitlement } from "@/hooks/use-entitlement";
-import { Paywall } from "@/components/Paywall";
 
 type NavItem = { to: string; key: string; icon: typeof LayoutGrid };
 
@@ -69,10 +68,10 @@ export function AppShell({
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { entitled, loading: entLoading } = useEntitlement();
-  // Paywall: gate everything except /settings (so users can manage billing / get out).
+  // Paywall: gate everything except /settings. Send users straight to pricing.
   const onSettings = pathname.startsWith("/settings");
   if (!entLoading && !entitled && !onSettings) {
-    return <Paywall />;
+    return <Navigate to="/pricing" replace />;
   }
 
 
