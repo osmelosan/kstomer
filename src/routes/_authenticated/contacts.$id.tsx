@@ -57,6 +57,7 @@ import {
   SheetDescription,
 } from "@/components/ui/sheet";
 import { useAutosave, type AutosaveStatus } from "@/hooks/use-autosave";
+import { getQuickNotesFor } from "@/lib/quick-notes";
 
 export const Route = createFileRoute("/_authenticated/contacts/$id")({
   head: ({ params }) =>
