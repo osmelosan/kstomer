@@ -74,6 +74,7 @@ export function MobileQuickActions() {
   // note form
   const [noteContact, setNoteContact] = useState<string>(CONTACT_OPTIONS[0].id);
   const [noteContent, setNoteContent] = useState("");
+  const [contactQuery, setContactQuery] = useState("");
 
   function reset() {
     setMode("menu");
