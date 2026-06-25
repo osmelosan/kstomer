@@ -97,10 +97,10 @@ function PricingPage() {
           <Link to="/" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground mb-6">
             <ArrowLeft className="h-4 w-4" /> Accueil
           </Link>
-          <h1 className="text-[40px] leading-[1.1] font-extrabold tracking-tight">
+          <h1 className="text-4xl font-bold tracking-tight">
             Choisissez votre plan
           </h1>
-          <p className="mt-4 text-muted-foreground text-[16px] max-w-xl mx-auto">
+          <p className="mt-4 text-muted-foreground text-base max-w-xl mx-auto">
             Essai gratuit 14 jours sur tous les plans. Sans engagement, annulez à tout moment.
           </p>
 
@@ -126,7 +126,12 @@ function PricingPage() {
               )}
             >
               Annuel
-              <span className="text-sm font-bold px-2 py-0.5 rounded bg-tertiary/20 text-tertiary">
+              <span className={cn(
+                "text-sm font-bold px-2 py-0.5 rounded",
+                interval === "yearly"
+                  ? "bg-white/20 text-white"
+                  : "bg-success/20 text-success",
+              )}>
                 -25%
               </span>
             </button>
@@ -154,11 +159,11 @@ function PricingPage() {
                   </div>
                 )}
                 <div>
-                  <h3 className="text-[22px] font-bold tracking-tight">{plan.name}</h3>
+                  <h3 className="text-xl font-bold tracking-tight">{plan.name}</h3>
                   <p className="text-sm text-muted-foreground mt-1">{plan.tagline}</p>
                 </div>
                 <div className="mt-6 flex items-baseline gap-1">
-                  <span className="text-[40px] font-extrabold tracking-tight">€{amount}</span>
+                  <span className="text-4xl font-bold tracking-tight">€{amount}</span>
                   <span className="text-sm text-muted-foreground">/ mois</span>
                 </div>
                 {interval === "yearly" && (
