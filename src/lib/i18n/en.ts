@@ -323,6 +323,7 @@ export const en = {
         callMadeSub: "Discussed scope and timeline",
         meetingHeld: "Discovery meeting",
         meetingHeldSub: "Video call with team — 4 attendees",
+        quickNote: "Note added from mobile",
         statusChanged: "Status changed to Hot prospect",
         statusChangedSub: "By Thomas Melo",
       },
