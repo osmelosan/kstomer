@@ -34,6 +34,7 @@ import {
   Check,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useRevenueGoal } from "@/hooks/use-revenue-goal";
 
 
 export const Route = createFileRoute("/_authenticated/settings")({
