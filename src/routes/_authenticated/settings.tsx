@@ -2,6 +2,8 @@ import { pageHead } from "@/lib/route-seo";
 import i18nGlobal from "@/lib/i18n";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useSubscription } from "@/hooks/use-subscription";
+import { useEntitlement } from "@/hooks/use-entitlement";
+import { listUsersWithRoles, setTesterRole } from "@/lib/admin.functions";
 import { createPortalSession } from "@/lib/payments.functions";
 import { getStripeEnvironment } from "@/lib/stripe";
 import { getPlanByPriceId } from "@/lib/pricing-plans";
