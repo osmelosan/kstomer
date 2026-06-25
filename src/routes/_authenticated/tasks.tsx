@@ -174,7 +174,17 @@ function TasksPage() {
   );
 }
 
-function TaskRow({ task, onToggle }: { task: Task; onToggle: () => void }) {
+function TaskRow({
+  task,
+  onToggle,
+  highlighted,
+  rowRef,
+}: {
+  task: Task;
+  onToggle: () => void;
+  highlighted?: boolean;
+  rowRef?: (el: HTMLDivElement | null) => void;
+}) {
   const { t, i18n: i18nInst } = useTranslation();
   const done = task.status === "done";
   const due = new Date(task.dueDate);
@@ -193,7 +203,14 @@ function TaskRow({ task, onToggle }: { task: Task; onToggle: () => void }) {
   };
 
   return (
-    <div className={cn("flex items-center gap-4 p-4 hover:bg-muted/40 transition-colors group", done && "opacity-60")}>
+    <div
+      ref={rowRef}
+      className={cn(
+        "flex items-center gap-4 p-4 hover:bg-muted/40 transition-colors group",
+        done && "opacity-60",
+        highlighted && "bg-secondary/10 ring-2 ring-secondary/40 animate-pulse",
+      )}
+    >
       <div className={cn("w-1 self-stretch rounded-full", accentBar[task.priority])} />
       <Checkbox checked={done} onCheckedChange={onToggle} aria-label="Toggle task" />
       <div className="flex-1 min-w-0">
