@@ -13,7 +13,6 @@ export const Route = createFileRoute("/pricing")({
     pageHead({
       routeKey: "pricing",
       title: "Tarifs — Kstomer",
-      description: "Choisissez le plan adapté à votre activité : Starter, Expansion ou Empire. Essai gratuit 14 jours.",
       path: "/pricing",
     }),
   component: PricingPage,
