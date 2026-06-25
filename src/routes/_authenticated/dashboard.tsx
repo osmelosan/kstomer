@@ -35,13 +35,13 @@ function Dashboard() {
       actions={
         <Link
           to="/contacts/new"
-          className="ml-2 inline-flex items-center gap-2 h-10 px-4 rounded-md bg-secondary text-secondary-foreground text-sm font-semibold shadow-sm hover:bg-secondary/90 active:scale-[0.98] transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50"
+          className="hidden md:inline-flex ml-2 items-center gap-2 h-10 px-4 rounded-md bg-secondary text-secondary-foreground text-sm font-semibold shadow-sm hover:bg-secondary/90 active:scale-[0.98] transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50"
         >
           <Plus className="h-4 w-4" /> {t("dashboard.newOpportunity")}
         </Link>
       }
     >
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 mb-8 md:mb-10">
         <MetricCard
           label={t("dashboard.revenue")}
           value="12 450,00 €"
@@ -68,7 +68,7 @@ function Dashboard() {
         />
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8">
         <section className="space-y-4">
           <SectionHeader title={t("dashboard.priorityActions")} cta={t("dashboard.seeAll")} ctaTo="/tasks" />
           <div className="bg-card rounded-2xl border border-border divide-y divide-border overflow-hidden shadow-card">

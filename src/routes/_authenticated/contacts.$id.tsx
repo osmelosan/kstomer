@@ -29,7 +29,7 @@ import {
   Loader2,
   CloudUpload,
 } from "lucide-react";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import i18n from "@/lib/i18n";
 import { Input } from "@/components/ui/input";
@@ -57,6 +57,7 @@ import {
   SheetDescription,
 } from "@/components/ui/sheet";
 import { useAutosave, type AutosaveStatus } from "@/hooks/use-autosave";
+import { getQuickNotesFor } from "@/lib/quick-notes";
 
 export const Route = createFileRoute("/_authenticated/contacts/$id")({
   head: ({ params }) =>
@@ -202,6 +203,27 @@ function ContactDetails() {
       date: "2w",
     },
   ]);
+
+  // Merge "quick notes" added on the go (mobile FAB) into the timeline.
+  useEffect(() => {
+    const quick = getQuickNotesFor(id);
+    if (!quick.length) return;
+    setActivities((prev) => {
+      const existing = new Set(prev.map((a) => a.id));
+      const extra: ActivityItem[] = quick
+        .filter((q) => !existing.has(`qn-${q.id}`))
+        .map((q) => ({
+          id: `qn-${q.id}`,
+          type: "note" as const,
+          title: q.content,
+          subtitle: t("contactDetail.activity.samples.quickNote"),
+          date: new Date(q.date).toLocaleDateString(i18n.language),
+        }));
+      return extra.length ? [...extra, ...prev] : prev;
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [id]);
+
   const [addingActivity, setAddingActivity] = useState(false);
   const [newActivity, setNewActivity] = useState<{ type: ActivityItem["type"]; title: string }>({
     type: "note",
