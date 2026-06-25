@@ -1,89 +1,95 @@
-## Authentification complète via Lovable Cloud (Supabase)
+# Pricing Kstomer + checkout Stripe
 
-Toute l'auth est gérée par Supabase managé par Lovable Cloud — aucune solution maison, aucun stockage de session local custom. Pas de mention de "Supabase" côté UI : on parle de "compte" / "Lovable Cloud" en interne.
+Provider : **Stripe (Seamless Payments by Lovable)** — pas de clé API à fournir, sandbox immédiat.
+Tax handling : **full compliance handling (`managed_payments`)** par défaut (SaaS digital, pays vendeur éligible). Stripe gère TVA, fraude, disputes, factures, support transactionnel. Modifiable par session ou désactivable plus tard.
 
-### 1. Activer Lovable Cloud
-Pré-requis. Provisionne automatiquement : DB Postgres, Supabase Auth (email + Google + reset), Storage, clients déjà câblés (`@/integrations/supabase/client`, `requireSupabaseAuth`, `attachSupabaseAuth`, layout `_authenticated/route.tsx`).
+## 1. Les trois tiers (remise annuelle -20 %)
 
-### 2. Configuration Auth (Supabase managé)
-- **Email/password** avec **vérification email obligatoire** (config Supabase Auth).
-- **Google OAuth** activé via `configure_social_auth` — broker Lovable, iframe-safe, géré dans Supabase Auth Providers.
-- **HIBP** (rejet des mots de passe compromis) activé via `configure_auth`.
-- **Reset password** via `supabase.auth.resetPasswordForEmail` (email envoyé par Supabase).
+| Plan | Mensuel | Annuel (par mois) | Total annuel |
+|---|---|---|---|
+| **Starter** | 17 €/mois | **13,60 €** | 163,20 €/an |
+| **Expansion** ⭐ *Le plus populaire* | 37 €/mois | **29,60 €** | 355,20 €/an |
+| **Empire** | 67 €/mois | **53,60 €** | 643,20 €/an |
 
-### 3. Schéma de base (migrations Supabase)
-Tout en Postgres, RLS activée partout.
+**Essai gratuit 14 jours** sur les 3 plans (`trial_period_days: 14` au niveau des prix Stripe).
+**Expansion en surbrillance** : badge "Le plus populaire", scale 1.05, bordure 2px Secondary Blue, ombre prononcée, CTA Deep Navy plein.
 
-**Table `profiles`** liée à `auth.users(id) ON DELETE CASCADE` :
-- colonnes : `id`, `email`, `full_name`, `avatar_url`, `created_at`, `updated_at`
-- RLS : l'utilisateur lit/écrit son propre profil
-- Trigger `on_auth_user_created` → `handle_new_user()` insère auto le profil à l'inscription
-- GRANTs : `authenticated` (CRUD), `service_role` (ALL)
+### Features incrémentales
 
-**Enum `app_role`** : `'admin' | 'tester' | 'user'`
+**Starter — 17 € / 13,60 €**
+- 1 utilisateur, 1 société / contexte
+- Contacts illimités
+- Pipeline kanban (1 pipeline)
+- Tâches & rappels
+- Dashboard IA (résumé hebdo)
+- Support email
 
-**Table `user_roles`** (séparée des profils — anti-escalade de privilèges) :
-- `id`, `user_id` (FK `auth.users`), `role`, `created_at`
-- UNIQUE `(user_id, role)`
-- RLS : lecture par l'utilisateur lui-même
-- **Pas de policy INSERT/UPDATE/DELETE pour `authenticated`** → vous attribuez les rôles à la main depuis la console Lovable Cloud (SQL editor), vous gardez le contrôle total
-- GRANTs : `SELECT` à `authenticated`, `ALL` à `service_role`
+**Expansion — 37 € / 29,60 € — *Le plus populaire***
+*Tout Starter +*
+- Multi-contextes / multi-sociétés (jusqu'à 5)
+- Pipelines multiples (jusqu'à 5)
+- Export reporting (CSV / PDF, planifiable)
+- Notes versionnées + historique étendu
+- Intégrations email (IMAP/SMTP)
+- Modèles d'emails IA
+- Support prioritaire
 
-**Fonction security definer `public.has_role(_user_id uuid, _role app_role)`** — utilisée par les futures policies RLS et le hook `useIsTester()` côté app.
+**Empire — 67 € / 53,60 €**
+*Tout Expansion +*
+- Jusqu'à 5 sièges utilisateurs
+- Contextes & pipelines illimités
+- Vues manager (consolidation équipe, perf par membre)
+- Alertes deals (froid/chaud, renouvellement 30j, montant > seuil)
+- Permissions par rôle
+- API & webhooks
+- Onboarding personnalisé
 
-### 4. Routes (TanStack Start + gate Lovable Cloud)
-```
-src/routes/
-  index.tsx                      → / (landing publique)
-  auth.tsx                       → /auth (login + signup + forgot)
-  reset-password.tsx             → /reset-password (public, callback email Supabase)
-  _authenticated/
-    route.tsx                    → gate managée par l'intégration Lovable Cloud
-                                   (ssr:false, redirige vers /auth si non auth)
-    dashboard.tsx                → déplacé ici
-    contacts.index.tsx, contacts.$id.tsx, contacts.new.tsx
-    kanban.tsx, tasks.tsx, analytics.tsx, archives.tsx, resellers.tsx
-    settings.tsx, onboarding.tsx
-```
-Toutes les routes app passent sous `_authenticated/`. Seules `/`, `/auth`, `/reset-password` restent publiques. La gate auto-générée par Lovable Cloud appelle `supabase.auth.getUser()` côté client et redirige vers `/auth`.
+## 2. Architecture technique
 
-> Note : vous demandiez `/login`, mais le standard Lovable Cloud est `/auth` (recommandé). On garde `/auth`.
+### Base de données (1 migration)
+- `plans` (seed 3 plans + features JSON, flag `is_featured` sur Expansion) — lecture publique via `TO anon SELECT`.
+- `subscriptions` (`user_id`, `plan_code`, `billing_interval`, `status`, `stripe_customer_id`, `stripe_subscription_id`, `current_period_end`, `trial_end`, `cancel_at_period_end`) — RLS : user lit la sienne, service_role écrit.
+- `billing_events` (audit webhooks Stripe, `event_id UNIQUE` pour idempotence) — service_role seul.
+- Fonction `has_active_subscription(_user_id)` (SECURITY DEFINER) pour gating.
+- Le flag `is_test_account` continue de contourner les limites.
 
-### 5. Page `/auth`
-Carte centrée style Kstomer (max-w 420px, navy primary). 3 onglets :
-- **Connexion** : email + password → `supabase.auth.signInWithPassword` + bouton **Google** → `lovable.auth.signInWithOAuth('google', { redirect_uri: window.location.origin })`
-- **Inscription** : email + password (validation zod) → `supabase.auth.signUp({ emailRedirectTo: origin })` → message "Vérifiez votre boîte mail"
-- **Mot de passe oublié** : email → `supabase.auth.resetPasswordForEmail(email, { redirectTo: origin + '/reset-password' })`
+### Stripe
+- Activation via `enable_stripe_payments` → environnement test immédiat (aucune clé à fournir).
+- 3 produits × 2 prix (mensuel / annuel) = **6 prix Stripe** créés via `batch_create_product`, avec `trial_period_days: 14` et `tax_code` SaaS (`txcd_10000000`) sur chaque produit.
 
-### 6. Page `/reset-password`
-Lit `type=recovery` dans l'URL, formulaire nouveau mot de passe → `supabase.auth.updateUser({ password })` → redirect `/dashboard`. Route publique.
+### Server functions (TanStack `createServerFn`)
+- `createCheckoutSession` (auth requise via `requireSupabaseAuth`) → crée une Checkout Session Stripe en mode `subscription` avec `managed_payments: { enabled: true }`, `subscription_data.trial_period_days: 14`, retourne `url`.
+- `openCustomerPortal` → URL du Stripe Billing Portal (changer/annuler le plan, MAJ moyen de paiement, factures).
+- `getCurrentSubscription` → souscription courante + jours d'essai restants.
 
-### 7. Intégration shell
-- `AppShell` lit `supabase.auth.getUser()` (re-valide côté Auth server) → nom + avatar dans le dropdown
-- **Sign out** : `cancelQueries` → `clear` → `supabase.auth.signOut()` → `navigate({ to: '/auth', replace: true })`
-- Listener unique `supabase.auth.onAuthStateChange` dans `__root.tsx`, filtré sur `SIGNED_IN/SIGNED_OUT/USER_UPDATED`
+### Webhook Stripe
+- Route publique `src/routes/api/public/stripe-webhook.ts`.
+- Vérification de signature Stripe (`stripe.webhooks.constructEvent` avec `STRIPE_WEBHOOK_SECRET`, body brut).
+- Traite : `checkout.session.completed`, `customer.subscription.created/updated/deleted`, `invoice.payment_succeeded/failed`.
+- Met à jour `subscriptions` via `supabaseAdmin` (import dynamique dans le handler), idempotent via `billing_events.event_id UNIQUE`.
 
-### 8. Comptes "tester" — vous gardez la main
-- Attribution **manuelle** via console Lovable Cloud :
-  ```sql
-  insert into public.user_roles (user_id, role) values ('<uuid>', 'tester');
-  ```
-- Hook `useIsTester()` lit le rôle via `supabase.from('user_roles').select` (RLS permet à l'utilisateur de voir ses propres rôles)
-- Helper `applyLimit(value, isTester)` → `isTester ? Infinity : value` pour court-circuiter toute future limite (quotas IA, prospects, etc.)
-- Aucune limite n'existe encore dans l'app — l'infra est posée, prête pour les futurs quotas
+### UI
+- **Page publique `/pricing`** : 3 cartes, toggle Mensuel / Annuel (badge "Économisez 20 %"), liste de features, CTA "Commencer l'essai gratuit" → `/auth` si non connecté → Checkout Stripe hébergé. Expansion en surbrillance (badge pill Secondary Blue, scale 1.05, bordure 2px, ombre prononcée, CTA plein Deep Navy).
+- **Settings → Billing** (refonte) : plan en cours, jours d'essai restants, prochain prélèvement, "Gérer mon abonnement" (Billing Portal), "Changer de plan".
+- **Bandeau AppShell** quand `trial_end - now < 3 jours`.
+- Tokens design respectés, i18n FR / EN / ES.
 
-### 9. i18n
-Clés `auth.*` ajoutées dans `fr.ts` / `en.ts` / `es.ts` : login, signup, forgotPassword, emailLabel, passwordLabel, googleButton, verifyEmailSent, resetEmailSent, invalidCredentials, etc.
+## 3. Tester avant la mise en ligne
 
-### Garanties techniques
-- **Tout passe par Supabase** : auth, session (cookies/localStorage gérés par `supabase-js`), profils, rôles, futur stockage de données
-- Pas de JWT custom, pas d'auth maison, pas de localStorage manuel pour la session
-- `attachSupabaseAuth` global (déjà câblé par l'intégration) attache le bearer à chaque server fn
-- Les loaders protégés vivent uniquement sous `_authenticated/` (sinon 401 au prerender)
-- Validation zod côté client sur tous les formulaires
-- RLS activée + GRANTs explicites sur chaque nouvelle table
+Environnement **test Stripe** actif dès l'activation :
+1. `/pricing` → choisir plan + intervalle → Checkout Stripe.
+2. Carte test `4242 4242 4242 4242`, CVC `123`, expiration future.
+3. Vérifier Settings → Billing (essai 14j, date de prélèvement).
+4. Tester annulation + changement de plan via le Billing Portal.
+5. Vérifier les webhooks : succès, `4000 0000 0000 9995` (échec paiement), `4000 0025 0000 3155` (3DS), annulation — entrées dans `billing_events`.
 
-### Hors périmètre
-- Apple/Microsoft (non demandé)
-- 2FA (UI factice existante dans Settings — non touchée)
-- Migration des mocks vers la DB Supabase (tâche séparée)
+**Passage en live** : bouton dédié dans la config Stripe Lovable (KYB / IBAN requis). Aucun changement de code, les 6 prix sont répliqués automatiquement vers le mode live.
+
+## Ordre d'exécution (mode build)
+
+1. Migration SQL (`plans`, `subscriptions`, `billing_events`, `has_active_subscription`).
+2. `enable_stripe_payments`.
+3. Création des 6 prix Stripe (3 plans × mensuel/annuel, trial 14j, `tax_code` SaaS).
+4. Server functions + webhook signé.
+5. UI `/pricing` (Expansion en surbrillance), refonte Settings → Billing, bandeau trial.
+6. Validation manuelle en sandbox avec cartes test.
