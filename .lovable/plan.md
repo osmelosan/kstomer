@@ -1,49 +1,33 @@
-## Objectif
+## Goal
+Re-enable Lovable's built-in Stripe payments and restore the previous pricing/checkout/entitlement setup (Starter 17/13€, Expansion 37/28€ "Most popular", Empire 67/31€, 14-day trial on all plans).
 
-Rendre le dashboard utilisable "on the go" sur mobile et permettre de réduire la sidebar en mode icônes sur desktop.
+## Steps
 
-## 1. Sidebar repliable (desktop)
+1. **Re-enable Stripe** via `payments--enable_stripe_payments` (seamless, no API key needed). This recreates the test environment.
 
-`src/components/AppShell.tsx`
-- Ajouter un state `collapsed` persisté dans `localStorage` (`kstomer.sidebar.collapsed`).
-- Largeur sidebar : `w-60` → `w-16` quand replié ; ajuster `ml-60` → `ml-16` sur le contenu.
-- Quand replié : masquer les labels (`<span>{t(key)}</span>`), centrer les icônes, remplacer le logo horizontal par le logo compact, et réduire le bloc user à l'avatar seul (dropdown conservé).
-- Ajouter un bouton toggle (icône `PanelLeftClose` / `PanelLeftOpen`) dans le header à gauche du `CompanySwitcher` (desktop uniquement, ≥ md).
-- Tooltips sur les items de nav quand replié (composant `Tooltip` shadcn déjà dispo).
+2. **Recreate the 3 products** (Starter, Expansion, Empire) with monthly + yearly prices and 14-day trial metadata using `payments--batch_create_product`. New Stripe price IDs will be generated.
 
-## 2. Sidebar mobile (off-canvas)
+3. **Update `src/lib/pricing-plans.ts`** with the new price IDs returned by Stripe.
 
-- En dessous de `md`, la sidebar passe en mode drawer : cachée par défaut (`-translate-x-full`), s'ouvre via un bouton hamburger dans le header.
-- Overlay sombre cliquable pour fermer. Fermeture automatique sur navigation.
-- Le header devient compact sur mobile : hamburger + logo compact + `NotificationsPopover` + avatar menu. `CommandPaletteTrigger` et `CompanySwitcher` cachés sous `md` (déplacés dans le drawer).
+4. **Verify existing code is intact** (no rewrite needed if files still present):
+   - `subscriptions` table + RLS + `has_active_subscription` (migration already applied)
+   - Webhook route `/api/public/payments/webhook`
+   - Checkout / portal server functions
+   - `/pricing` page with monthly/yearly toggle and "Le plus populaire" badge on Expansion
+   - `use-subscription` hook, `use-entitlement` hook, hard paywall in `AppShell`
+   - Settings → Billing section
 
-## 3. FAB "Quick Actions" mobile
+   Any file that was removed when Stripe was disconnected will be recreated to match the prior implementation.
 
-Nouveau composant `src/components/MobileQuickActions.tsx` :
-- Bouton flottant rond (bottom-right, `fixed bottom-4 right-4 md:hidden`) avec icône `Plus`.
-- Au tap, ouvre un `Sheet` (bottom sheet shadcn) avec 2 actions principales :
-  1. **Nouvelle opportunité** → ouvre un mini-formulaire (nom, montant, colonne pipeline, tag) qui pousse dans `localStorage` `kstomer.kanban.v1` (même format que `kanban.tsx`), puis toast + lien "Voir dans le pipeline".
-  2. **Note sur un contact** → étape 1 : combobox de sélection contact (liste depuis mock contacts existants), étape 2 : textarea + bouton "Ajouter". Sauvegarde via la même mécanique d'autosave/notes que `contacts.$id.tsx` (clé localStorage existante).
-- Monté dans `AppShell` pour être dispo partout, mais affiché uniquement sur mobile.
+5. **Testing guide** (after build):
+   - Sign in as a non-tester account
+   - Visit `/pricing`, pick a plan → embedded Stripe Checkout opens
+   - Use test card `4242 4242 4242 4242`, any future expiry, any CVC, any ZIP
+   - Webhook fires → `subscriptions` row created → paywall lifts → app accessible
+   - Settings → Billing shows current plan; "Manage" opens Stripe Portal (open in new tab — preview iframe blocks it)
+   - Test decline: `4000 0000 0000 0002`
+   - Test 3DS: `4000 0025 0000 3155`
+   - Admin can grant `tester` role in Settings → Administration to bypass paywall
 
-## 4. Dashboard mobile
-
-`src/routes/_authenticated/dashboard.tsx`
-- KPI cards : grille passe de `grid-cols-4` → `grid-cols-2 md:grid-cols-4`, padding réduit sur mobile.
-- Actions prioritaires & suggestions IA : empilage vertical, tap target ≥ 44px, troncature avec `truncate` + `min-w-0`.
-- Padding du `<main>` : `px-4 md:px-8 py-4 md:py-8` (modif dans `AppShell`).
-- Titre h1 : `text-2xl md:text-[36px]`.
-
-## Détails techniques
-
-- Aucun changement backend ; les nouvelles opportunités et notes utilisent les mêmes clés `localStorage` que les pages existantes pour rester synchronisées.
-- i18n : ajouter clés `quickActions.*` (FR/EN/ES) — `newOpportunity`, `addNote`, `selectContact`, `notePlaceholder`, `sidebarCollapse`, `sidebarExpand`.
-- Respect des patterns responsive du système (grid + `min-w-0` + `shrink-0`).
-- Sidebar utilise transition CSS (`transition-[width,transform] duration-200`).
-
-## Test rapide
-
-1. Desktop : clic sur toggle → sidebar passe en icônes, tooltips au hover, état persisté après reload.
-2. Mobile (devtools 375px) : hamburger ouvre le drawer, FAB visible en bas à droite.
-3. FAB → "Nouvelle opportunité" → remplir → toast → aller sur `/kanban` → carte présente.
-4. FAB → "Note contact" → choisir contact → écrire → aller sur la fiche contact → note visible dans la timeline.
+## Notes
+Test mode only — no real charges. Going live later requires claiming the Stripe account from Settings.
