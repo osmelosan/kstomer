@@ -215,7 +215,7 @@ function PricingPage() {
         </div>
 
         <p className="text-center text-xs text-muted-foreground mt-10">
-          Paiements sécurisés. TVA gérée automatiquement.
+          Paiements sécurisés.{"\u00a0"}
         </p>
       </div>
     </main>
