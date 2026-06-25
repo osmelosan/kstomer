@@ -44,7 +44,7 @@ function AuthPage() {
     <main className="min-h-screen bg-background flex items-center justify-center px-4 py-12">
       <div className="w-full max-w-[420px]">
         <Link to="/" className="block mb-8">
-          <Logo variant="horizontal" theme="on-light" className="h-12 mx-auto" />
+          <Logo variant="horizontal" theme="on-light" className="h-24 mx-auto" />
         </Link>
         <h1 className="sr-only">{t("auth.metaTitle")}</h1>
         <div className="rounded-xl bg-card border border-border shadow-[0_1px_3px_rgba(15,27,61,0.05)] p-8">
