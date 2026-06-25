@@ -121,6 +121,8 @@ function SettingsPage() {
             <SecuritySection twoFA={twoFA} setTwoFA={setTwoFA} />
           )}
           {activeSection === "integrations" && <IntegrationsSection />}
+          {activeSection === "admin" && isAdmin && <AdminSection />}
+
 
           <div className="flex justify-end">
             <button
