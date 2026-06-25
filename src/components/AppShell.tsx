@@ -34,6 +34,8 @@ import { useCompany, ALL_COMPANIES, type Company } from "@/lib/company-context";
 import { useCurrentUser } from "@/hooks/use-current-user";
 import { supabase } from "@/integrations/supabase/client";
 import { PaymentTestModeBanner } from "@/components/PaymentTestModeBanner";
+import { useEntitlement } from "@/hooks/use-entitlement";
+import { Paywall } from "@/components/Paywall";
 
 type NavItem = { to: string; key: string; icon: typeof LayoutGrid };
 
