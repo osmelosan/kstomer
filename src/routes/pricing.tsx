@@ -179,18 +179,31 @@ function PricingPage() {
                   ))}
                 </ul>
 
-                <button
-                  onClick={() => handleSelect(plan)}
-                  disabled={authed === null}
-                  className={cn(
-                    "mt-7 h-11 rounded-lg text-sm font-semibold transition-colors",
-                    plan.highlighted
-                      ? "bg-secondary text-secondary-foreground hover:bg-secondary/90"
-                      : "bg-primary text-primary-foreground hover:bg-primary/90",
-                  )}
-                >
-                  {plan.trialDays ? "Démarrer l'essai gratuit" : "Choisir ce plan"}
-                </button>
+                {currentPlanId === plan.id ? (
+                  <div className="mt-7 h-11 rounded-lg text-sm font-semibold inline-flex items-center justify-center gap-2 bg-tertiary/10 text-tertiary border border-tertiary/30">
+                    <BadgeCheck className="h-4 w-4" />
+                    Votre plan actuel
+                  </div>
+                ) : (
+                  <button
+                    onClick={() => handleSelect(plan)}
+                    disabled={authed === null || portalLoading}
+                    className={cn(
+                      "mt-7 h-11 rounded-lg text-sm font-semibold transition-colors inline-flex items-center justify-center gap-2",
+                      plan.highlighted
+                        ? "bg-secondary text-secondary-foreground hover:bg-secondary/90"
+                        : "bg-primary text-primary-foreground hover:bg-primary/90",
+                    )}
+                  >
+                    {portalLoading && currentPlanId && <Loader2 className="h-4 w-4 animate-spin" />}
+                    {currentPlanId
+                      ? "Changer pour ce plan"
+                      : plan.trialDays
+                        ? "Démarrer l'essai gratuit"
+                        : "Choisir ce plan"}
+                  </button>
+                )}
+
               </div>
             );
           })}
