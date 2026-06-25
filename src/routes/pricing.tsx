@@ -1,12 +1,16 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
-import { Check, Sparkles, ArrowLeft } from "lucide-react";
-import { PRICING_PLANS, type BillingInterval, type PricingPlan } from "@/lib/pricing-plans";
+import { Check, Sparkles, ArrowLeft, BadgeCheck, Loader2 } from "lucide-react";
+import { toast } from "sonner";
+import { PRICING_PLANS, type BillingInterval, type PricingPlan, getPlanByPriceId } from "@/lib/pricing-plans";
 import { StripeEmbeddedCheckout } from "@/components/StripeEmbeddedCheckout";
 import { supabase } from "@/integrations/supabase/client";
 import { useEffect } from "react";
 import { cn } from "@/lib/utils";
 import { pageHead } from "@/lib/route-seo";
+import { useSubscription } from "@/hooks/use-subscription";
+import { createPortalSession } from "@/lib/payments.functions";
+import { getStripeEnvironment } from "@/lib/stripe";
 
 export const Route = createFileRoute("/pricing")({
   head: () =>
@@ -23,18 +27,43 @@ function PricingPage() {
   const [interval, setInterval] = useState<BillingInterval>("monthly");
   const [checkoutPlan, setCheckoutPlan] = useState<PricingPlan | null>(null);
   const [authed, setAuthed] = useState<boolean | null>(null);
+  const { subscription, isActive } = useSubscription();
+  const [portalLoading, setPortalLoading] = useState(false);
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => setAuthed(!!data.user));
   }, []);
+
+  const currentPlanId = isActive && subscription
+    ? getPlanByPriceId(subscription.price_id)?.id
+    : undefined;
+
+  const openPortal = async () => {
+    setPortalLoading(true);
+    try {
+      const result = await createPortalSession({
+        data: { environment: getStripeEnvironment(), returnUrl: `${window.location.origin}/settings` },
+      });
+      if ("error" in result) toast.error(result.error);
+      else window.open(result.url, "_blank");
+    } finally {
+      setPortalLoading(false);
+    }
+  };
 
   const handleSelect = (plan: PricingPlan) => {
     if (authed === false) {
       navigate({ to: "/auth", search: { redirect: "/pricing" } as never });
       return;
     }
+    if (currentPlanId && currentPlanId !== plan.id) {
+      // Switching plans → Stripe portal handles proration.
+      openPortal();
+      return;
+    }
     setCheckoutPlan(plan);
   };
+
 
   if (checkoutPlan) {
     const priceId =
