@@ -1,6 +1,10 @@
 import { pageHead } from "@/lib/route-seo";
 import i18nGlobal from "@/lib/i18n";
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { useSubscription } from "@/hooks/use-subscription";
+import { createPortalSession } from "@/lib/payments.functions";
+import { getStripeEnvironment } from "@/lib/stripe";
+import { getPlanByPriceId } from "@/lib/pricing-plans";
 import { AppShell } from "@/components/AppShell";
 import { Switch } from "@/components/ui/switch";
 import { useState } from "react";
