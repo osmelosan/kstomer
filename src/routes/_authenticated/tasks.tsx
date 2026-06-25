@@ -1,6 +1,6 @@
 import { pageHead } from "@/lib/route-seo";
 import { createFileRoute } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { AppShell } from "@/components/AppShell";
 import i18n from "@/lib/i18n";
@@ -22,7 +22,12 @@ import { Plus, CheckSquare, Calendar as CalendarIcon, User2 } from "lucide-react
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 
+type TasksSearch = { focus?: string };
+
 export const Route = createFileRoute("/_authenticated/tasks")({
+  validateSearch: (search: Record<string, unknown>): TasksSearch => ({
+    focus: typeof search.focus === "string" ? search.focus : undefined,
+  }),
   head: () =>
     pageHead({
       routeKey: "tasks",
