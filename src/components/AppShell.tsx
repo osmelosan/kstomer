@@ -68,6 +68,13 @@ export function AppShell({
   const { user, profile } = useCurrentUser();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const { entitled, loading: entLoading } = useEntitlement();
+  // Paywall: gate everything except /settings (so users can manage billing / get out).
+  const onSettings = pathname.startsWith("/settings");
+  if (!entLoading && !entitled && !onSettings) {
+    return <Paywall />;
+  }
+
 
   const displayName =
     profile?.full_name ||
