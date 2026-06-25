@@ -68,7 +68,7 @@ function Dashboard() {
         />
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8">
         <section className="space-y-4">
           <SectionHeader title={t("dashboard.priorityActions")} cta={t("dashboard.seeAll")} ctaTo="/tasks" />
           <div className="bg-card rounded-2xl border border-border divide-y divide-border overflow-hidden shadow-card">
