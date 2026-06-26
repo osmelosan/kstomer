@@ -17,7 +17,9 @@ import {
   Store,
   Award,
   Activity,
+  Info,
 } from "lucide-react";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 export const Route = createFileRoute("/_authenticated/resellers/$slug")({
   head: ({ params }) => {
