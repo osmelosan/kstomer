@@ -1,5 +1,5 @@
 import { pageHead } from "@/lib/route-seo";
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { AppShell } from "@/components/AppShell";
 import { Store, TrendingUp, Sparkles, RefreshCw, AlertCircle } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -8,6 +8,8 @@ import { useServerFn } from "@tanstack/react-start";
 import ReactMarkdown from "react-markdown";
 import i18n from "@/lib/i18n";
 import { analyzeResellers } from "@/lib/resellers-ai.functions";
+import { RESELLERS } from "@/lib/mock-resellers";
+
 
 export const Route = createFileRoute("/_authenticated/resellers")({
   head: () =>
