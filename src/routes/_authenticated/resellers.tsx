@@ -50,8 +50,16 @@ function Resellers() {
           </thead>
           <tbody>
             {RESELLERS.map((r) => (
-              <tr key={r.name} className="border-b border-border last:border-0 hover:bg-muted/40">
-                <td className="p-4 font-semibold">{r.name}</td>
+              <tr key={r.id} className="border-b border-border last:border-0 hover:bg-muted/40">
+                <td className="p-4 font-semibold">
+                  <Link
+                    to="/resellers/$id"
+                    params={{ id: r.id }}
+                    className="text-secondary hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary/40 rounded-sm"
+                  >
+                    {r.name}
+                  </Link>
+                </td>
                 <td className="p-4">
                   <span
                     className={`inline-flex items-center text-xs font-semibold px-3 py-1 rounded-full ${
