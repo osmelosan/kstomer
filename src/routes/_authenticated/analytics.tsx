@@ -193,7 +193,7 @@ function Analytics() {
                 <CartesianGrid stroke="var(--color-border)" vertical={false} />
                 <XAxis dataKey="m" stroke="var(--color-muted-foreground)" fontSize={12} axisLine={false} tickLine={false} />
                 <YAxis stroke="var(--color-muted-foreground)" fontSize={12} axisLine={false} tickLine={false} />
-                <Tooltip contentStyle={{ background: "var(--color-card)", border: "1px solid var(--color-border)", borderRadius: 8 }} />
+                <RechartsTooltip contentStyle={{ background: "var(--color-card)", border: "1px solid var(--color-border)", borderRadius: 8 }} />
                 <Area type="monotone" dataKey="v" stroke="var(--color-secondary)" fill="url(#g)" strokeWidth={2.5} />
               </AreaChart>
             </ResponsiveContainer>
