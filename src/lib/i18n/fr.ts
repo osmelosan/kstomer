@@ -581,6 +581,12 @@ export const fr = {
     activeContacts: "Contacts actifs",
     opportunities: "Opportunités",
     vsLastMonth: "vs mois dernier",
+    infos: {
+      totalRevenue: "Somme du chiffre d'affaires encaissé sur la période sélectionnée (deals gagnés, hors taxes).",
+      conversionRate: "Part des opportunités gagnées sur le total clôturé (gagnées + perdues) durant la période.",
+      activeContacts: "Contacts ayant eu au moins une interaction (email, appel, note) au cours des 30 derniers jours.",
+      opportunities: "Valeur cumulée des opportunités encore ouvertes dans le pipeline, pondérée par la probabilité.",
+    },
     revenueGrowth: "Croissance du revenu",
     current: "Actuel",
     previous: "Précédent",

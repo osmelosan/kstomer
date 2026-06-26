@@ -6,7 +6,7 @@ import {
   AreaChart,
   CartesianGrid,
   ResponsiveContainer,
-  Tooltip,
+  Tooltip as RechartsTooltip,
   XAxis,
   YAxis,
 } from "recharts";
@@ -21,7 +21,9 @@ import {
   AlertCircle,
   AlertTriangle,
   CalendarIcon,
+  Info,
 } from "lucide-react";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { useTranslation, Trans } from "react-i18next";
 import i18n from "@/lib/i18n";
 import { useEffect, useState } from "react";
@@ -161,12 +163,14 @@ function Analytics() {
         </div>
       }
     >
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-5 mb-8">
-        <Kpi label={t("analytics.totalRevenue")} value="45 280,00 €" icon={<Wallet className="h-4 w-4" />} delta="+12.5%" />
-        <Kpi label={t("analytics.conversionRate")} value="24.8%" icon={<MousePointerClick className="h-4 w-4" />} delta="+3.2%" />
-        <Kpi label={t("analytics.activeContacts")} value="1 284" icon={<Users className="h-4 w-4" />} delta={t("analytics.vsLastMonth")} neutral />
-        <Kpi label={t("analytics.opportunities")} value="128 500 €" icon={<TrendingUp className="h-4 w-4" />} delta="+8k €" />
-      </div>
+      <TooltipProvider delayDuration={150}>
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-5 mb-8">
+          <Kpi label={t("analytics.totalRevenue")} value="45 280,00 €" icon={<Wallet className="h-4 w-4" />} delta="+12.5%" info={t("analytics.infos.totalRevenue")} />
+          <Kpi label={t("analytics.conversionRate")} value="24.8%" icon={<MousePointerClick className="h-4 w-4" />} delta="+3.2%" info={t("analytics.infos.conversionRate")} />
+          <Kpi label={t("analytics.activeContacts")} value="1 284" icon={<Users className="h-4 w-4" />} delta={t("analytics.vsLastMonth")} neutral info={t("analytics.infos.activeContacts")} />
+          <Kpi label={t("analytics.opportunities")} value="128 500 €" icon={<TrendingUp className="h-4 w-4" />} delta="+8k €" info={t("analytics.infos.opportunities")} />
+        </div>
+      </TooltipProvider>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 mb-8">
         <div className="k-card p-6 lg:col-span-2">
@@ -191,7 +195,7 @@ function Analytics() {
                 <CartesianGrid stroke="var(--color-border)" vertical={false} />
                 <XAxis dataKey="m" stroke="var(--color-muted-foreground)" fontSize={12} axisLine={false} tickLine={false} />
                 <YAxis stroke="var(--color-muted-foreground)" fontSize={12} axisLine={false} tickLine={false} />
-                <Tooltip contentStyle={{ background: "var(--color-card)", border: "1px solid var(--color-border)", borderRadius: 8 }} />
+                <RechartsTooltip contentStyle={{ background: "var(--color-card)", border: "1px solid var(--color-border)", borderRadius: 8 }} />
                 <Area type="monotone" dataKey="v" stroke="var(--color-secondary)" fill="url(#g)" strokeWidth={2.5} />
               </AreaChart>
             </ResponsiveContainer>
@@ -299,12 +303,14 @@ function Kpi({
   icon,
   delta,
   neutral,
+  info,
 }: {
   label: string;
   value: string;
   icon: React.ReactNode;
   delta: string;
   neutral?: boolean;
+  info?: string;
 }) {
   return (
     <div className="k-card p-6">
@@ -319,7 +325,25 @@ function Kpi({
           {delta}
         </span>
       </div>
-      <div className="k-label mt-4">{label}</div>
+      <div className="k-label mt-4 flex items-center gap-1">
+        <span>{label}</span>
+        {info ? (
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <button
+                type="button"
+                aria-label={info}
+                className="inline-flex items-center text-muted-foreground/70 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary rounded-full"
+              >
+                <Info className="h-3 w-3" />
+              </button>
+            </TooltipTrigger>
+            <TooltipContent side="top" className="max-w-[260px] text-xs leading-relaxed">
+              {info}
+            </TooltipContent>
+          </Tooltip>
+        ) : null}
+      </div>
       <div className="text-[28px] font-bold mt-1 tracking-tight">{value}</div>
     </div>
   );
