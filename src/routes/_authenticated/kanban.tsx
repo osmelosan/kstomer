@@ -294,8 +294,9 @@ function KanbanPage() {
 
       // over a column?
       const overIsColumn = over.data.current?.type === "column";
+      const overColumnId = (over.data.current?.columnId as string | undefined) ?? overId;
       const toCol = overIsColumn
-        ? prev.columns.find((c) => c.id === overId)!
+        ? prev.columns.find((c) => c.id === overColumnId)
         : prev.columns.find((c) => c.cardIds.includes(overId));
       if (!toCol || toCol.id === fromCol.id) return prev;
 
