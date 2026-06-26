@@ -2,8 +2,10 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { Logo } from "@/components/Logo";
 import { ArrowRight, BadgeCheck } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import i18n from "@/lib/i18n";
+import i18n, { SUPPORTED_LANGUAGES, type LanguageCode } from "@/lib/i18n";
 import { pageHead } from "@/lib/route-seo";
+import { useEffect } from "react";
+import { detectLanguageFromIp } from "@/lib/ip-language";
 
 export const Route = createFileRoute("/")({
   head: () =>
@@ -17,7 +19,24 @@ export const Route = createFileRoute("/")({
 
 
 function WelcomePage() {
-  const { t } = useTranslation();
+  const { t, i18n: i18nInstance } = useTranslation();
+
+  useEffect(() => {
+    detectLanguageFromIp().then((lang) => {
+      if (lang) {
+        i18nInstance.changeLanguage(lang);
+        if (typeof document !== "undefined") document.documentElement.lang = lang;
+      }
+    });
+  }, [i18nInstance]);
+
+  const currentLang = i18nInstance.language.split("-")[0] as LanguageCode;
+
+  const changeLanguage = (code: LanguageCode) => {
+    i18nInstance.changeLanguage(code);
+    if (typeof document !== "undefined") document.documentElement.lang = code;
+  };
+
   return (
     <main className="min-h-screen bg-background flex items-center justify-center px-6 py-16">
       <div className="w-full max-w-xl rounded-2xl bg-card border border-border shadow-[0_1px_3px_rgba(15,27,61,0.05)] px-10 py-14 text-center">
@@ -79,6 +98,22 @@ function WelcomePage() {
         </Link>
 
         <p className="mt-4 text-xs text-muted-foreground">{t("welcome.fastSetup")}</p>
+
+        <div className="mt-8 flex items-center justify-center gap-1 border-t border-border pt-6">
+          {SUPPORTED_LANGUAGES.map((lang) => (
+            <button
+              key={lang.code}
+              onClick={() => changeLanguage(lang.code)}
+              className={`px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${
+                currentLang === lang.code
+                  ? "bg-muted text-foreground"
+                  : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+              }`}
+            >
+              {lang.label}
+            </button>
+          ))}
+        </div>
       </div>
     </main>
   );
