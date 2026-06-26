@@ -50,10 +50,9 @@ function AuthPage() {
         <div className="rounded-xl bg-card border border-border shadow-[0_1px_3px_rgba(15,27,61,0.05)] p-8">
 
           <Tabs value={tab} onValueChange={(v) => setTab(v as typeof tab)}>
-            <TabsList className="grid grid-cols-3 w-full mb-6">
+            <TabsList className="grid grid-cols-2 w-full mb-6">
               <TabsTrigger value="signin">{t("auth.signIn")}</TabsTrigger>
               <TabsTrigger value="signup">{t("auth.signUp")}</TabsTrigger>
-              <TabsTrigger value="forgot">{t("auth.forgot")}</TabsTrigger>
             </TabsList>
             <TabsContent value="signin">
               <SignInForm onSwitchForgot={() => setTab("forgot")} />

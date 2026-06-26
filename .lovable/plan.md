@@ -1,23 +1,14 @@
-## Goal
-Let the user edit the monthly revenue goal (currently hardcoded "16 000 €") from the Settings page. The Dashboard footer under the Revenue card should reflect that value, and the progress bar should be computed from it.
+## Problem
+On the `/auth` page, the three tab buttons (Iniciar sesión / Registrarse / Olvidé mi contraseña) overlap because the Spanish "Olvidé mi contraseña" text is too long for a `grid-cols-3` layout. Additionally, the "Forgot password" flow is duplicated: it exists both as a tab trigger and as a text link inside the Sign In form.
 
-## Changes
+## Solution
+1. **Remove the "Forgot password" tab trigger** from `TabsList` in `src/routes/auth.tsx`.
+2. **Change `grid-cols-3` to `grid-cols-2`** so the remaining "Sign In" and "Sign Up" tabs have enough room.
+3. **Keep the `TabsContent value="forgot"`** and the existing `onSwitchForgot` link inside `SignInForm` so users can still access the password-reset flow by clicking the link below the password field.
 
-1. **New `useRevenueGoal` hook** (`src/hooks/use-revenue-goal.ts`)
-   - Reads/writes the goal in `localStorage` under `kstomer.revenueGoal` (default `16000`).
-   - Exposes `{ goal, setGoal }` with cross-tab sync via the `storage` event.
+No other files need changes. The i18n key `auth.forgot` will simply no longer be used on this page (the link uses `auth.forgotLink` instead).
 
-2. **New Settings section: "Preferences"** (or appended to Profile)
-   - Add a `preferences` entry to the `SectionKey` union and sidebar in `src/routes/_authenticated/settings.tsx`.
-   - New `PreferencesSection` component with a numeric input "Objectif de revenu mensuel (€)", an inline save button, and a confirmation toast.
-   - i18n keys added in FR/EN/ES: `settings.sections.preferences`, `settings.preferences.revenueGoalLabel`, `settings.preferences.revenueGoalHelp`, `settings.preferences.save`, `settings.preferences.saved`.
-
-3. **Dashboard wiring** (`src/routes/_authenticated/dashboard.tsx`)
-   - Use `useRevenueGoal()` to get the current goal.
-   - Format with `Intl.NumberFormat` based on current locale + `€`.
-   - Replace the static `t("dashboard.revenueGoal")` with an interpolated string (`{{goal}}`), e.g. `"Objectif : {{goal}} ce mois"` — update all three locales accordingly.
-   - Compute `progress` from `currentRevenue / goal` (keeping the existing mocked `12 450` revenue as the numerator) instead of the hardcoded `75`.
-
-## Out of scope
-- Persisting the goal to the backend (kept local-only for now, matching other mock data on the Dashboard).
-- Editing the revenue value itself or per-company goals.
+## Verification
+- Build passes (`bun run build`).
+- The auth page renders two non-overlapping tabs.
+- Clicking "¿Olvidaste tu contraseña?" under the password field still shows the forgot-password form.
