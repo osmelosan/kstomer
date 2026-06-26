@@ -22,11 +22,6 @@ export const Route = createFileRoute("/_authenticated/resellers")({
   component: Resellers,
 });
 
-const RESELLERS = [
-  { name: "Emilie Sales", tier: "Bronze", deals: 4, revenue: "3 200 €", health: 2 },
-  { name: "Marc Partners", tier: "Silver", deals: 12, revenue: "9 800 €", health: 4 },
-  { name: "Nova Distrib", tier: "Gold", deals: 24, revenue: "21 400 €", health: 5 },
-];
 
 function Resellers() {
   const { t } = useTranslation();
