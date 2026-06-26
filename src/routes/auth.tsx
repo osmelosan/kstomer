@@ -76,7 +76,7 @@ function GoogleButton() {
   const handleGoogle = async () => {
     setLoading(true);
     const result = await lovable.auth.signInWithOAuth("google", {
-      redirect_uri: window.location.origin + "/dashboard",
+      redirect_uri: window.location.origin + "/auth/callback",
     });
     if (result.error) {
       toast.error(result.error.message ?? t("auth.googleError"));
@@ -236,7 +236,7 @@ function SignUpForm() {
       email,
       password,
       options: {
-        emailRedirectTo: `${window.location.origin}/dashboard`,
+        emailRedirectTo: `${window.location.origin}/auth/callback`,
         data: { full_name: fullName },
       },
     });

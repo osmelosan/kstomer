@@ -695,6 +695,7 @@ export const es = {
     integrations: {
       connected: "Conectado",
       connect: "Conectar",
+      comingSoon: "Próximamente",
       googleCalendar: "Google Calendar",
       googleCalendarDesc: "Sincroniza tus citas y seguimientos.",
       gmail: "Gmail",
