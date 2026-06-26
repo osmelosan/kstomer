@@ -42,7 +42,7 @@ export function useSubscription() {
     load();
 
     const channel = supabase
-      .channel("subscriptions-self")
+      .channel(`subscriptions-self-${crypto.randomUUID()}`)
       .on("postgres_changes", { event: "*", schema: "public", table: "subscriptions" }, () => load())
       .subscribe();
 
