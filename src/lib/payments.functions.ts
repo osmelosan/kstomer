@@ -1,5 +1,4 @@
 import { createServerFn } from "@tanstack/react-start";
-import { createClient } from "@supabase/supabase-js";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import {
   type StripeEnv,
@@ -104,7 +103,7 @@ export const reconcileCheckoutSession = createServerFn({ method: "POST" })
     return data;
   })
   .handler(async ({ data, context }): Promise<{ ok: true } | { error: string }> => {
-    const { userId } = context;
+    const { userId, supabase } = context;
     try {
       const stripe = createStripeClient(data.environment);
       const session = await stripe.checkout.sessions.retrieve(data.sessionId, {
@@ -115,19 +114,17 @@ export const reconcileCheckoutSession = createServerFn({ method: "POST" })
         return { error: "Checkout session not complete" };
       }
 
-      const sub = session.subscription as (typeof stripe extends { subscriptions: infer S } ? never : any);
+      // Verify this session belongs to the authenticated user
+      const sessionUserId = session.metadata?.userId;
+      if (sessionUserId && sessionUserId !== userId) {
+        console.error("[reconcile] userId mismatch session=%s auth=%s", sessionUserId, userId);
+        return { error: "Session does not belong to this user" };
+      }
+
+      const sub = session.subscription as any;
       if (!sub || typeof sub !== "object") {
         return { error: "No subscription found in checkout session" };
       }
-
-      const SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
-      const SUPABASE_URL = process.env.SUPABASE_URL;
-      if (!SERVICE_ROLE_KEY || !SUPABASE_URL) {
-        console.error("[reconcile] Missing SUPABASE_SERVICE_ROLE_KEY or SUPABASE_URL");
-        return { error: "Server configuration error" };
-      }
-
-      const adminSupabase = createClient(SUPABASE_URL, SERVICE_ROLE_KEY);
 
       const item = sub.items?.data?.[0];
       const periodStart = item?.current_period_start ?? sub.current_period_start;
@@ -138,7 +135,8 @@ export const reconcileCheckoutSession = createServerFn({ method: "POST" })
         item?.price?.id ||
         "";
 
-      const { error: dbError } = await adminSupabase.from("subscriptions").upsert(
+      // Use the user's own authenticated client — works via RLS INSERT/UPDATE policies
+      const { error: dbError } = await supabase.from("subscriptions").upsert(
         {
           user_id: userId,
           stripe_subscription_id: sub.id,
