@@ -1,8 +1,0 @@
-{
-  "rewrites": [
-    {
-      "source": "/__l5e/:path*",
-      "destination": "https://kstomer.lovable.app/__l5e/:path*"
-    }
-  ]
-}

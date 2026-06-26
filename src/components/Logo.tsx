@@ -1,6 +1,3 @@
-import horizontalOnDark from "@/assets/kstomer-horizontal-on-dark.png.asset.json";
-import horizontalOnLight from "@/assets/kstomer-horizontal-on-light.png.asset.json";
-import isotipo from "@/assets/kstomer-isotipo.svg.asset.json";
 import { cn } from "@/lib/utils";
 
 type LogoVariant = "horizontal" | "icon";
@@ -8,12 +5,12 @@ type LogoTheme = "on-dark" | "on-light";
 
 const SOURCES: Record<LogoVariant, Record<LogoTheme, string>> = {
   horizontal: {
-    "on-dark": horizontalOnLight.url,
-    "on-light": horizontalOnDark.url,
+    "on-dark": "/kstomer-horizontal-on-dark.png",
+    "on-light": "/kstomer-horizontal-on-light.png",
   },
   icon: {
-    "on-dark": isotipo.url,
-    "on-light": isotipo.url,
+    "on-dark": "/kstomer-isotipo.png",
+    "on-light": "/kstomer-isotipo.png",
   },
 };
 
