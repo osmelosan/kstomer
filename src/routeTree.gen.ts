@@ -24,6 +24,7 @@ import { Route as AuthenticatedKanbanRouteImport } from './routes/_authenticated
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedArchivesRouteImport } from './routes/_authenticated/archives'
 import { Route as AuthenticatedAnalyticsRouteImport } from './routes/_authenticated/analytics'
+import { Route as AuthenticatedResellersIndexRouteImport } from './routes/_authenticated/resellers.index'
 import { Route as AuthenticatedContactsIndexRouteImport } from './routes/_authenticated/contacts.index'
 import { Route as AuthenticatedResellersSlugRouteImport } from './routes/_authenticated/resellers.$slug'
 import { Route as AuthenticatedContactsNewRouteImport } from './routes/_authenticated/contacts.new'
@@ -104,6 +105,12 @@ const AuthenticatedAnalyticsRoute = AuthenticatedAnalyticsRouteImport.update({
   path: '/analytics',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedResellersIndexRoute =
+  AuthenticatedResellersIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => AuthenticatedResellersRoute,
+  } as any)
 const AuthenticatedContactsIndexRoute =
   AuthenticatedContactsIndexRouteImport.update({
     id: '/contacts/',
@@ -153,6 +160,7 @@ export interface FileRoutesByFullPath {
   '/contacts/new': typeof AuthenticatedContactsNewRoute
   '/resellers/$slug': typeof AuthenticatedResellersSlugRoute
   '/contacts/': typeof AuthenticatedContactsIndexRoute
+  '/resellers/': typeof AuthenticatedResellersIndexRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
 }
 export interface FileRoutesByTo {
@@ -166,7 +174,6 @@ export interface FileRoutesByTo {
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/kanban': typeof AuthenticatedKanbanRoute
   '/onboarding': typeof AuthenticatedOnboardingRoute
-  '/resellers': typeof AuthenticatedResellersRouteWithChildren
   '/settings': typeof AuthenticatedSettingsRoute
   '/tasks': typeof AuthenticatedTasksRoute
   '/checkout/return': typeof CheckoutReturnRoute
@@ -174,6 +181,7 @@ export interface FileRoutesByTo {
   '/contacts/new': typeof AuthenticatedContactsNewRoute
   '/resellers/$slug': typeof AuthenticatedResellersSlugRoute
   '/contacts': typeof AuthenticatedContactsIndexRoute
+  '/resellers': typeof AuthenticatedResellersIndexRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
 }
 export interface FileRoutesById {
@@ -197,6 +205,7 @@ export interface FileRoutesById {
   '/_authenticated/contacts/new': typeof AuthenticatedContactsNewRoute
   '/_authenticated/resellers/$slug': typeof AuthenticatedResellersSlugRoute
   '/_authenticated/contacts/': typeof AuthenticatedContactsIndexRoute
+  '/_authenticated/resellers/': typeof AuthenticatedResellersIndexRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
 }
 export interface FileRouteTypes {
@@ -220,6 +229,7 @@ export interface FileRouteTypes {
     | '/contacts/new'
     | '/resellers/$slug'
     | '/contacts/'
+    | '/resellers/'
     | '/api/public/payments/webhook'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -233,7 +243,6 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/kanban'
     | '/onboarding'
-    | '/resellers'
     | '/settings'
     | '/tasks'
     | '/checkout/return'
@@ -241,6 +250,7 @@ export interface FileRouteTypes {
     | '/contacts/new'
     | '/resellers/$slug'
     | '/contacts'
+    | '/resellers'
     | '/api/public/payments/webhook'
   id:
     | '__root__'
@@ -263,6 +273,7 @@ export interface FileRouteTypes {
     | '/_authenticated/contacts/new'
     | '/_authenticated/resellers/$slug'
     | '/_authenticated/contacts/'
+    | '/_authenticated/resellers/'
     | '/api/public/payments/webhook'
   fileRoutesById: FileRoutesById
 }
@@ -384,6 +395,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAnalyticsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/resellers/': {
+      id: '/_authenticated/resellers/'
+      path: '/'
+      fullPath: '/resellers/'
+      preLoaderRoute: typeof AuthenticatedResellersIndexRouteImport
+      parentRoute: typeof AuthenticatedResellersRoute
+    }
     '/_authenticated/contacts/': {
       id: '/_authenticated/contacts/'
       path: '/contacts'
@@ -424,11 +442,13 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedResellersRouteChildren {
   AuthenticatedResellersSlugRoute: typeof AuthenticatedResellersSlugRoute
+  AuthenticatedResellersIndexRoute: typeof AuthenticatedResellersIndexRoute
 }
 
 const AuthenticatedResellersRouteChildren: AuthenticatedResellersRouteChildren =
   {
     AuthenticatedResellersSlugRoute: AuthenticatedResellersSlugRoute,
+    AuthenticatedResellersIndexRoute: AuthenticatedResellersIndexRoute,
   }
 
 const AuthenticatedResellersRouteWithChildren =
