@@ -157,6 +157,7 @@ export const es = {
     chosenBy: "ELEGIDO POR 1.200+ FUNDADORES",
     cta: "Comenzar la aventura",
     fastSetup: "Configuración rápida • 2 minutos",
+    seePricing: "Ver precios →",
   },
   onboarding: {
     metaTitle: "Personaliza tu experiencia — Kstomer",

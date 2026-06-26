@@ -75,7 +75,7 @@ function WelcomePage() {
           to="/pricing"
           className="mt-3 inline-block text-sm text-secondary hover:underline font-medium"
         >
-          Voir les tarifs →
+          {t("welcome.seePricing")}
         </Link>
 
         <p className="mt-4 text-xs text-muted-foreground">{t("welcome.fastSetup")}</p>

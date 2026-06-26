@@ -35,7 +35,7 @@ export function HelpMenu() {
           </button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-56">
-          <DropdownMenuItem onClick={() => window.open("https://docs.lovable.dev", "_blank")}>
+          <DropdownMenuItem onClick={() => window.open("mailto:support@kstomer.io", "_blank")}>
             <BookOpen className="h-4 w-4 mr-2" />
             {t("help.docs")}
           </DropdownMenuItem>
