@@ -514,6 +514,12 @@ export const fr = {
       sendEmail: "Envoyer un email",
       call: "Appeler",
       notFound: "Revendeur introuvable.",
+      info: {
+        activeDeals: "Nombre d'affaires actuellement ouvertes dans le pipeline de ce partenaire (hors Gagné et Perdu).",
+        revenue: "Cumul du chiffre d'affaires généré par ce partenaire depuis sa date d'entrée (affaires gagnées uniquement).",
+        tier: "Niveau attribué automatiquement selon le revenu cumulé et l'ancienneté : Bronze (< 100k€), Silver (100k–500k€), Gold (> 500k€).",
+        health: "Score composite (1–5) basé sur l'activité récente, la vélocité des affaires et la date du dernier contact.",
+      },
     },
   },
 
