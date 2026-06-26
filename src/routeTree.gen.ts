@@ -25,6 +25,7 @@ import { Route as AuthenticatedDashboardRouteImport } from './routes/_authentica
 import { Route as AuthenticatedArchivesRouteImport } from './routes/_authenticated/archives'
 import { Route as AuthenticatedAnalyticsRouteImport } from './routes/_authenticated/analytics'
 import { Route as AuthenticatedContactsIndexRouteImport } from './routes/_authenticated/contacts.index'
+import { Route as AuthenticatedResellersIdRouteImport } from './routes/_authenticated/resellers.$id'
 import { Route as AuthenticatedContactsNewRouteImport } from './routes/_authenticated/contacts.new'
 import { Route as AuthenticatedContactsIdRouteImport } from './routes/_authenticated/contacts.$id'
 import { Route as ApiPublicPaymentsWebhookRouteImport } from './routes/api/public/payments/webhook'
@@ -109,6 +110,12 @@ const AuthenticatedContactsIndexRoute =
     path: '/contacts/',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedResellersIdRoute =
+  AuthenticatedResellersIdRouteImport.update({
+    id: '/$id',
+    path: '/$id',
+    getParentRoute: () => AuthenticatedResellersRoute,
+  } as any)
 const AuthenticatedContactsNewRoute =
   AuthenticatedContactsNewRouteImport.update({
     id: '/contacts/new',
@@ -138,12 +145,13 @@ export interface FileRoutesByFullPath {
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/kanban': typeof AuthenticatedKanbanRoute
   '/onboarding': typeof AuthenticatedOnboardingRoute
-  '/resellers': typeof AuthenticatedResellersRoute
+  '/resellers': typeof AuthenticatedResellersRouteWithChildren
   '/settings': typeof AuthenticatedSettingsRoute
   '/tasks': typeof AuthenticatedTasksRoute
   '/checkout/return': typeof CheckoutReturnRoute
   '/contacts/$id': typeof AuthenticatedContactsIdRoute
   '/contacts/new': typeof AuthenticatedContactsNewRoute
+  '/resellers/$id': typeof AuthenticatedResellersIdRoute
   '/contacts/': typeof AuthenticatedContactsIndexRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
 }
@@ -158,12 +166,13 @@ export interface FileRoutesByTo {
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/kanban': typeof AuthenticatedKanbanRoute
   '/onboarding': typeof AuthenticatedOnboardingRoute
-  '/resellers': typeof AuthenticatedResellersRoute
+  '/resellers': typeof AuthenticatedResellersRouteWithChildren
   '/settings': typeof AuthenticatedSettingsRoute
   '/tasks': typeof AuthenticatedTasksRoute
   '/checkout/return': typeof CheckoutReturnRoute
   '/contacts/$id': typeof AuthenticatedContactsIdRoute
   '/contacts/new': typeof AuthenticatedContactsNewRoute
+  '/resellers/$id': typeof AuthenticatedResellersIdRoute
   '/contacts': typeof AuthenticatedContactsIndexRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
 }
@@ -180,12 +189,13 @@ export interface FileRoutesById {
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/kanban': typeof AuthenticatedKanbanRoute
   '/_authenticated/onboarding': typeof AuthenticatedOnboardingRoute
-  '/_authenticated/resellers': typeof AuthenticatedResellersRoute
+  '/_authenticated/resellers': typeof AuthenticatedResellersRouteWithChildren
   '/_authenticated/settings': typeof AuthenticatedSettingsRoute
   '/_authenticated/tasks': typeof AuthenticatedTasksRoute
   '/checkout/return': typeof CheckoutReturnRoute
   '/_authenticated/contacts/$id': typeof AuthenticatedContactsIdRoute
   '/_authenticated/contacts/new': typeof AuthenticatedContactsNewRoute
+  '/_authenticated/resellers/$id': typeof AuthenticatedResellersIdRoute
   '/_authenticated/contacts/': typeof AuthenticatedContactsIndexRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
 }
@@ -208,6 +218,7 @@ export interface FileRouteTypes {
     | '/checkout/return'
     | '/contacts/$id'
     | '/contacts/new'
+    | '/resellers/$id'
     | '/contacts/'
     | '/api/public/payments/webhook'
   fileRoutesByTo: FileRoutesByTo
@@ -228,6 +239,7 @@ export interface FileRouteTypes {
     | '/checkout/return'
     | '/contacts/$id'
     | '/contacts/new'
+    | '/resellers/$id'
     | '/contacts'
     | '/api/public/payments/webhook'
   id:
@@ -249,6 +261,7 @@ export interface FileRouteTypes {
     | '/checkout/return'
     | '/_authenticated/contacts/$id'
     | '/_authenticated/contacts/new'
+    | '/_authenticated/resellers/$id'
     | '/_authenticated/contacts/'
     | '/api/public/payments/webhook'
   fileRoutesById: FileRoutesById
@@ -378,6 +391,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedContactsIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/resellers/$id': {
+      id: '/_authenticated/resellers/$id'
+      path: '/$id'
+      fullPath: '/resellers/$id'
+      preLoaderRoute: typeof AuthenticatedResellersIdRouteImport
+      parentRoute: typeof AuthenticatedResellersRoute
+    }
     '/_authenticated/contacts/new': {
       id: '/_authenticated/contacts/new'
       path: '/contacts/new'
@@ -402,13 +422,27 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface AuthenticatedResellersRouteChildren {
+  AuthenticatedResellersIdRoute: typeof AuthenticatedResellersIdRoute
+}
+
+const AuthenticatedResellersRouteChildren: AuthenticatedResellersRouteChildren =
+  {
+    AuthenticatedResellersIdRoute: AuthenticatedResellersIdRoute,
+  }
+
+const AuthenticatedResellersRouteWithChildren =
+  AuthenticatedResellersRoute._addFileChildren(
+    AuthenticatedResellersRouteChildren,
+  )
+
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedAnalyticsRoute: typeof AuthenticatedAnalyticsRoute
   AuthenticatedArchivesRoute: typeof AuthenticatedArchivesRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedKanbanRoute: typeof AuthenticatedKanbanRoute
   AuthenticatedOnboardingRoute: typeof AuthenticatedOnboardingRoute
-  AuthenticatedResellersRoute: typeof AuthenticatedResellersRoute
+  AuthenticatedResellersRoute: typeof AuthenticatedResellersRouteWithChildren
   AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
   AuthenticatedTasksRoute: typeof AuthenticatedTasksRoute
   AuthenticatedContactsIdRoute: typeof AuthenticatedContactsIdRoute
@@ -422,7 +456,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedKanbanRoute: AuthenticatedKanbanRoute,
   AuthenticatedOnboardingRoute: AuthenticatedOnboardingRoute,
-  AuthenticatedResellersRoute: AuthenticatedResellersRoute,
+  AuthenticatedResellersRoute: AuthenticatedResellersRouteWithChildren,
   AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
   AuthenticatedTasksRoute: AuthenticatedTasksRoute,
   AuthenticatedContactsIdRoute: AuthenticatedContactsIdRoute,
