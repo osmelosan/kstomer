@@ -163,12 +163,14 @@ function Analytics() {
         </div>
       }
     >
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-5 mb-8">
-        <Kpi label={t("analytics.totalRevenue")} value="45 280,00 €" icon={<Wallet className="h-4 w-4" />} delta="+12.5%" />
-        <Kpi label={t("analytics.conversionRate")} value="24.8%" icon={<MousePointerClick className="h-4 w-4" />} delta="+3.2%" />
-        <Kpi label={t("analytics.activeContacts")} value="1 284" icon={<Users className="h-4 w-4" />} delta={t("analytics.vsLastMonth")} neutral />
-        <Kpi label={t("analytics.opportunities")} value="128 500 €" icon={<TrendingUp className="h-4 w-4" />} delta="+8k €" />
-      </div>
+      <TooltipProvider delayDuration={150}>
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-5 mb-8">
+          <Kpi label={t("analytics.totalRevenue")} value="45 280,00 €" icon={<Wallet className="h-4 w-4" />} delta="+12.5%" info={t("analytics.infos.totalRevenue")} />
+          <Kpi label={t("analytics.conversionRate")} value="24.8%" icon={<MousePointerClick className="h-4 w-4" />} delta="+3.2%" info={t("analytics.infos.conversionRate")} />
+          <Kpi label={t("analytics.activeContacts")} value="1 284" icon={<Users className="h-4 w-4" />} delta={t("analytics.vsLastMonth")} neutral info={t("analytics.infos.activeContacts")} />
+          <Kpi label={t("analytics.opportunities")} value="128 500 €" icon={<TrendingUp className="h-4 w-4" />} delta="+8k €" info={t("analytics.infos.opportunities")} />
+        </div>
+      </TooltipProvider>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 mb-8">
         <div className="k-card p-6 lg:col-span-2">
