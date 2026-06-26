@@ -25,7 +25,7 @@ import {
 import { useAutosave, type AutosaveStatus } from "@/hooks/use-autosave";
 
 export const Route = createFileRoute("/_authenticated/resellers/$id")({
-  loader: ({ params }) => {
+  loader: ({ params }): { reseller: Reseller } => {
     const reseller = getResellerById(params.id);
     if (!reseller) throw notFound();
     return { reseller };
