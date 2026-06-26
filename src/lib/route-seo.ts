@@ -17,7 +17,6 @@ type RouteKey =
   | "analytics"
   | "archives"
   | "resellers"
-  | "resellerDetail"
   | "onboarding"
   | "pricing"
   | "settings";
@@ -82,11 +81,6 @@ const DESCRIPTIONS: Record<RouteKey, Record<Lang, string>> = {
     fr: "Gérez votre réseau de revendeurs et partenaires.",
     en: "Manage your reseller and partner network.",
     es: "Gestiona tu red de distribuidores y socios.",
-  },
-  resellerDetail: {
-    fr: "Fiche revendeur : coordonnées, affaires en cours et historique.",
-    en: "Reseller sheet: contact details, active deals and history.",
-    es: "Ficha de distribuidor: contactos, oportunidades activas e historial.",
   },
   onboarding: {
     fr: "Configurez votre profil Kstomer en quelques étapes.",
