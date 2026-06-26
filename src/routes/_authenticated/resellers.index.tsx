@@ -11,7 +11,7 @@ import { analyzeResellers } from "@/lib/resellers-ai.functions";
 import { RESELLERS } from "@/lib/mock-resellers";
 
 
-export const Route = createFileRoute("/_authenticated/resellers")({
+export const Route = createFileRoute("/_authenticated/resellers/")({
   head: () =>
     pageHead({
       routeKey: "resellers",
