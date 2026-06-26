@@ -84,6 +84,14 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { property: "og:site_name", content: "Kstomer" },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
+      { title: "Kstomer - Smart CRM" },
+      { property: "og:title", content: "Kstomer - Smart CRM" },
+      { name: "twitter:title", content: "Kstomer - Smart CRM" },
+      { name: "description", content: "Converts HTML/CSS from Google Stitch into a responsive React application with TypeScript and Tailwind CSS." },
+      { property: "og:description", content: "Converts HTML/CSS from Google Stitch into a responsive React application with TypeScript and Tailwind CSS." },
+      { name: "twitter:description", content: "Converts HTML/CSS from Google Stitch into a responsive React application with TypeScript and Tailwind CSS." },
+      { property: "og:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/MMfG7bwTSGaygvR1eIWevHjwQwH3/social-images/social-1782473073821-Kstomer-light-transparent.webp" },
+      { name: "twitter:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/MMfG7bwTSGaygvR1eIWevHjwQwH3/social-images/social-1782473073821-Kstomer-light-transparent.webp" },
     ],
     links: [
       { rel: "stylesheet", href: appCss },
@@ -133,10 +141,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 
 
 function RootShell({ children }: { children: ReactNode }) {
-  const { i18n } = useTranslation();
-  const lang = (i18n.language || "fr").split("-")[0];
   return (
-    <html lang={lang}>
+    <html lang="fr">
       <head>
         <HeadContent />
       </head>
