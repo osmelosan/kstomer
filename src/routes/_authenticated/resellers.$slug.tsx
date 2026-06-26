@@ -201,11 +201,29 @@ function ResellerDetail() {
   );
 }
 
-function Kpi({ label, value, icon }: { label: string; value: React.ReactNode; icon: React.ReactNode }) {
+function Kpi({ label, value, icon, info }: { label: string; value: React.ReactNode; icon: React.ReactNode; info?: string }) {
   return (
     <div className="k-card p-5">
       <div className="flex items-center justify-between">
-        <div className="k-label">{label}</div>
+        <div className="k-label flex items-center gap-1">
+          <span>{label}</span>
+          {info ? (
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <button
+                  type="button"
+                  aria-label={info}
+                  className="inline-flex items-center text-muted-foreground/70 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary rounded-full"
+                >
+                  <Info className="h-3 w-3" />
+                </button>
+              </TooltipTrigger>
+              <TooltipContent side="top" className="max-w-[260px] text-xs leading-relaxed">
+                {info}
+              </TooltipContent>
+            </Tooltip>
+          ) : null}
+        </div>
         <div className="h-8 w-8 rounded-md bg-secondary/10 text-secondary grid place-items-center">{icon}</div>
       </div>
       <div className="text-[22px] font-bold mt-2 tracking-tight">{value}</div>
