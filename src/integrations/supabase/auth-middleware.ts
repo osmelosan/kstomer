@@ -71,6 +71,25 @@ export const requireSupabaseAuth = createMiddleware({ type: 'function' }).server
       throw new Error('Unauthorized: Invalid token');
     }
 
+    // Decode JWT payload locally — avoids a round-trip to Supabase auth API.
+    // Supabase access tokens are standard JWTs: header.payload.signature (base64url).
+    let claims: Record<string, unknown>;
+    try {
+      const payloadB64 = token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/');
+      claims = JSON.parse(Buffer.from(payloadB64, 'base64').toString('utf-8'));
+    } catch {
+      throw new Error('Unauthorized: Malformed token');
+    }
+
+    if (typeof claims.exp === 'number' && Date.now() / 1000 > claims.exp) {
+      throw new Error('Unauthorized: Token expired');
+    }
+
+    const userId = typeof claims.sub === 'string' ? claims.sub : null;
+    if (!userId) {
+      throw new Error('Unauthorized: No user ID in token');
+    }
+
     const supabase = createClient<Database>(
       SUPABASE_URL!,
       SUPABASE_PUBLISHABLE_KEY!,
@@ -89,20 +108,11 @@ export const requireSupabaseAuth = createMiddleware({ type: 'function' }).server
       }
     );
 
-    const { data: userData, error: userError } = await supabase.auth.getUser(token);
-    if (userError || !userData?.user) {
-      throw new Error('Unauthorized: Invalid token');
-    }
-
-    if (!userData.user.id) {
-      throw new Error('Unauthorized: No user ID found in token');
-    }
-
     return next({
       context: {
         supabase,
-        userId: userData.user.id,
-        claims: userData.user,
+        userId,
+        claims,
       },
     });
   },
