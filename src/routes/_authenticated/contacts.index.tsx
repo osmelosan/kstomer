@@ -67,10 +67,10 @@ function Contacts() {
       title={t("contacts.title")}
       subtitle={t("contacts.subtitle")}
       actions={
-        <Link
-          to="/contacts/new"
-          className="ml-2 inline-flex items-center gap-2 h-10 px-4 rounded-md bg-primary text-primary-foreground text-sm font-semibold hover:bg-primary/90"
-        >
+          <Link
+            to="/contacts/new"
+            className="ml-2 inline-flex items-center gap-2 h-10 px-4 rounded-md bg-secondary text-secondary-foreground text-sm font-semibold shadow-sm hover:bg-secondary/90 active:scale-[0.98] transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50"
+          >
           <Plus className="h-4 w-4" /> {t("contacts.newContact")}
         </Link>
       }
