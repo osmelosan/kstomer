@@ -303,12 +303,14 @@ function Kpi({
   icon,
   delta,
   neutral,
+  info,
 }: {
   label: string;
   value: string;
   icon: React.ReactNode;
   delta: string;
   neutral?: boolean;
+  info?: string;
 }) {
   return (
     <div className="k-card p-6">
@@ -323,7 +325,25 @@ function Kpi({
           {delta}
         </span>
       </div>
-      <div className="k-label mt-4">{label}</div>
+      <div className="k-label mt-4 flex items-center gap-1">
+        <span>{label}</span>
+        {info ? (
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <button
+                type="button"
+                aria-label={info}
+                className="inline-flex items-center text-muted-foreground/70 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary rounded-full"
+              >
+                <Info className="h-3 w-3" />
+              </button>
+            </TooltipTrigger>
+            <TooltipContent side="top" className="max-w-[260px] text-xs leading-relaxed">
+              {info}
+            </TooltipContent>
+          </Tooltip>
+        ) : null}
+      </div>
       <div className="text-[28px] font-bold mt-1 tracking-tight">{value}</div>
     </div>
   );
