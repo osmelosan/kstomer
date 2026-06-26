@@ -129,15 +129,17 @@ function SettingsPage() {
           {activeSection === "admin" && isAdmin && <AdminSection />}
 
 
-          <div className="flex justify-end">
-            <button
-              onClick={handleSave}
-              disabled={saving}
-              className="h-10 px-5 rounded-md bg-primary text-primary-foreground text-sm font-semibold disabled:opacity-60"
-            >
-              {saving ? t("common.loading") : t("settings.save")}
-            </button>
-          </div>
+          {activeSection !== "profile" && activeSection !== "preferences" && (
+            <div className="flex justify-end">
+              <button
+                onClick={handleSave}
+                disabled={saving}
+                className="h-10 px-5 rounded-md bg-primary text-primary-foreground text-sm font-semibold disabled:opacity-60"
+              >
+                {saving ? t("common.loading") : t("settings.save")}
+              </button>
+            </div>
+          )}
         </div>
       </div>
     </AppShell>
