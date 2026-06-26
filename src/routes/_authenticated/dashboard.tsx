@@ -15,6 +15,7 @@ import {
 import { useTranslation } from "react-i18next";
 import i18n from "@/lib/i18n";
 import { useRevenueGoal } from "@/hooks/use-revenue-goal";
+import { useCurrentUser } from "@/hooks/use-current-user";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
   head: () =>
@@ -30,6 +31,7 @@ export const Route = createFileRoute("/_authenticated/dashboard")({
 function Dashboard() {
   const { t, i18n: i18nInstance } = useTranslation();
   const { goal } = useRevenueGoal();
+  const { profile, user } = useCurrentUser();
   const currentRevenue = 12450;
   const locale = i18nInstance.language || "fr";
   const goalFormatted = new Intl.NumberFormat(locale, {
@@ -38,10 +40,16 @@ function Dashboard() {
     maximumFractionDigits: 0,
   }).format(goal);
   const progress = Math.min(100, Math.round((currentRevenue / goal) * 100));
+  const fullName =
+    profile?.full_name ||
+    (user?.user_metadata?.full_name as string | undefined) ||
+    user?.email?.split("@")[0] ||
+    "";
+  const firstName = fullName.split(/\s+/)[0] || "";
   return (
     <AppShell
       title={t("dashboard.title")}
-      subtitle={t("dashboard.subtitle")}
+      subtitle={t("dashboard.subtitle", { name: firstName })}
       actions={
         <Link
           to="/contacts/new"

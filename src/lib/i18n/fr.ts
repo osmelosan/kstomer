@@ -189,7 +189,7 @@ export const fr = {
   dashboard: {
     metaTitle: "Tableau de bord — Kstomer",
     title: "Tableau de bord",
-    subtitle: "Bienvenue Thomas. Voici vos priorités pour aujourd'hui.",
+    subtitle: "Bienvenue {{name}}. Voici vos priorités pour aujourd'hui.",
     newOpportunity: "Nouvelle opportunité",
     revenue: "Chiffre d'affaires",
     revenueDelta: "+12%",
