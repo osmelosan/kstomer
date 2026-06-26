@@ -1,4 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
+import { createClient } from "@supabase/supabase-js";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import {
   type StripeEnv,
@@ -92,6 +93,77 @@ export const createCheckoutSession = createServerFn({ method: "POST" })
       return { clientSecret: session.client_secret ?? "" };
     } catch (error) {
       console.error("[checkout] error:", getStripeErrorMessage(error));
+      return { error: getStripeErrorMessage(error) };
+    }
+  });
+
+export const reconcileCheckoutSession = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data: { sessionId: string; environment: StripeEnv }) => {
+    if (!/^cs_[a-zA-Z0-9_]+$/.test(data.sessionId)) throw new Error("Invalid sessionId");
+    return data;
+  })
+  .handler(async ({ data, context }): Promise<{ ok: true } | { error: string }> => {
+    const { userId } = context;
+    try {
+      const stripe = createStripeClient(data.environment);
+      const session = await stripe.checkout.sessions.retrieve(data.sessionId, {
+        expand: ["subscription"],
+      });
+
+      if (session.status !== "complete") {
+        return { error: "Checkout session not complete" };
+      }
+
+      const sub = session.subscription as (typeof stripe extends { subscriptions: infer S } ? never : any);
+      if (!sub || typeof sub !== "object") {
+        return { error: "No subscription found in checkout session" };
+      }
+
+      const SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
+      const SUPABASE_URL = process.env.SUPABASE_URL;
+      if (!SERVICE_ROLE_KEY || !SUPABASE_URL) {
+        console.error("[reconcile] Missing SUPABASE_SERVICE_ROLE_KEY or SUPABASE_URL");
+        return { error: "Server configuration error" };
+      }
+
+      const adminSupabase = createClient(SUPABASE_URL, SERVICE_ROLE_KEY);
+
+      const item = sub.items?.data?.[0];
+      const periodStart = item?.current_period_start ?? sub.current_period_start;
+      const periodEnd = item?.current_period_end ?? sub.current_period_end;
+      const priceId =
+        item?.price?.lookup_key ||
+        item?.price?.metadata?.lovable_external_id ||
+        item?.price?.id ||
+        "";
+
+      const { error: dbError } = await adminSupabase.from("subscriptions").upsert(
+        {
+          user_id: userId,
+          stripe_subscription_id: sub.id,
+          stripe_customer_id: typeof sub.customer === "string" ? sub.customer : sub.customer?.id,
+          product_id: item?.price?.product ?? "",
+          price_id: priceId,
+          status: sub.status,
+          current_period_start: periodStart ? new Date(periodStart * 1000).toISOString() : null,
+          current_period_end: periodEnd ? new Date(periodEnd * 1000).toISOString() : null,
+          cancel_at_period_end: sub.cancel_at_period_end ?? false,
+          environment: data.environment,
+          updated_at: new Date().toISOString(),
+        },
+        { onConflict: "stripe_subscription_id" },
+      );
+
+      if (dbError) {
+        console.error("[reconcile] supabase error:", dbError);
+        return { error: dbError.message };
+      }
+
+      console.log("[reconcile] subscription written for user=%s sub=%s", userId, sub.id);
+      return { ok: true };
+    } catch (error) {
+      console.error("[reconcile] error:", getStripeErrorMessage(error));
       return { error: getStripeErrorMessage(error) };
     }
   });
