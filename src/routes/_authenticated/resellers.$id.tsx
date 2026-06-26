@@ -89,7 +89,7 @@ function tierClass(tier: Reseller["tier"]) {
 }
 
 function ResellerDetail() {
-  const { reseller } = Route.useLoaderData();
+  const { reseller } = Route.useLoaderData() as { reseller: Reseller };
   const { t, i18n: i18nInst } = useTranslation();
   const storageKey = `reseller-notes:${reseller.id}`;
 
