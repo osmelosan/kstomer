@@ -65,31 +65,34 @@ function ResellerDetail() {
       </div>
 
       {/* KPIs */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-        <Kpi label={t("resellers.detail.activeDeals")} value={String(reseller.deals)} icon={<Briefcase className="h-4 w-4" />} />
-        <Kpi label={t("resellers.detail.totalRevenue")} value={reseller.revenue} icon={<TrendingUp className="h-4 w-4" />} />
-        <Kpi label={t("resellers.detail.tier")} value={reseller.tier} icon={<Award className="h-4 w-4" />} />
-        <Kpi
-          label={t("resellers.detail.health")}
-          value={
-            <div className="flex gap-1 mt-1">
-              {[1, 2, 3, 4, 5].map((i) => (
-                <span
-                  key={i}
-                  className="h-2 w-5 rounded-full"
-                  style={{
-                    background:
-                      i <= reseller.health
-                        ? "var(--color-secondary)"
-                        : "color-mix(in oklab, var(--color-secondary) 15%, transparent)",
-                  }}
-                />
-              ))}
-            </div>
-          }
-          icon={<Activity className="h-4 w-4" />}
-        />
-      </div>
+      <TooltipProvider delayDuration={150}>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+          <Kpi label={t("resellers.detail.activeDeals")} value={String(reseller.deals)} icon={<Briefcase className="h-4 w-4" />} info={t("resellers.detail.info.activeDeals")} />
+          <Kpi label={t("resellers.detail.totalRevenue")} value={reseller.revenue} icon={<TrendingUp className="h-4 w-4" />} info={t("resellers.detail.info.revenue")} />
+          <Kpi label={t("resellers.detail.tier")} value={reseller.tier} icon={<Award className="h-4 w-4" />} info={t("resellers.detail.info.tier")} />
+          <Kpi
+            label={t("resellers.detail.health")}
+            value={
+              <div className="flex gap-1 mt-1">
+                {[1, 2, 3, 4, 5].map((i) => (
+                  <span
+                    key={i}
+                    className="h-2 w-5 rounded-full"
+                    style={{
+                      background:
+                        i <= reseller.health
+                          ? "var(--color-secondary)"
+                          : "color-mix(in oklab, var(--color-secondary) 15%, transparent)",
+                    }}
+                  />
+                ))}
+              </div>
+            }
+            icon={<Activity className="h-4 w-4" />}
+            info={t("resellers.detail.info.health")}
+          />
+        </div>
+      </TooltipProvider>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Contact column */}
