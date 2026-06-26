@@ -21,7 +21,9 @@ import {
   AlertCircle,
   AlertTriangle,
   CalendarIcon,
+  Info,
 } from "lucide-react";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { useTranslation, Trans } from "react-i18next";
 import i18n from "@/lib/i18n";
 import { useEffect, useState } from "react";
