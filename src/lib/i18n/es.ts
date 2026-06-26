@@ -654,6 +654,8 @@ export const es = {
       saved: "Objetivo actualizado.",
     },
     fullName: "Nombre completo",
+    firstName: "Nombre",
+    lastName: "Apellido",
     email: "Email",
     company: "Empresa",
     timezone: "Zona horaria",

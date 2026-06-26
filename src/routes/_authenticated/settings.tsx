@@ -35,6 +35,8 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useRevenueGoal } from "@/hooks/use-revenue-goal";
+import { useCurrentUser } from "@/hooks/use-current-user";
+import { supabase } from "@/integrations/supabase/client";
 
 
 export const Route = createFileRoute("/_authenticated/settings")({
@@ -144,16 +146,67 @@ function SettingsPage() {
 
 function ProfileSection() {
   const { t } = useTranslation();
+  const { user, profile } = useCurrentUser();
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    const fullName =
+      profile?.full_name ||
+      (user?.user_metadata?.full_name as string | undefined) ||
+      "";
+    const parts = fullName.trim().split(/\s+/);
+    setFirstName(parts[0] ?? "");
+    setLastName(parts.slice(1).join(" "));
+  }, [profile, user]);
+
+  const handleSave = async () => {
+    if (!user) return;
+    setSaving(true);
+    const full_name = [firstName, lastName].filter(Boolean).join(" ");
+    const { error } = await supabase
+      .from("profiles")
+      .update({ full_name })
+      .eq("id", user.id);
+    setSaving(false);
+    if (error) {
+      toast.error(t("settings.saved") + " ✗");
+    } else {
+      toast.success(t("settings.saved"));
+    }
+  };
+
   return (
     <div className="k-card p-7">
       <h3 className="text-[18px] font-semibold tracking-tight mb-4">
         {t("settings.sections.profile")}
       </h3>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-        <Field label={t("settings.fullName")} defaultValue="Thomas Melo" />
-        <Field label={t("settings.email")} defaultValue="thomas@kstomer.io" />
-        <Field label={t("settings.company")} defaultValue="Kstomer Lab" />
-        <Field label={t("settings.timezone")} defaultValue="Europe/Paris" />
+        <Field
+          label={t("settings.firstName")}
+          value={firstName}
+          onChange={(v) => setFirstName(v)}
+        />
+        <Field
+          label={t("settings.lastName")}
+          value={lastName}
+          onChange={(v) => setLastName(v)}
+        />
+        <Field
+          label={t("settings.email")}
+          value={user?.email ?? ""}
+          readOnly
+        />
+      </div>
+      <div className="flex justify-end mt-5">
+        <button
+          onClick={handleSave}
+          disabled={saving}
+          className="h-10 px-5 rounded-md bg-primary text-primary-foreground text-sm font-semibold disabled:opacity-60"
+        >
+          {saving ? t("common.loading") : t("settings.save")}
+        </button>
       </div>
     </div>
   );
@@ -503,14 +556,31 @@ function IntegrationsSection() {
   );
 }
 
-function Field({ label, defaultValue, type = "text" }: { label: string; defaultValue?: string; type?: string }) {
+function Field({
+  label,
+  defaultValue,
+  value,
+  onChange,
+  readOnly,
+  type = "text",
+}: {
+  label: string;
+  defaultValue?: string;
+  value?: string;
+  onChange?: (v: string) => void;
+  readOnly?: boolean;
+  type?: string;
+}) {
   return (
     <div>
       <label className="block text-sm font-semibold mb-2">{label}</label>
       <input
         type={type}
-        defaultValue={defaultValue}
-        className="w-full h-11 px-3 rounded-md border border-input bg-card text-sm focus:ring-2 focus:ring-ring/40 focus:outline-none"
+        defaultValue={value === undefined ? defaultValue : undefined}
+        value={value}
+        onChange={onChange ? (e) => onChange(e.target.value) : undefined}
+        readOnly={readOnly}
+        className={`w-full h-11 px-3 rounded-md border border-input bg-card text-sm focus:ring-2 focus:ring-ring/40 focus:outline-none${readOnly ? " opacity-60 cursor-not-allowed" : ""}`}
       />
     </div>
   );

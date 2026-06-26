@@ -654,6 +654,8 @@ export const en = {
       saved: "Goal updated.",
     },
     fullName: "Full name",
+    firstName: "First name",
+    lastName: "Last name",
     email: "Email",
     company: "Company",
     timezone: "Timezone",
