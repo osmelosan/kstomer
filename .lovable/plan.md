@@ -1,34 +1,35 @@
-## Goal
-Add a small info icon (`Info` from lucide-react) inside each KPI card on the Reseller Detail page (`/resellers/$slug`) that, on hover/click, shows a tooltip explaining what the metric represents and how it is computed.
+## Suggestion: checklist technique pré-lancement v1
 
-## Scope
-Only the 4 KPI cards on `src/routes/_authenticated/resellers.$slug.tsx`:
-- **Affaires actives** — count of deals in pipeline whose stage is not "Won" or "Lost".
-- **Revenu total** — sum of closed-won deal amounts since the partner's start date (`partnerSince`).
-- **Niveau (Tier)** — Bronze / Silver / Gold based on cumulative revenue thresholds and tenure.
-- **Santé** — composite indicator (Healthy / At risk / Critical) from recent activity, deal velocity, and last contact.
+Avant de déployer, je propose une passe rapide de vérifications techniques + 2 corrections de "polish" que j'ai repérées en lisant le code.
 
-## Implementation
+### Corrections à faire (rapides, sûres)
 
-1. **`Kpi` helper component** (same file, lines 199-220)
-   - Add optional prop `info?: string`.
-   - When set, render a `lucide-react` `Info` icon (12px, muted) next to the label, wrapped in a shadcn `Tooltip` (`@/components/ui/tooltip`). Use existing `TooltipProvider` if not already mounted at the app root — add a local `<TooltipProvider delayDuration={150}>` around the KPI row to be safe.
+1. **`src/routes/index.tsx` (landing publique)**
+   - Ligne 78 : `"Voir les tarifs →"` est en dur en français. Le remplacer par une clé i18n (`welcome.seePricing`) en FR/EN/ES, comme le reste de la page.
 
-2. **Wire the 4 KPI usages** to pass localized `info` strings via `t('resellers.detail.kpi.<key>.info')`.
+2. **`src/routes/sitemap[.]xml.ts`**
+   - Le sitemap ne liste que `/` et `/auth`. Ajouter `/pricing` (route publique réelle) pour le SEO.
 
-3. **i18n keys** in `src/lib/i18n/{fr,en,es}.ts` under `resellers.detail.kpi`:
-   - `activeDeals.info`
-   - `revenue.info`
-   - `tier.info`
-   - `health.info`
-   Three short sentences each (FR/EN/ES) describing meaning + calculation basis.
+3. **`src/routes/__root.tsx`**
+   - Ligne 137 : `<html lang="fr">` est codé en dur alors qu'on a un `useEffect` qui met à jour `document.documentElement.lang` côté client. Utiliser la langue détectée pour le SSR initial (évite un "flash" de langue et améliore l'accessibilité / SEO).
 
-4. **Accessibility**: icon gets `aria-label` = same explanation; button-style trigger so it's keyboard-focusable.
+4. **`src/components/HelpMenu.tsx`**
+   - Ligne 38 : `window.open("https://docs.lovable.dev", ...)` — lien vers la doc Lovable au lieu d'une doc Kstomer. Soit le retirer, soit pointer vers une page d'aide interne (ou `mailto:` support) en attendant.
 
-## Out of scope
-- Other pages (Dashboard, Analytics) — can be a follow-up if you want the same treatment.
-- Changing how the metrics are actually computed.
+### Vérifications à lancer (sans modification de code)
 
-## Files touched
-- `src/routes/_authenticated/resellers.$slug.tsx` (Kpi component + 4 call sites)
-- `src/lib/i18n/fr.ts`, `src/lib/i18n/en.ts`, `src/lib/i18n/es.ts`
+5. **Scan de sécurité** (`security--run_security_scan`) — re-run pour confirmer qu'il ne reste aucune finding critique après les derniers changements Stripe/RLS.
+6. **Paramètres de publication** (`publish_settings--get_publish_settings`) — vérifier que la visibilité prévue (public) est bien celle configurée.
+7. **Mode test Stripe** — confirmer visuellement que la bannière `PaymentTestModeBanner` s'affiche bien en preview et que `VITE_PAYMENTS_CLIENT_TOKEN` est en `pk_test_*` (et prévoir le swap en `pk_live_*` au moment du go-live réel).
+
+### Hors scope (à faire plus tard si besoin)
+
+- Refonte landing marketing, parcours premier utilisateur sur des données vides, tests E2E. À traiter en v1.1.
+
+### Fichiers touchés
+
+- `src/routes/index.tsx`
+- `src/routes/sitemap[.]xml.ts`
+- `src/routes/__root.tsx`
+- `src/components/HelpMenu.tsx`
+- `src/lib/i18n/{fr,en,es}.ts` (1 clé ajoutée)
