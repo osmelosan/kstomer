@@ -46,13 +46,39 @@ function AuthCallbackPage() {
       }
 
       // Implicit flow fallback: Supabase auto-detects #access_token from hash.
-      // Check whether the session was already set by the client.
+      // Subscribe to auth state changes and also check the session immediately
+      // in case the client already processed the hash before this effect ran.
+      let resolved = false;
+      const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+        if (resolved) return;
+        if (event === "SIGNED_IN" && session) {
+          resolved = true;
+          subscription.unsubscribe();
+          navigate({ to: "/dashboard", replace: true });
+        }
+      });
+
       const { data } = await supabase.auth.getSession();
-      if (data.session) {
+      if (data.session && !resolved) {
+        resolved = true;
+        subscription.unsubscribe();
         navigate({ to: "/dashboard", replace: true });
-      } else {
-        navigate({ to: "/auth", replace: true });
+        return;
       }
+
+      // Timeout: if no session after 5s, send back to sign-in.
+      const timer = setTimeout(() => {
+        if (!resolved) {
+          resolved = true;
+          subscription.unsubscribe();
+          navigate({ to: "/auth", replace: true });
+        }
+      }, 5000);
+
+      return () => {
+        clearTimeout(timer);
+        subscription.unsubscribe();
+      };
     }
 
     handleCallback();

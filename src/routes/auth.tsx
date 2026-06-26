@@ -75,16 +75,44 @@ function GoogleButton() {
   const [loading, setLoading] = useState(false);
   const handleGoogle = async () => {
     setLoading(true);
-    const result = await lovable.auth.signInWithOAuth("google", {
-      redirect_uri: window.location.origin + "/auth/callback",
-    });
-    if (result.error) {
-      toast.error(result.error.message ?? t("auth.googleError"));
-      setLoading(false);
+
+    // In the Lovable editor the page runs inside an iframe — use the popup-based
+    // OAuth so the embed isn't broken by a full-page redirect to the broker.
+    // Everywhere else (production, localhost) go straight to Supabase OAuth.
+    let isInIframe = false;
+    try {
+      isInIframe = window.self !== window.top;
+    } catch {
+      isInIframe = true;
+    }
+
+    if (isInIframe) {
+      const result = await lovable.auth.signInWithOAuth("google", {
+        redirect_uri: window.location.origin + "/auth/callback",
+      });
+      if (result.error) {
+        toast.error(result.error.message ?? t("auth.googleError"));
+        setLoading(false);
+        return;
+      }
+      if (!result.redirected) {
+        // Popup returned tokens directly — session already set by lovable wrapper.
+        window.location.href = "/dashboard";
+      }
       return;
     }
-    if (result.redirected) return;
-    window.location.href = "/dashboard";
+
+    // Production path: direct Supabase OAuth (no /~oauth/initiate broker needed).
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: {
+        redirectTo: window.location.origin + "/auth/callback",
+      },
+    });
+    if (error) {
+      toast.error(error.message ?? t("auth.googleError"));
+      setLoading(false);
+    }
   };
   return (
     <Button
