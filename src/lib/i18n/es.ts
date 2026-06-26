@@ -514,6 +514,12 @@ export const es = {
       sendEmail: "Enviar email",
       call: "Llamar",
       notFound: "Revendedor no encontrado.",
+      info: {
+        activeDeals: "Número de operaciones actualmente abiertas en el pipeline de este socio (excluyendo Ganadas y Perdidas).",
+        revenue: "Ingresos acumulados generados por este socio desde su fecha de alta (solo operaciones ganadas).",
+        tier: "Nivel asignado automáticamente según ingresos acumulados y antigüedad: Bronze (< 100k€), Silver (100k–500k€), Gold (> 500k€).",
+        health: "Puntuación compuesta (1–5) basada en actividad reciente, velocidad de operaciones y fecha del último contacto.",
+      },
     },
   },
 

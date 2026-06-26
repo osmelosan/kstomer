@@ -17,7 +17,9 @@ import {
   Store,
   Award,
   Activity,
+  Info,
 } from "lucide-react";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 export const Route = createFileRoute("/_authenticated/resellers/$slug")({
   head: ({ params }) => {
@@ -63,31 +65,34 @@ function ResellerDetail() {
       </div>
 
       {/* KPIs */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-        <Kpi label={t("resellers.detail.activeDeals")} value={String(reseller.deals)} icon={<Briefcase className="h-4 w-4" />} />
-        <Kpi label={t("resellers.detail.totalRevenue")} value={reseller.revenue} icon={<TrendingUp className="h-4 w-4" />} />
-        <Kpi label={t("resellers.detail.tier")} value={reseller.tier} icon={<Award className="h-4 w-4" />} />
-        <Kpi
-          label={t("resellers.detail.health")}
-          value={
-            <div className="flex gap-1 mt-1">
-              {[1, 2, 3, 4, 5].map((i) => (
-                <span
-                  key={i}
-                  className="h-2 w-5 rounded-full"
-                  style={{
-                    background:
-                      i <= reseller.health
-                        ? "var(--color-secondary)"
-                        : "color-mix(in oklab, var(--color-secondary) 15%, transparent)",
-                  }}
-                />
-              ))}
-            </div>
-          }
-          icon={<Activity className="h-4 w-4" />}
-        />
-      </div>
+      <TooltipProvider delayDuration={150}>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+          <Kpi label={t("resellers.detail.activeDeals")} value={String(reseller.deals)} icon={<Briefcase className="h-4 w-4" />} info={t("resellers.detail.info.activeDeals")} />
+          <Kpi label={t("resellers.detail.totalRevenue")} value={reseller.revenue} icon={<TrendingUp className="h-4 w-4" />} info={t("resellers.detail.info.revenue")} />
+          <Kpi label={t("resellers.detail.tier")} value={reseller.tier} icon={<Award className="h-4 w-4" />} info={t("resellers.detail.info.tier")} />
+          <Kpi
+            label={t("resellers.detail.health")}
+            value={
+              <div className="flex gap-1 mt-1">
+                {[1, 2, 3, 4, 5].map((i) => (
+                  <span
+                    key={i}
+                    className="h-2 w-5 rounded-full"
+                    style={{
+                      background:
+                        i <= reseller.health
+                          ? "var(--color-secondary)"
+                          : "color-mix(in oklab, var(--color-secondary) 15%, transparent)",
+                    }}
+                  />
+                ))}
+              </div>
+            }
+            icon={<Activity className="h-4 w-4" />}
+            info={t("resellers.detail.info.health")}
+          />
+        </div>
+      </TooltipProvider>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Contact column */}
@@ -196,11 +201,29 @@ function ResellerDetail() {
   );
 }
 
-function Kpi({ label, value, icon }: { label: string; value: React.ReactNode; icon: React.ReactNode }) {
+function Kpi({ label, value, icon, info }: { label: string; value: React.ReactNode; icon: React.ReactNode; info?: string }) {
   return (
     <div className="k-card p-5">
       <div className="flex items-center justify-between">
-        <div className="k-label">{label}</div>
+        <div className="k-label flex items-center gap-1">
+          <span>{label}</span>
+          {info ? (
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <button
+                  type="button"
+                  aria-label={info}
+                  className="inline-flex items-center text-muted-foreground/70 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary rounded-full"
+                >
+                  <Info className="h-3 w-3" />
+                </button>
+              </TooltipTrigger>
+              <TooltipContent side="top" className="max-w-[260px] text-xs leading-relaxed">
+                {info}
+              </TooltipContent>
+            </Tooltip>
+          ) : null}
+        </div>
         <div className="h-8 w-8 rounded-md bg-secondary/10 text-secondary grid place-items-center">{icon}</div>
       </div>
       <div className="text-[22px] font-bold mt-2 tracking-tight">{value}</div>
