@@ -189,7 +189,7 @@ export const es = {
   dashboard: {
     metaTitle: "Panel — Kstomer",
     title: "Panel",
-    subtitle: "Bienvenido Thomas. Estas son tus prioridades de hoy.",
+    subtitle: "Bienvenido {{name}}. Estas son tus prioridades de hoy.",
     newOpportunity: "Nueva oportunidad",
     revenue: "Facturación",
     revenueDelta: "+12%",
@@ -654,6 +654,8 @@ export const es = {
       saved: "Objetivo actualizado.",
     },
     fullName: "Nombre completo",
+    firstName: "Nombre",
+    lastName: "Apellido",
     email: "Email",
     company: "Empresa",
     timezone: "Zona horaria",
