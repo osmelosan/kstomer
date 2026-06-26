@@ -56,13 +56,15 @@ export const createCheckoutSession = createServerFn({ method: "POST" })
     },
   )
   .handler(async ({ data, context }): Promise<CheckoutResult> => {
+    console.log("[checkout] handler called env=%s priceId=%s", data.environment, data.priceId);
     try {
       const stripe = createStripeClient(data.environment);
       const { userId, supabase } = context;
       const { data: { user } } = await supabase.auth.getUser();
 
       const prices = await stripe.prices.list({ lookup_keys: [data.priceId] });
-      if (!prices.data.length) throw new Error("Price not found");
+      console.log("[checkout] price lookup count=%d", prices.data.length);
+      if (!prices.data.length) throw new Error("Price not found: " + data.priceId);
       const stripePrice = prices.data[0];
       const isRecurring = stripePrice.type === "recurring";
 
@@ -86,8 +88,10 @@ export const createCheckoutSession = createServerFn({ method: "POST" })
         }),
       });
 
+      console.log("[checkout] session created hasSecret=%s", !!session.client_secret);
       return { clientSecret: session.client_secret ?? "" };
     } catch (error) {
+      console.error("[checkout] error:", getStripeErrorMessage(error));
       return { error: getStripeErrorMessage(error) };
     }
   });
