@@ -176,7 +176,7 @@ function ResellerDetail() {
                   </tr>
                 </thead>
                 <tbody>
-                  {reseller.pipeline.map((d) => (
+                  {reseller.pipeline.map((d: ResellerDeal) => (
                     <tr key={d.id} className="border-b border-border last:border-0">
                       <td className="py-3 pr-3 font-medium">{d.name}</td>
                       <td className="py-3 pr-3">
