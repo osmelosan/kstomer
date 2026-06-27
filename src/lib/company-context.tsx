@@ -10,7 +10,7 @@ import { useOrganizations, type Organization } from "@/hooks/use-organizations";
 import { useSubscription } from "@/hooks/use-subscription";
 import { getPlanByPriceId, PRICING_PLANS } from "./pricing-plans";
 
-export type Company = { id: string; name: string };
+export type Company = { id: string; name: string; address: string | null };
 
 export const ALL_COMPANIES: Company = { id: "all", name: "All companies" };
 
@@ -34,7 +34,7 @@ export function CompanyProvider({ children }: { children: ReactNode }) {
   const { subscription } = useSubscription();
 
   const companies: Company[] = useMemo(
-    () => organizations.map((o) => ({ id: o.id, name: o.name })),
+    () => organizations.map((o) => ({ id: o.id, name: o.name, address: o.address })),
     [organizations],
   );
 
