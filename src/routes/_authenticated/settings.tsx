@@ -24,6 +24,7 @@ import {
   CreditCard,
   Download,
   Monitor,
+  Plus,
   Smartphone,
   Trash2,
   Calendar,
@@ -37,6 +38,7 @@ import { cn } from "@/lib/utils";
 import { useRevenueGoal } from "@/hooks/use-revenue-goal";
 import { useCurrentUser } from "@/hooks/use-current-user";
 import { supabase } from "@/integrations/supabase/client";
+import { useCompany } from "@/lib/company-context";
 
 
 export const Route = createFileRoute("/_authenticated/settings")({
@@ -50,7 +52,7 @@ export const Route = createFileRoute("/_authenticated/settings")({
   component: SettingsPage,
 });
 
-type SectionKey = "profile" | "preferences" | "notifications" | "language" | "billing" | "security" | "integrations" | "admin";
+type SectionKey = "profile" | "company" | "preferences" | "notifications" | "language" | "billing" | "security" | "integrations" | "admin";
 
 function SettingsPage() {
   const { t, i18n } = useTranslation();
@@ -64,6 +66,7 @@ function SettingsPage() {
 
   const sections: { key: SectionKey; label: string }[] = [
     { key: "profile", label: t("settings.sections.profile") },
+    { key: "company", label: t("settings.sections.company") },
     { key: "preferences", label: t("settings.sections.preferences") },
     { key: "notifications", label: t("settings.sections.notifications") },
     { key: "language", label: t("settings.sections.language") },
@@ -101,6 +104,7 @@ function SettingsPage() {
 
         <div className="space-y-6">
           {activeSection === "profile" && <ProfileSection />}
+          {activeSection === "company" && <CompanySection />}
           {activeSection === "preferences" && <PreferencesSection />}
           {activeSection === "language" && (
             <LanguageSection
@@ -129,7 +133,7 @@ function SettingsPage() {
           {activeSection === "admin" && isAdmin && <AdminSection />}
 
 
-          {activeSection !== "profile" && activeSection !== "preferences" && (
+          {activeSection !== "profile" && activeSection !== "company" && activeSection !== "preferences" && (
             <div className="flex justify-end">
               <button
                 onClick={handleSave}
@@ -151,6 +155,7 @@ function ProfileSection() {
   const { user, profile } = useCurrentUser();
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
+  const [phone, setPhone] = useState("");
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
@@ -161,6 +166,7 @@ function ProfileSection() {
     const parts = fullName.trim().split(/\s+/);
     setFirstName(parts[0] ?? "");
     setLastName(parts.slice(1).join(" "));
+    setPhone(profile?.phone ?? "");
   }, [profile, user]);
 
   const handleSave = async () => {
@@ -169,7 +175,7 @@ function ProfileSection() {
     const full_name = [firstName, lastName].filter(Boolean).join(" ");
     const { error } = await supabase
       .from("profiles")
-      .update({ full_name })
+      .update({ full_name, phone: phone || null })
       .eq("id", user.id);
     setSaving(false);
     if (error) {
@@ -200,6 +206,12 @@ function ProfileSection() {
           value={user?.email ?? ""}
           readOnly
         />
+        <Field
+          label={t("settings.phone")}
+          value={phone}
+          onChange={(v) => setPhone(v)}
+          type="tel"
+        />
       </div>
       <div className="flex justify-end mt-5">
         <button
@@ -210,6 +222,117 @@ function ProfileSection() {
           {saving ? t("common.loading") : t("settings.save")}
         </button>
       </div>
+    </div>
+  );
+}
+
+function CompanySection() {
+  const { t } = useTranslation();
+  const { companies, loading, maxCompanies, createOrg, updateOrg, deleteOrg } = useCompany();
+  const [drafts, setDrafts] = useState<Record<string, { name: string; address: string }>>({});
+  const [saving, setSaving] = useState<Record<string, boolean>>({});
+  const [newName, setNewName] = useState("");
+  const [adding, setAdding] = useState(false);
+  const atLimit = companies.length >= maxCompanies;
+
+  const getDraft = (id: string, field: "name" | "address") => {
+    return drafts[id]?.[field] ?? (companies.find((c) => c.id === id) as { id: string; name: string } | undefined)?.[field] ?? "";
+  };
+
+  const setDraft = (id: string, field: "name" | "address", value: string) => {
+    setDrafts((prev) => ({
+      ...prev,
+      [id]: { name: getDraft(id, "name"), address: getDraft(id, "address"), [field]: value },
+    }));
+  };
+
+  const handleSave = async (id: string) => {
+    setSaving((s) => ({ ...s, [id]: true }));
+    await updateOrg(id, { name: getDraft(id, "name"), address: getDraft(id, "address") || null });
+    setSaving((s) => ({ ...s, [id]: false }));
+    toast.success(t("settings.saved"));
+  };
+
+  const handleAdd = async () => {
+    if (!newName.trim()) return;
+    setAdding(true);
+    await createOrg(newName.trim());
+    setNewName("");
+    setAdding(false);
+  };
+
+  const handleDelete = async (id: string) => {
+    if (companies.length <= 1) return;
+    await deleteOrg(id);
+    toast.success(t("settings.saved"));
+  };
+
+  if (loading) {
+    return <div className="k-card p-7 text-sm text-muted-foreground">{t("common.loading")}</div>;
+  }
+
+  return (
+    <div className="space-y-4">
+      {companies.map((c) => (
+        <div key={c.id} className="k-card p-7">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+            <Field
+              label={t("settings.company.name")}
+              value={getDraft(c.id, "name")}
+              onChange={(v) => setDraft(c.id, "name", v)}
+            />
+            <Field
+              label={t("settings.company.address")}
+              value={getDraft(c.id, "address")}
+              onChange={(v) => setDraft(c.id, "address", v)}
+            />
+          </div>
+          <div className="flex justify-between items-center mt-5">
+            <button
+              onClick={() => handleDelete(c.id)}
+              disabled={companies.length <= 1}
+              className="text-sm text-destructive hover:underline disabled:opacity-40 disabled:cursor-not-allowed"
+            >
+              {t("settings.company.delete")}
+            </button>
+            <button
+              onClick={() => handleSave(c.id)}
+              disabled={saving[c.id]}
+              className="h-10 px-5 rounded-md bg-primary text-primary-foreground text-sm font-semibold disabled:opacity-60"
+            >
+              {saving[c.id] ? t("common.loading") : t("settings.save")}
+            </button>
+          </div>
+        </div>
+      ))}
+
+      {atLimit && maxCompanies === 1 && (
+        <p className="text-sm text-muted-foreground px-1">{t("settings.company.upgradeHint")}</p>
+      )}
+
+      {!atLimit && (
+        <div className="k-card p-7">
+          <h3 className="text-[15px] font-semibold mb-4">{t("settings.company.addCompany")}</h3>
+          <div className="flex gap-3">
+            <input
+              type="text"
+              value={newName}
+              onChange={(e) => setNewName(e.target.value)}
+              placeholder={t("settings.company.namePlaceholder")}
+              className="flex-1 h-11 px-3 rounded-md border border-input bg-card text-sm focus:ring-2 focus:ring-ring/40 focus:outline-none"
+              onKeyDown={(e) => e.key === "Enter" && handleAdd()}
+            />
+            <button
+              onClick={handleAdd}
+              disabled={adding || !newName.trim()}
+              className="h-11 px-4 rounded-md bg-secondary text-secondary-foreground text-sm font-semibold disabled:opacity-60 inline-flex items-center gap-2"
+            >
+              <Plus className="h-4 w-4" />
+              {adding ? t("common.loading") : t("settings.company.addCompany")}
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

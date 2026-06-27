@@ -11,6 +11,7 @@ export interface PricingPlan {
   features: string[];
   highlighted?: boolean;
   trialDays?: number;
+  maxCompanies: number;
 }
 
 export const PRICING_PLANS: PricingPlan[] = [
@@ -22,6 +23,7 @@ export const PRICING_PLANS: PricingPlan[] = [
     yearlyPriceId: "starter_yearly",
     monthlyAmount: 17,
     yearlyMonthlyAmount: 13,
+    maxCompanies: 1,
     features: [
       "1 utilisateur, 1 société",
       "Pipeline et rappels intelligents",
@@ -40,6 +42,7 @@ export const PRICING_PLANS: PricingPlan[] = [
     yearlyPriceId: "expansion_yearly",
     monthlyAmount: 37,
     yearlyMonthlyAmount: 28,
+    maxCompanies: Infinity,
     features: [
       "Multi-contextes / multi-sociétés",
       "Pipelines illimités",
@@ -59,6 +62,7 @@ export const PRICING_PLANS: PricingPlan[] = [
     yearlyPriceId: "empire_yearly",
     monthlyAmount: 67,
     yearlyMonthlyAmount: 31,
+    maxCompanies: Infinity,
     features: [
       "Tout Expansion, sans limites",
       "Vues manager + KPIs équipe",

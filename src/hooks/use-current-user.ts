@@ -7,6 +7,7 @@ export type Profile = {
   email: string | null;
   full_name: string | null;
   avatar_url: string | null;
+  phone: string | null;
 };
 
 export function useCurrentUser() {
@@ -38,7 +39,7 @@ export function useCurrentUser() {
     let cancelled = false;
     supabase
       .from("profiles")
-      .select("id, email, full_name, avatar_url")
+      .select("id, email, full_name, avatar_url, phone")
       .eq("id", user.id)
       .maybeSingle()
       .then(({ data }) => {
