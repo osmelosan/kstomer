@@ -662,8 +662,11 @@ export const en = {
     company: {
       name: "Company name",
       namePlaceholder: "Company name",
-      address: "Address",
-      addressPlaceholder: "Full address",
+      address: "Street address",
+      addressPlaceholder: "Street, number…",
+      city: "City",
+      postalCode: "Postal code",
+      country: "Country",
       addCompany: "Add a company",
       delete: "Delete this company",
       upgradeHint: "Upgrade to the Expansion plan to manage multiple companies.",

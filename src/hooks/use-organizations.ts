@@ -7,6 +7,9 @@ export type Organization = {
   owner_id: string;
   name: string;
   address: string | null;
+  city: string | null;
+  postal_code: string | null;
+  country: string | null;
   created_at: string;
   updated_at: string;
 };
@@ -72,7 +75,7 @@ export function useOrganizations() {
   );
 
   const updateOrg = useCallback(
-    async (id: string, patch: { name?: string; address?: string | null }) => {
+    async (id: string, patch: { name?: string; address?: string | null; city?: string | null; postal_code?: string | null; country?: string | null }) => {
       const { data } = await supabase
         .from("organizations")
         .update(patch)
