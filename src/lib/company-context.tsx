@@ -10,7 +10,7 @@ import { useOrganizations, type Organization } from "@/hooks/use-organizations";
 import { useSubscription } from "@/hooks/use-subscription";
 import { getPlanByPriceId, PRICING_PLANS } from "./pricing-plans";
 
-export type Company = { id: string; name: string; address: string | null };
+export type Company = { id: string; name: string; address: string | null; city: string | null; postal_code: string | null; country: string | null };
 
 export const ALL_COMPANIES: Company = { id: "all", name: "All companies" };
 
@@ -21,7 +21,7 @@ type Ctx = {
   loading: boolean;
   maxCompanies: number;
   createOrg: (name: string, address?: string) => Promise<Organization | null>;
-  updateOrg: (id: string, patch: { name?: string; address?: string | null }) => Promise<Organization | null>;
+  updateOrg: (id: string, patch: { name?: string; address?: string | null; city?: string | null; postal_code?: string | null; country?: string | null }) => Promise<Organization | null>;
   deleteOrg: (id: string) => Promise<void>;
 };
 
@@ -34,7 +34,7 @@ export function CompanyProvider({ children }: { children: ReactNode }) {
   const { subscription } = useSubscription();
 
   const companies: Company[] = useMemo(
-    () => organizations.map((o) => ({ id: o.id, name: o.name, address: o.address })),
+    () => organizations.map((o) => ({ id: o.id, name: o.name, address: o.address, city: o.city, postal_code: o.postal_code, country: o.country })),
     [organizations],
   );
 

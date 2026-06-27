@@ -229,26 +229,40 @@ function ProfileSection() {
 function CompanySection() {
   const { t } = useTranslation();
   const { companies, loading, maxCompanies, createOrg, updateOrg, deleteOrg } = useCompany();
-  const [drafts, setDrafts] = useState<Record<string, { name: string; address: string }>>({});
+  type DraftField = "name" | "address" | "city" | "postal_code" | "country";
+  const [drafts, setDrafts] = useState<Record<string, Record<DraftField, string>>>({});
   const [saving, setSaving] = useState<Record<string, boolean>>({});
   const [newName, setNewName] = useState("");
   const [adding, setAdding] = useState(false);
   const atLimit = companies.length >= maxCompanies;
 
-  const getDraft = (id: string, field: "name" | "address") => {
-    return drafts[id]?.[field] ?? companies.find((c) => c.id === id)?.[field] ?? "";
+  const getDraft = (id: string, field: DraftField): string => {
+    return drafts[id]?.[field] ?? (companies.find((c) => c.id === id)?.[field] ?? "") ?? "";
   };
 
-  const setDraft = (id: string, field: "name" | "address", value: string) => {
+  const setDraft = (id: string, field: DraftField, value: string) => {
     setDrafts((prev) => ({
       ...prev,
-      [id]: { name: getDraft(id, "name"), address: getDraft(id, "address"), [field]: value },
+      [id]: {
+        name: getDraft(id, "name"),
+        address: getDraft(id, "address"),
+        city: getDraft(id, "city"),
+        postal_code: getDraft(id, "postal_code"),
+        country: getDraft(id, "country"),
+        [field]: value,
+      },
     }));
   };
 
   const handleSave = async (id: string) => {
     setSaving((s) => ({ ...s, [id]: true }));
-    await updateOrg(id, { name: getDraft(id, "name"), address: getDraft(id, "address") || null });
+    await updateOrg(id, {
+      name: getDraft(id, "name"),
+      address: getDraft(id, "address") || null,
+      city: getDraft(id, "city") || null,
+      postal_code: getDraft(id, "postal_code") || null,
+      country: getDraft(id, "country") || null,
+    });
     setSaving((s) => ({ ...s, [id]: false }));
     toast.success(t("settings.saved"));
   };
@@ -276,16 +290,37 @@ function CompanySection() {
       {companies.map((c) => (
         <div key={c.id} className="k-card p-7">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+            <div className="md:col-span-2">
+              <Field
+                label={t("settings.company.name")}
+                value={getDraft(c.id, "name")}
+                onChange={(v) => setDraft(c.id, "name", v)}
+              />
+            </div>
+            <div className="md:col-span-2">
+              <Field
+                label={t("settings.company.address")}
+                value={getDraft(c.id, "address")}
+                onChange={(v) => setDraft(c.id, "address", v)}
+              />
+            </div>
             <Field
-              label={t("settings.company.name")}
-              value={getDraft(c.id, "name")}
-              onChange={(v) => setDraft(c.id, "name", v)}
+              label={t("settings.company.city")}
+              value={getDraft(c.id, "city")}
+              onChange={(v) => setDraft(c.id, "city", v)}
             />
             <Field
-              label={t("settings.company.address")}
-              value={getDraft(c.id, "address")}
-              onChange={(v) => setDraft(c.id, "address", v)}
+              label={t("settings.company.postalCode")}
+              value={getDraft(c.id, "postal_code")}
+              onChange={(v) => setDraft(c.id, "postal_code", v)}
             />
+            <div className="md:col-span-2">
+              <Field
+                label={t("settings.company.country")}
+                value={getDraft(c.id, "country")}
+                onChange={(v) => setDraft(c.id, "country", v)}
+              />
+            </div>
           </div>
           <div className="flex justify-between items-center mt-5">
             <button
