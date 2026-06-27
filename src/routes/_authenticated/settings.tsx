@@ -236,7 +236,7 @@ function CompanySection() {
   const atLimit = companies.length >= maxCompanies;
 
   const getDraft = (id: string, field: "name" | "address") => {
-    return drafts[id]?.[field] ?? (companies.find((c) => c.id === id) as { id: string; name: string } | undefined)?.[field] ?? "";
+    return drafts[id]?.[field] ?? companies.find((c) => c.id === id)?.[field] ?? "";
   };
 
   const setDraft = (id: string, field: "name" | "address", value: string) => {
