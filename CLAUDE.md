@@ -17,3 +17,7 @@
 - Uses the Stripe SDK directly (no Lovable gateway).
 - Sandbox environment is inferred from the publishable key prefix (`pk_test_` → sandbox, `pk_live_` → live).
 - Price IDs in `src/lib/pricing-plans.ts` are Stripe **lookup keys** — make sure matching lookup keys are configured in the Stripe dashboard for each price.
+
+## Git workflow
+- Push all changes directly to `main`. Do not create feature branches or pull requests unless explicitly asked.
+- Before starting any work: `git fetch origin main && git checkout main && git pull origin main` to ensure you are on the latest commit.
