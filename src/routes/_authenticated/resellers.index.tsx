@@ -11,6 +11,7 @@ import { analyzeResellers } from "@/lib/resellers-ai.functions";
 import { RESELLERS } from "@/lib/mock-resellers";
 
 
+
 export const Route = createFileRoute("/_authenticated/resellers/")({
   head: () =>
     pageHead({
@@ -131,7 +132,6 @@ function AIInsightsCard() {
       const result = await analyze({
         data: {
           language: safeLang,
-          resellers: RESELLERS,
         },
       });
       setMarkdown(result.markdown);

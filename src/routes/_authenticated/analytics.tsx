@@ -375,23 +375,6 @@ function AIInsightsCard() {
       const result = await analyze({
         data: {
           language: safeLang,
-          kpis: {
-            revenue: "45 280 €",
-            conversion: "24.8%",
-            activeContacts: "1284",
-            opportunities: "128 500 €",
-          },
-          sources: [
-            { label: "LinkedIn", value: 42 },
-            { label: "Referral", value: 28 },
-            { label: "Direct search", value: 15 },
-            { label: "Others", value: 15 },
-          ],
-          segments: [
-            { name: "SaaS", volume: 42, conversion: "32.4%", avgValue: "1240 €", health: 4 },
-            { name: "Solopreneurs", volume: 156, conversion: "18.2%", avgValue: "450 €", health: 3 },
-            { name: "Agencies", volume: 28, conversion: "26.1%", avgValue: "2100 €", health: 5 },
-          ],
         },
       });
       setMarkdown(result.markdown);
