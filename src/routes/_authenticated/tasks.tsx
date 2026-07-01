@@ -4,9 +4,15 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { AppShell } from "@/components/AppShell";
 import i18n from "@/lib/i18n";
-import { MOCK_TASKS, type Task, type TaskPriority, type TaskStatus } from "@/lib/mock-tasks";
+import { useTasks, type Task, type TaskPriority, type TaskStatus } from "@/hooks/use-tasks";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
@@ -41,7 +47,7 @@ export const Route = createFileRoute("/_authenticated/tasks")({
 function TasksPage() {
   const { t } = useTranslation();
   const { focus } = Route.useSearch();
-  const [tasks, setTasks] = useState<Task[]>(MOCK_TASKS);
+  const { tasks, loading, createTask, toggleDone } = useTasks();
   const [status, setStatus] = useState<TaskStatus | "all">("all");
   const [priority, setPriority] = useState<TaskPriority | "all">("all");
   const [query, setQuery] = useState("");
@@ -66,42 +72,29 @@ function TasksPage() {
     };
   }, [focus]);
 
-
   const filtered = useMemo(() => {
     return tasks.filter((task) => {
       if (status !== "all" && task.status !== status) return false;
       if (priority !== "all" && task.priority !== priority) return false;
       if (query) {
         const q = query.toLowerCase();
-        const haystack = `${t(task.titleKey)} ${t(task.subtitleKey)} ${task.contact ?? ""}`.toLowerCase();
+        const haystack = `${task.title} ${task.contact ?? ""}`.toLowerCase();
         if (!haystack.includes(q)) return false;
       }
       return true;
     });
-  }, [tasks, status, priority, query, t]);
+  }, [tasks, status, priority, query]);
 
-  const toggleDone = (id: string) => {
-    setTasks((prev) =>
-      prev.map((task) =>
-        task.id === id
-          ? { ...task, status: task.status === "done" ? "todo" : "done" }
-          : task,
-      ),
-    );
-  };
-
-  const handleCreate = (data: { title: string; priority: TaskPriority; dueDate: string }) => {
-    const newTask: Task = {
-      id: `t_${Date.now()}`,
-      titleKey: data.title,
-      subtitleKey: "",
-      dueDate: data.dueDate || new Date().toISOString().slice(0, 10),
+  const handleCreate = async (data: { title: string; priority: TaskPriority; dueDate: string }) => {
+    const created = await createTask({
+      title: data.title,
       priority: data.priority,
-      status: "todo",
-    };
-    setTasks((prev) => [newTask, ...prev]);
-    setOpen(false);
-    toast.success(t("tasks.created"));
+      dueDate: data.dueDate || new Date().toISOString().slice(0, 10),
+    });
+    if (created) {
+      setOpen(false);
+      toast.success(t("tasks.created"));
+    }
   };
 
   return (
@@ -150,7 +143,7 @@ function TasksPage() {
         </div>
       </div>
 
-      {filtered.length === 0 ? (
+      {loading ? null : filtered.length === 0 ? (
         <div className="bg-card rounded-2xl border border-border p-16 text-center shadow-card">
           <CheckSquare className="h-10 w-10 text-muted-foreground mx-auto mb-3" />
           <p className="text-sm text-muted-foreground">{t("tasks.empty")}</p>
@@ -161,7 +154,7 @@ function TasksPage() {
             <TaskRow
               key={task.id}
               task={task}
-              onToggle={() => toggleDone(task.id)}
+              onToggle={() => toggleDone(task)}
               highlighted={highlight === task.id}
               rowRef={(el) => {
                 rowRefs.current[task.id] = el;
@@ -187,7 +180,7 @@ function TaskRow({
 }) {
   const { t, i18n: i18nInst } = useTranslation();
   const done = task.status === "done";
-  const due = new Date(task.dueDate);
+  const due = new Date(task.due_date);
   const overdue = !done && due.getTime() < Date.now();
 
   const priorityClass: Record<TaskPriority, string> = {
@@ -214,23 +207,30 @@ function TaskRow({
       <div className={cn("w-1 self-stretch rounded-full", accentBar[task.priority])} />
       <Checkbox checked={done} onCheckedChange={onToggle} aria-label="Toggle task" />
       <div className="flex-1 min-w-0">
-        <p className={cn("text-sm font-semibold truncate", done && "line-through")}>
-          {/* Allow free text fallback when titleKey is a plain string with no translation */}
-          {t(task.titleKey, { defaultValue: task.titleKey })}
-        </p>
+        <p className={cn("text-sm font-semibold truncate", done && "line-through")}>{task.title}</p>
         <div className="flex items-center gap-3 text-xs text-muted-foreground mt-1">
           {task.contact && (
             <span className="inline-flex items-center gap-1">
               <User2 className="h-3 w-3" /> {task.contact}
             </span>
           )}
-          <span className={cn("inline-flex items-center gap-1", overdue && "text-destructive font-medium")}>
+          <span
+            className={cn(
+              "inline-flex items-center gap-1",
+              overdue && "text-destructive font-medium",
+            )}
+          >
             <CalendarIcon className="h-3 w-3" />
             {due.toLocaleDateString(i18nInst.language, { day: "numeric", month: "short" })}
           </span>
         </div>
       </div>
-      <span className={cn("px-2.5 py-0.5 rounded-full text-[10px] font-bold tracking-wider border", priorityClass[task.priority])}>
+      <span
+        className={cn(
+          "px-2.5 py-0.5 rounded-full text-[10px] font-bold tracking-wider border",
+          priorityClass[task.priority],
+        )}
+      >
         {t(`tasks.priority.${task.priority}`)}
       </span>
     </div>
@@ -264,7 +264,12 @@ function NewTaskDialog({
       <div className="space-y-4 py-2">
         <div className="space-y-2">
           <Label htmlFor="task-title">{t("tasks.form.title")}</Label>
-          <Input id="task-title" value={title} onChange={(e) => setTitle(e.target.value)} autoFocus />
+          <Input
+            id="task-title"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            autoFocus
+          />
         </div>
         <div className="grid grid-cols-2 gap-4">
           <div className="space-y-2">
@@ -282,7 +287,12 @@ function NewTaskDialog({
           </div>
           <div className="space-y-2">
             <Label htmlFor="task-due">{t("tasks.form.dueDate")}</Label>
-            <Input id="task-due" type="date" value={dueDate} onChange={(e) => setDueDate(e.target.value)} />
+            <Input
+              id="task-due"
+              type="date"
+              value={dueDate}
+              onChange={(e) => setDueDate(e.target.value)}
+            />
           </div>
         </div>
       </div>
