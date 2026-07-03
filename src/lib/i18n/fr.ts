@@ -510,6 +510,13 @@ export const fr = {
     editCard: "Modifier la carte",
     cardName: "Nom",
     amount: "Montant (€)",
+    stage: "Étape",
+    viewFullContact: "Voir la fiche complète",
+    archive: "Archiver",
+    archiveTitle: "Archiver « {{name}} » ?",
+    archiveBody:
+      "Cela le retire du pipeline. La fiche reste en base — la restaurer depuis l'interface n'est pas encore possible.",
+    noCompany: "Sélectionnez une société précise pour voir et gérer son pipeline.",
     errors: {
       nameRequired: "Le nom est obligatoire.",
     },

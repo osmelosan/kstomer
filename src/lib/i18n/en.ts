@@ -493,6 +493,13 @@ export const en = {
     editCard: "Edit card",
     cardName: "Name",
     amount: "Amount (€)",
+    stage: "Stage",
+    viewFullContact: "View full contact",
+    archive: "Archive",
+    archiveTitle: "Archive “{{name}}”?",
+    archiveBody:
+      "This removes it from the pipeline. You can still find it later from the database — restoring it from the UI isn't available yet.",
+    noCompany: "Select a specific company to see and manage its pipeline.",
     errors: {
       nameRequired: "Name is required.",
     },

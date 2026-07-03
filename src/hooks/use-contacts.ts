@@ -5,6 +5,13 @@ import { useCurrentUser } from "./use-current-user";
 
 export type ContactStage = "new_lead" | "contacted" | "proposal" | "active" | "at_risk";
 
+export type SubscriptionDetails = {
+  id: string;
+  deal_value: number | null;
+  mrr: number | null;
+  plan_name: string | null;
+};
+
 export type Contact = {
   id: string;
   organization_id: string;
@@ -22,7 +29,10 @@ export type Contact = {
   archived_at: string | null;
   created_at: string;
   updated_at: string;
+  subscription_details: SubscriptionDetails | null;
 };
+
+const SELECT = "*, subscription_details(id, deal_value, mrr, plan_name)";
 
 export function useContacts() {
   const { user } = useCurrentUser();
@@ -33,12 +43,12 @@ export function useContacts() {
   const fetchContacts = useCallback(async (organizationId: string | null) => {
     let query = supabase
       .from("contacts")
-      .select("*")
+      .select(SELECT)
       .is("archived_at", null)
       .order("created_at", { ascending: false });
     if (organizationId) query = query.eq("organization_id", organizationId);
     const { data } = await query;
-    return (data ?? []) as Contact[];
+    return (data ?? []) as unknown as Contact[];
   }, []);
 
   useEffect(() => {
@@ -67,6 +77,7 @@ export function useContacts() {
       email?: string | null;
       phone?: string | null;
       stage?: ContactStage;
+      confidence_level?: number | null;
     }) => {
       if (!user || current.id === "all") return null;
       const { data: created, error } = await supabase
@@ -80,12 +91,14 @@ export function useContacts() {
           email: data.email ?? null,
           phone: data.phone ?? null,
           stage: data.stage ?? "new_lead",
+          confidence_level: data.confidence_level ?? null,
         })
-        .select()
+        .select(SELECT)
         .single();
       if (error) throw error;
-      if (created) setContacts((prev) => [created as Contact, ...prev]);
-      return created as Contact | null;
+      const row = created as unknown as Contact | null;
+      if (row) setContacts((prev) => [row, ...prev]);
+      return row;
     },
     [user, current.id],
   );
@@ -108,12 +121,74 @@ export function useContacts() {
         >
       >,
     ) => {
-      const { data } = await supabase.from("contacts").update(patch).eq("id", id).select().single();
-      if (data) setContacts((prev) => prev.map((c) => (c.id === id ? (data as Contact) : c)));
-      return data as Contact | null;
+      const { data } = await supabase
+        .from("contacts")
+        .update(patch)
+        .eq("id", id)
+        .select(SELECT)
+        .single();
+      const row = data as unknown as Contact | null;
+      if (row) setContacts((prev) => prev.map((c) => (c.id === id ? row : c)));
+      return row;
     },
     [],
   );
 
-  return { contacts, loading, createContact, updateContact };
+  // Changes a contact's pipeline stage and logs the transition to
+  // stage_history, matching what getPipelineSummaryTool/dashboard AI
+  // insights already expect from real board activity.
+  const changeStage = useCallback(
+    async (id: string, toStage: ContactStage) => {
+      const current = contacts.find((c) => c.id === id);
+      if (!current || current.stage === toStage) return null;
+      const updated = await updateContact(id, { stage: toStage });
+      if (updated) {
+        await supabase.from("stage_history").insert({
+          contact_id: id,
+          organization_id: updated.organization_id,
+          from_stage: current.stage,
+          to_stage: toStage,
+          changed_by_user_id: user?.id ?? null,
+        });
+      }
+      return updated;
+    },
+    [contacts, updateContact, user],
+  );
+
+  const upsertDealValue = useCallback(
+    async (contactId: string, organizationId: string, dealValue: number | null) => {
+      const { data } = await supabase
+        .from("subscription_details")
+        .upsert(
+          { contact_id: contactId, organization_id: organizationId, deal_value: dealValue },
+          { onConflict: "contact_id" },
+        )
+        .select("id, deal_value, mrr, plan_name")
+        .single();
+      const row = data as SubscriptionDetails | null;
+      if (row) {
+        setContacts((prev) =>
+          prev.map((c) => (c.id === contactId ? { ...c, subscription_details: row } : c)),
+        );
+      }
+      return row;
+    },
+    [],
+  );
+
+  const archiveContact = useCallback(async (id: string) => {
+    await supabase.from("contacts").update({ archived_at: new Date().toISOString() }).eq("id", id);
+    setContacts((prev) => prev.filter((c) => c.id !== id));
+  }, []);
+
+  return {
+    contacts,
+    loading,
+    createContact,
+    updateContact,
+    changeStage,
+    upsertDealValue,
+    archiveContact,
+  };
 }

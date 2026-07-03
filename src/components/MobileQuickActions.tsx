@@ -14,65 +14,27 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
-import { addQuickNote } from "@/lib/quick-notes";
-
-const KANBAN_STORAGE_KEY = "kstomer.kanban.v1";
-
-// Keep this list in sync with src/routes/_authenticated/contacts.index.tsx
-const CONTACT_OPTIONS = [
-  { id: "jean-dupont", name: "Jean Dupont" },
-  { id: "marie-lefebvre", name: "Marie Lefebvre" },
-  { id: "pierre-durand", name: "Pierre Durand" },
-];
+import { useContacts } from "@/hooks/use-contacts";
+import { useCompany } from "@/lib/company-context";
+import { supabase } from "@/integrations/supabase/client";
 
 type Mode = "menu" | "opportunity" | "note";
-
-function uid() {
-  return (
-    globalThis.crypto?.randomUUID?.() ??
-    `id-${Date.now()}-${Math.random().toString(36).slice(2)}`
-  );
-}
-
-function pushOpportunity(input: { name: string; amount: number; tag: string }) {
-  try {
-    const raw = window.localStorage.getItem(KANBAN_STORAGE_KEY);
-    if (!raw) return false;
-    const board = JSON.parse(raw) as {
-      columns: { id: string; cardIds: string[] }[];
-      cards: Record<string, unknown>;
-    };
-    if (!board?.columns?.length) return false;
-    const card = {
-      id: uid(),
-      name: input.name,
-      amount: input.amount,
-      tag: { label: input.tag.toUpperCase(), tone: "success" },
-      confidence: 3,
-      createdAt: new Date().toISOString(),
-    };
-    board.cards[card.id] = card;
-    board.columns[0].cardIds = [card.id, ...board.columns[0].cardIds];
-    window.localStorage.setItem(KANBAN_STORAGE_KEY, JSON.stringify(board));
-    return true;
-  } catch {
-    return false;
-  }
-}
 
 export function MobileQuickActions() {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const { current } = useCompany();
+  const { contacts, createContact, upsertDealValue } = useContacts();
   const [open, setOpen] = useState(false);
   const [mode, setMode] = useState<Mode>("menu");
+  const [submitting, setSubmitting] = useState(false);
 
   // opportunity form
   const [oppName, setOppName] = useState("");
   const [oppAmount, setOppAmount] = useState("");
-  const [oppTag, setOppTag] = useState("normal");
 
   // note form
-  const [noteContact, setNoteContact] = useState<string>(CONTACT_OPTIONS[0].id);
+  const [noteContact, setNoteContact] = useState<string>("");
   const [noteContent, setNoteContent] = useState("");
   const [contactQuery, setContactQuery] = useState("");
 
@@ -80,9 +42,9 @@ export function MobileQuickActions() {
     setMode("menu");
     setOppName("");
     setOppAmount("");
-    setOppTag("normal");
     setNoteContent("");
     setContactQuery("");
+    setNoteContact(contacts[0]?.id ?? "");
   }
 
   function close() {
@@ -90,36 +52,48 @@ export function MobileQuickActions() {
     setTimeout(reset, 200);
   }
 
-  function submitOpportunity() {
-    if (!oppName.trim()) return;
-    const amount = Number(oppAmount.replace(/[^0-9.]/g, "")) || 0;
-    const ok = pushOpportunity({ name: oppName.trim(), amount, tag: oppTag });
-    if (!ok) {
-      // Fallback: send the user to the kanban to seed the board first
-      toast.error(t("quickActions.kanbanInitNeeded"));
-      navigate({ to: "/kanban" });
-    } else {
+  async function submitOpportunity() {
+    if (!oppName.trim() || current.id === "all") return;
+    setSubmitting(true);
+    try {
+      const amount = Number(oppAmount.replace(/[^0-9.]/g, "")) || 0;
+      const created = await createContact({ contact_name: oppName.trim(), stage: "new_lead" });
+      if (created && amount) {
+        await upsertDealValue(created.id, created.organization_id, amount);
+      }
       toast.success(t("quickActions.opportunityCreated"), {
         action: {
           label: t("quickActions.viewInPipeline"),
           onClick: () => navigate({ to: "/kanban" }),
         },
       });
+      close();
+    } finally {
+      setSubmitting(false);
     }
-    close();
   }
 
-  function submitNote() {
-    if (!noteContent.trim()) return;
-    addQuickNote(noteContact, noteContent.trim());
-    const contact = CONTACT_OPTIONS.find((c) => c.id === noteContact);
-    toast.success(t("quickActions.noteAdded", { name: contact?.name ?? "" }), {
-      action: {
-        label: t("quickActions.viewContact"),
-        onClick: () => navigate({ to: "/contacts/$id", params: { id: noteContact } }),
-      },
-    });
-    close();
+  async function submitNote() {
+    if (!noteContent.trim() || !noteContact) return;
+    const contact = contacts.find((c) => c.id === noteContact);
+    if (!contact) return;
+    setSubmitting(true);
+    try {
+      await supabase.from("notes").insert({
+        organization_id: contact.organization_id,
+        contact_id: contact.id,
+        note_text: noteContent.trim(),
+      });
+      toast.success(t("quickActions.noteAdded", { name: contact.contact_name }), {
+        action: {
+          label: t("quickActions.viewContact"),
+          onClick: () => navigate({ to: "/contacts/$id", params: { id: noteContact } }),
+        },
+      });
+      close();
+    } finally {
+      setSubmitting(false);
+    }
   }
 
   return (
@@ -144,10 +118,7 @@ export function MobileQuickActions() {
       </button>
 
       <Sheet open={open} onOpenChange={(v) => (v ? setOpen(true) : close())}>
-        <SheetContent
-          side="bottom"
-          className="rounded-t-2xl p-0 max-h-[88vh] overflow-y-auto"
-        >
+        <SheetContent side="bottom" className="rounded-t-2xl p-0 max-h-[88vh] overflow-y-auto">
           <SheetHeader className="px-5 pt-5 pb-3 flex flex-row items-center justify-between gap-4 space-y-0">
             <SheetTitle className="text-base">
               {mode === "menu"
@@ -196,9 +167,7 @@ export function MobileQuickActions() {
                   </div>
                   <div className="min-w-0">
                     <p className="text-sm font-semibold">{t("quickActions.addNote")}</p>
-                    <p className="text-xs text-muted-foreground">
-                      {t("quickActions.addNoteSub")}
-                    </p>
+                    <p className="text-xs text-muted-foreground">{t("quickActions.addNoteSub")}</p>
                   </div>
                 </button>
 
@@ -246,25 +215,13 @@ export function MobileQuickActions() {
                     className="mt-1"
                   />
                 </label>
-                <label className="block">
-                  <span className="text-xs font-medium text-muted-foreground">
-                    {t("quickActions.opportunityTag")}
-                  </span>
-                  <Select value={oppTag} onValueChange={setOppTag}>
-                    <SelectTrigger className="mt-1">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="normal">{t("quickActions.tags.normal")}</SelectItem>
-                      <SelectItem value="urgent">{t("quickActions.tags.urgent")}</SelectItem>
-                      <SelectItem value="suivi">{t("quickActions.tags.followUp")}</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </label>
+                {current.id === "all" && (
+                  <p className="text-xs text-destructive">{t("newContact.noCompany")}</p>
+                )}
                 <button
                   type="button"
                   onClick={submitOpportunity}
-                  disabled={!oppName.trim()}
+                  disabled={!oppName.trim() || current.id === "all" || submitting}
                   className="w-full h-11 rounded-md bg-primary text-primary-foreground text-sm font-semibold disabled:opacity-50 hover:bg-primary/90 transition-colors"
                 >
                   {t("quickActions.create")}
@@ -296,10 +253,8 @@ export function MobileQuickActions() {
                       {(() => {
                         const q = contactQuery.trim().toLowerCase();
                         const filtered = q
-                          ? CONTACT_OPTIONS.filter((c) =>
-                              c.name.toLowerCase().includes(q),
-                            )
-                          : CONTACT_OPTIONS;
+                          ? contacts.filter((c) => c.contact_name.toLowerCase().includes(q))
+                          : contacts;
                         if (!filtered.length) {
                           return (
                             <div className="px-3 py-4 text-xs text-muted-foreground text-center">
@@ -309,7 +264,7 @@ export function MobileQuickActions() {
                         }
                         return filtered.map((c) => (
                           <SelectItem key={c.id} value={c.id}>
-                            {c.name}
+                            {c.contact_name}
                           </SelectItem>
                         ));
                       })()}
@@ -332,7 +287,7 @@ export function MobileQuickActions() {
                 <button
                   type="button"
                   onClick={submitNote}
-                  disabled={!noteContent.trim()}
+                  disabled={!noteContent.trim() || !noteContact || submitting}
                   className="w-full h-11 rounded-md bg-primary text-primary-foreground text-sm font-semibold disabled:opacity-50 hover:bg-primary/90 transition-colors"
                 >
                   {t("quickActions.save")}

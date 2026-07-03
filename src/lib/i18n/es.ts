@@ -505,6 +505,13 @@ export const es = {
     editCard: "Editar tarjeta",
     cardName: "Nombre",
     amount: "Importe (€)",
+    stage: "Etapa",
+    viewFullContact: "Ver ficha completa",
+    archive: "Archivar",
+    archiveTitle: "¿Archivar «{{name}}»?",
+    archiveBody:
+      "Esto lo quita del pipeline. La ficha se conserva en la base — restaurarla desde la interfaz todavía no es posible.",
+    noCompany: "Selecciona una empresa concreta para ver y gestionar su pipeline.",
     errors: {
       nameRequired: "El nombre es obligatorio.",
     },

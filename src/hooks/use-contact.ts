@@ -28,7 +28,7 @@ export function useContact(id: string) {
     setLoading(true);
     const { data: contactRow } = await supabase
       .from("contacts")
-      .select("*")
+      .select("*, subscription_details(id, deal_value, mrr, plan_name)")
       .eq("id", id)
       .maybeSingle();
     setContact(contactRow as Contact | null);
@@ -78,7 +78,7 @@ export function useContact(id: string) {
       >,
     ) => {
       const { data } = await supabase.from("contacts").update(patch).eq("id", id).select().single();
-      if (data) setContact(data as Contact);
+      if (data) setContact((prev) => (prev ? { ...prev, ...data } : (data as Contact)));
       return data as Contact | null;
     },
     [id],
