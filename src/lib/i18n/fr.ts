@@ -570,6 +570,20 @@ export const fr = {
     searchPlaceholder: "Rechercher un partenaire…",
     activePartners: "Partenaires actifs",
     partnerRevenue: "CA partenaires (M)",
+    newReseller: "Nouveau revendeur",
+    noCompany: "Sélectionnez une société précise pour voir et gérer ses revendeurs.",
+    empty: "Aucun revendeur pour l'instant. Ajoutez le premier pour commencer.",
+    tiers: { bronze: "Bronze", silver: "Silver", gold: "Gold" },
+    new: {
+      metaTitle: "Nouveau revendeur — Kstomer",
+      title: "Nouveau revendeur",
+      subtitle: "Ajoutez un partenaire revendeur à votre CRM.",
+      name: "Nom",
+      company: "Société",
+      email: "Email",
+      phone: "Téléphone",
+      create: "Créer le revendeur",
+    },
     ai: {
       title: "Analyse IA du portefeuille",
       cta: "Analyser mon portefeuille",
@@ -613,6 +627,14 @@ export const fr = {
       sendEmail: "Envoyer un email",
       call: "Appeler",
       notFound: "Revendeur introuvable.",
+      linkContact: "Lier un contact à ce revendeur",
+      selectContact: "Sélectionner un contact…",
+      link: "Lier",
+      noAvailableContacts: "Aucun contact disponible.",
+      linkError: {
+        already_linked: "Ce contact est déjà lié à un autre revendeur.",
+        unknown: "Impossible de lier ce contact. Réessayez.",
+      },
       info: {
         activeDeals:
           "Nombre d'affaires actuellement ouvertes dans le pipeline de ce partenaire (hors Gagné et Perdu).",

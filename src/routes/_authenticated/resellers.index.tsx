@@ -1,14 +1,14 @@
 import { pageHead } from "@/lib/route-seo";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { AppShell } from "@/components/AppShell";
-import { Store, TrendingUp, Sparkles, RefreshCw, AlertCircle } from "lucide-react";
+import { Store, TrendingUp, Sparkles, RefreshCw, AlertCircle, Plus } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import ReactMarkdown from "react-markdown";
 import i18n from "@/lib/i18n";
 import { analyzeResellers } from "@/lib/resellers-ai.functions";
-import { RESELLERS } from "@/lib/mock-resellers";
+import { useResellers, tierFor } from "@/hooks/use-resellers";
 import { useCompany } from "@/lib/company-context";
 
 export const Route = createFileRoute("/_authenticated/resellers/")({
@@ -22,91 +22,124 @@ export const Route = createFileRoute("/_authenticated/resellers/")({
   component: Resellers,
 });
 
+function fmtMoney(n: number) {
+  return new Intl.NumberFormat("fr-FR", {
+    style: "currency",
+    currency: "EUR",
+    maximumFractionDigits: 0,
+  }).format(n);
+}
+
 function Resellers() {
   const { t } = useTranslation();
+  const { current } = useCompany();
+  const { resellers, loading } = useResellers();
+  const totalRevenue = resellers.reduce((sum, r) => sum + r.revenue, 0);
+
   return (
     <AppShell
       title={t("resellers.title")}
       subtitle={t("resellers.subtitle")}
       search={{ placeholder: t("resellers.searchPlaceholder") }}
+      actions={
+        <Link
+          to="/resellers/new"
+          className="ml-2 inline-flex items-center gap-2 h-10 px-4 rounded-md bg-secondary text-secondary-foreground text-sm font-semibold shadow-sm hover:bg-secondary/90 active:scale-[0.98] transition-all"
+        >
+          <Plus className="h-4 w-4" /> {t("resellers.newReseller")}
+        </Link>
+      }
     >
       <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-6">
         <Kpi
           label={t("resellers.activePartners")}
-          value="14"
+          value={String(resellers.length)}
           icon={<Store className="h-4 w-4" />}
         />
         <Kpi
           label={t("resellers.partnerRevenue")}
-          value="34 400 €"
+          value={fmtMoney(totalRevenue)}
           icon={<TrendingUp className="h-4 w-4" />}
         />
       </div>
 
       <AIInsightsCard />
 
-      <div className="k-card overflow-hidden">
-        <table className="w-full text-sm">
-          <thead>
-            <tr className="text-[11px] uppercase tracking-wider text-muted-foreground border-b border-border bg-muted/40">
-              <th className="text-left p-4">{t("resellers.th.partner")}</th>
-              <th className="text-left p-4">{t("resellers.th.tier")}</th>
-              <th className="text-left p-4">{t("resellers.th.deals")}</th>
-              <th className="text-left p-4">{t("resellers.th.revenue")}</th>
-              <th className="text-left p-4">{t("resellers.th.health")}</th>
-            </tr>
-          </thead>
-          <tbody>
-            {RESELLERS.map((r) => (
-              <tr
-                key={r.slug}
-                className="border-b border-border last:border-0 hover:bg-muted/40 cursor-pointer"
-              >
-                <td className="p-4 font-semibold">
-                  <Link
-                    to="/resellers/$slug"
-                    params={{ slug: r.slug }}
-                    className="text-foreground hover:text-secondary transition-colors"
-                  >
-                    {r.name}
-                  </Link>
-                </td>
-                <td className="p-4">
-                  <span
-                    className={`inline-flex items-center text-xs font-semibold px-3 py-1 rounded-full ${
-                      r.tier === "Gold"
-                        ? "bg-warning-soft text-warning-foreground"
-                        : r.tier === "Silver"
-                          ? "bg-muted text-foreground"
-                          : "bg-secondary/10 text-secondary"
-                    }`}
-                  >
-                    {r.tier}
-                  </span>
-                </td>
-                <td className="p-4">{r.deals}</td>
-                <td className="p-4">{r.revenue}</td>
-                <td className="p-4">
-                  <div className="flex gap-1">
-                    {[1, 2, 3, 4, 5].map((i) => (
-                      <span
-                        key={i}
-                        className="h-2 w-5 rounded-full"
-                        style={{
-                          background:
-                            i <= r.health
-                              ? "var(--color-secondary)"
-                              : "color-mix(in oklab, var(--color-secondary) 15%, transparent)",
-                        }}
-                      />
-                    ))}
-                  </div>
-                </td>
+      {current.id === "all" ? (
+        <div className="k-card p-6 text-sm text-muted-foreground">{t("resellers.noCompany")}</div>
+      ) : loading ? (
+        <div className="k-card p-6 text-sm text-muted-foreground">{t("common.loading")}</div>
+      ) : resellers.length === 0 ? (
+        <div className="k-card p-8 text-center text-sm text-muted-foreground">
+          {t("resellers.empty")}
+        </div>
+      ) : (
+        <div className="k-card overflow-hidden">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="text-[11px] uppercase tracking-wider text-muted-foreground border-b border-border bg-muted/40">
+                <th className="text-left p-4">{t("resellers.th.partner")}</th>
+                <th className="text-left p-4">{t("resellers.th.tier")}</th>
+                <th className="text-left p-4">{t("resellers.th.deals")}</th>
+                <th className="text-left p-4">{t("resellers.th.revenue")}</th>
+                <th className="text-left p-4">{t("resellers.th.health")}</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+            </thead>
+            <tbody>
+              {resellers.map((r) => {
+                const tier = tierFor(r.revenue);
+                return (
+                  <tr
+                    key={r.id}
+                    className="border-b border-border last:border-0 hover:bg-muted/40 cursor-pointer"
+                  >
+                    <td className="p-4 font-semibold">
+                      <Link
+                        to="/resellers/$id"
+                        params={{ id: r.id }}
+                        className="text-foreground hover:text-secondary transition-colors"
+                      >
+                        {r.name}
+                      </Link>
+                    </td>
+                    <td className="p-4">
+                      <span
+                        className={`inline-flex items-center text-xs font-semibold px-3 py-1 rounded-full ${
+                          tier === "gold"
+                            ? "bg-warning-soft text-warning-foreground"
+                            : tier === "silver"
+                              ? "bg-muted text-foreground"
+                              : "bg-secondary/10 text-secondary"
+                        }`}
+                      >
+                        {t(`resellers.tiers.${tier}`)}
+                      </span>
+                    </td>
+                    <td className="p-4">{r.dealsCount}</td>
+                    <td className="p-4">{fmtMoney(r.revenue)}</td>
+                    <td className="p-4">
+                      <div className="flex gap-1">
+                        {[1, 2, 3, 4, 5].map((i) => (
+                          <span
+                            key={i}
+                            className="h-2 w-5 rounded-full"
+                            style={{
+                              background:
+                                i <= (r.confidence_level ?? 0)
+                                  ? "var(--color-secondary)"
+                                  : "color-mix(in oklab, var(--color-secondary) 15%, transparent)",
+                            }}
+                          />
+                        ))}
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      )}
     </AppShell>
   );
 }

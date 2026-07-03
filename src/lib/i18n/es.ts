@@ -565,6 +565,20 @@ export const es = {
     searchPlaceholder: "Buscar un socio…",
     activePartners: "Socios activos",
     partnerRevenue: "Facturación socios (M)",
+    newReseller: "Nuevo distribuidor",
+    noCompany: "Selecciona una empresa concreta para ver y gestionar sus distribuidores.",
+    empty: "Todavía no hay distribuidores. Añade el primero para empezar.",
+    tiers: { bronze: "Bronze", silver: "Silver", gold: "Gold" },
+    new: {
+      metaTitle: "Nuevo distribuidor — Kstomer",
+      title: "Nuevo distribuidor",
+      subtitle: "Añade un socio distribuidor a tu CRM.",
+      name: "Nombre",
+      company: "Empresa",
+      email: "Email",
+      phone: "Teléfono",
+      create: "Crear distribuidor",
+    },
     ai: {
       title: "Análisis IA de la cartera",
       cta: "Analizar mi cartera",
@@ -608,6 +622,14 @@ export const es = {
       sendEmail: "Enviar email",
       call: "Llamar",
       notFound: "Revendedor no encontrado.",
+      linkContact: "Vincular un contacto a este distribuidor",
+      selectContact: "Selecciona un contacto…",
+      link: "Vincular",
+      noAvailableContacts: "No hay contactos disponibles.",
+      linkError: {
+        already_linked: "Este contacto ya está vinculado a otro distribuidor.",
+        unknown: "No se pudo vincular este contacto. Reintenta.",
+      },
       info: {
         activeDeals:
           "Número de operaciones actualmente abiertas en el pipeline de este socio (excluyendo Ganadas y Perdidas).",

@@ -553,6 +553,20 @@ export const en = {
     searchPlaceholder: "Search a partner…",
     activePartners: "Active partners",
     partnerRevenue: "Partner revenue (M)",
+    newReseller: "New reseller",
+    noCompany: "Select a specific company to see and manage its resellers.",
+    empty: "No resellers yet. Add your first one to get started.",
+    tiers: { bronze: "Bronze", silver: "Silver", gold: "Gold" },
+    new: {
+      metaTitle: "New reseller — Kstomer",
+      title: "New reseller",
+      subtitle: "Add a reseller partner to your CRM.",
+      name: "Name",
+      company: "Company",
+      email: "Email",
+      phone: "Phone",
+      create: "Create reseller",
+    },
     ai: {
       title: "AI portfolio analysis",
       cta: "Analyze my portfolio",
@@ -596,6 +610,14 @@ export const en = {
       sendEmail: "Send email",
       call: "Call",
       notFound: "Reseller not found.",
+      linkContact: "Link a contact to this reseller",
+      selectContact: "Select a contact…",
+      link: "Link",
+      noAvailableContacts: "No contacts available.",
+      linkError: {
+        already_linked: "This contact is already linked to another reseller.",
+        unknown: "Could not link this contact. Try again.",
+      },
       info: {
         activeDeals:
           "Number of deals currently open in this partner's pipeline (excluding Won and Lost).",
