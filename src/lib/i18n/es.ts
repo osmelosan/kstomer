@@ -274,6 +274,15 @@ export const es = {
     contactEmail: "Enviar correo",
     contactPhone: "Llamar",
     contactWebsite: "Ver sitio web",
+    ai: {
+      title: "Resumen diario de IA",
+      disclaimer: "Generado por IA — verifica antes de actuar.",
+      regenerate: "Regenerar",
+      loading: "Analizando…",
+      errorGeneric: "No se pudo generar el análisis. Inténtalo de nuevo.",
+      errorRate: "Demasiadas solicitudes. Espera un momento.",
+      errorCredits: "Créditos de IA agotados. Recarga tu espacio de trabajo.",
+    },
   },
   contacts: {
     metaTitle: "Contactos — Kstomer",
@@ -805,6 +814,15 @@ export const es = {
       demoSub: "Slides + acceso sandbox",
       contractTitle: "Firmar el contrato anual",
       contractSub: "Renovación Gold",
+    },
+    ai: {
+      title: "Análisis de carga de trabajo IA",
+      disclaimer: "Generado por IA — verifica antes de actuar.",
+      regenerate: "Regenerar",
+      loading: "Analizando…",
+      errorGeneric: "No se pudo generar el análisis. Inténtalo de nuevo.",
+      errorRate: "Demasiadas solicitudes. Espera un momento.",
+      errorCredits: "Créditos de IA agotados. Recarga tu espacio de trabajo.",
     },
   },
 };

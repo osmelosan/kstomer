@@ -274,6 +274,15 @@ export const fr = {
     contactEmail: "Envoyer un email",
     contactPhone: "Appeler",
     contactWebsite: "Voir le site web",
+    ai: {
+      title: "Briefing IA du jour",
+      disclaimer: "Généré par IA — à vérifier avant d'agir.",
+      regenerate: "Régénérer",
+      loading: "Analyse en cours…",
+      errorGeneric: "Impossible de générer l'analyse. Réessayez.",
+      errorRate: "Trop de requêtes. Merci de patienter un instant.",
+      errorCredits: "Crédits IA épuisés. Rechargez votre espace de travail.",
+    },
   },
   contacts: {
     metaTitle: "Contacts — Kstomer",
@@ -805,6 +814,15 @@ export const fr = {
       demoSub: "Slides + accès sandbox",
       contractTitle: "Signer le contrat annuel",
       contractSub: "Renouvellement Gold",
+    },
+    ai: {
+      title: "Analyse IA de la charge de travail",
+      disclaimer: "Généré par IA — à vérifier avant d'agir.",
+      regenerate: "Régénérer",
+      loading: "Analyse en cours…",
+      errorGeneric: "Impossible de générer l'analyse. Réessayez.",
+      errorRate: "Trop de requêtes. Merci de patienter un instant.",
+      errorCredits: "Crédits IA épuisés. Rechargez votre espace de travail.",
     },
   },
 };
