@@ -29,7 +29,7 @@ Kstomer helps solo founders and consultants take control of their sales in minut
 - 🗂️ **Kanban pipeline** — drag-and-drop deal tracking (`@dnd-kit`)
 - 📇 **Unified contact book** — one place for every prospect and client
 - ✅ **Tasks & follow-up reminders** — never drop a deal
-- 📊 **AI-assisted analytics** — portfolio and revenue insights powered by the Vercel AI SDK
+- 📊 **AI-assisted insights** — tool-calling AI diagnoses and next steps on the Dashboard, Tasks, Analytics, and Resellers pages, powered by the Vercel AI SDK
 - 🤝 **Reseller / portfolio management** — track partners and their pipelines
 - 🏢 **Multi-organization support** — switch between companies, with a guided onboarding flow
 - 💳 **Built-in billing** — Stripe Checkout, embedded checkout, and subscription management
@@ -63,7 +63,12 @@ src/
 ├── components/               # App shell, command palette, checkout UI, ...
 │   └── ui/                   # shadcn/ui primitives
 ├── hooks/                    # use-tasks, use-subscription, use-organizations, ...
-├── lib/                      # pricing-plans, stripe, i18n, AI functions, utils
+├── lib/                      # pricing-plans, stripe, i18n, utils
+│   ├── crm-ai-tools.server.ts       # Shared tool definitions for the AI insights cards
+│   ├── dashboard-ai.functions.ts    # AI insights server fn for the Dashboard
+│   ├── tasks-ai.functions.ts        # AI insights server fn for Tasks
+│   ├── analytics-ai.functions.ts    # AI insights server fn for Analytics
+│   └── resellers-ai.functions.ts    # AI insights server fn for Resellers
 ├── integrations/supabase/    # Browser + server Supabase clients, auth, DB types
 └── assets/
 supabase/
@@ -113,7 +118,7 @@ Non-secret config and empty placeholders live in the committed `.env`; secrets a
 | `STRIPE_SECRET_KEY` | Vercel + local `.env.development` | Test key: `sk_test_…` |
 | `STRIPE_LIVE_SECRET_KEY` | Vercel only | Live key: `sk_live_…` (when going live) |
 | `VITE_PAYMENTS_CLIENT_TOKEN` | `.env.development` / Vercel | Stripe publishable key (`pk_test_…` or `pk_live_…`) — sandbox vs. live is inferred from this prefix |
-| `LOVABLE_API_KEY` | Vercel only | Server-only secret — powers the AI gateway used by analytics and reseller AI functions |
+| `LOVABLE_API_KEY` | Vercel only | Server-only secret — powers the AI gateway used by the Dashboard, Tasks, Analytics, and Reseller AI insights functions |
 
 ## Database
 
