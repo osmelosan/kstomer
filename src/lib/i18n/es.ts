@@ -704,17 +704,18 @@ export const es = {
     vsLastMonth: "vs mes pasado",
     infos: {
       totalRevenue:
-        "Suma de los ingresos cobrados durante el periodo seleccionado (negocios ganados, sin impuestos).",
+        "Suma del valor de los negocios de contactos que llegaron a la etapa Activo durante el periodo seleccionado.",
       conversionRate:
-        "Proporción de oportunidades ganadas sobre el total cerrado (ganadas + perdidas) en el periodo.",
-      activeContacts:
-        "Contactos con al menos una interacción (email, llamada, nota) en los últimos 30 días.",
+        "Proporción de contactos creados en el periodo que llegaron a la etapa Activo.",
+      activeContacts: "Contactos con fecha de último contacto en los últimos 30 días.",
       opportunities:
-        "Valor acumulado de las oportunidades aún abiertas en el pipeline, ponderado por probabilidad.",
+        "Valor acumulado de los negocios aún en el pipeline (todavía no Activo), ponderado por el nivel de confianza.",
     },
     revenueGrowth: "Crecimiento de ingresos",
     current: "Actual",
     previous: "Anterior",
+    noCompany: "Selecciona una empresa concreta para ver su analítica.",
+    noRevenueData: "Todavía no hay ingresos en este periodo.",
     leadSources: "Fuentes de leads",
     sources: {
       linkedin: "LinkedIn",
@@ -747,7 +748,7 @@ export const es = {
     scheduleReminders: "Programar recordatorios →",
     renewalsTitle: "Renovaciones próximas",
     renewalsBody:
-      "12 suscripciones «Premium» vencen en los próximos 30 días. Valor en riesgo: <0>5.400 €</0>.",
+      "{{count}} suscripciones vencen en los próximos 30 días. Valor en riesgo: <0>{{value}}</0>.",
     seeList: "Ver la lista",
     ai: {
       title: "Análisis IA del rendimiento",

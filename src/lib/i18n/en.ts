@@ -692,17 +692,17 @@ export const en = {
     vsLastMonth: "vs last month",
     infos: {
       totalRevenue:
-        "Sum of revenue collected over the selected period (won deals, excluding taxes).",
-      conversionRate:
-        "Share of opportunities won versus the total closed (won + lost) during the period.",
-      activeContacts:
-        "Contacts with at least one interaction (email, call, note) in the last 30 days.",
+        "Sum of deal value for contacts that reached the Active stage during the selected period.",
+      conversionRate: "Share of contacts created in this period that reached the Active stage.",
+      activeContacts: "Contacts with a last-contact date within the last 30 days.",
       opportunities:
-        "Cumulative value of opportunities still open in the pipeline, weighted by probability.",
+        "Cumulative deal value of contacts still in the pipeline (not yet Active), weighted by confidence level.",
     },
     revenueGrowth: "Revenue growth",
     current: "Current",
     previous: "Previous",
+    noCompany: "Select a specific company to see its analytics.",
+    noRevenueData: "No revenue in this period yet.",
     leadSources: "Lead sources",
     sources: {
       linkedin: "LinkedIn",
@@ -735,7 +735,7 @@ export const en = {
     scheduleReminders: "Schedule reminders →",
     renewalsTitle: "Upcoming renewals",
     renewalsBody:
-      "12 “Premium” subscriptions are due in the next 30 days. Value at risk: <0>€5,400</0>.",
+      "{{count}} subscriptions are due in the next 30 days. Value at risk: <0>{{value}}</0>.",
     seeList: "See the list",
     ai: {
       title: "AI performance analysis",

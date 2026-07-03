@@ -709,17 +709,17 @@ export const fr = {
     vsLastMonth: "vs mois dernier",
     infos: {
       totalRevenue:
-        "Somme du chiffre d'affaires encaissé sur la période sélectionnée (deals gagnés, hors taxes).",
-      conversionRate:
-        "Part des opportunités gagnées sur le total clôturé (gagnées + perdues) durant la période.",
-      activeContacts:
-        "Contacts ayant eu au moins une interaction (email, appel, note) au cours des 30 derniers jours.",
+        "Somme de la valeur des affaires pour les contacts passés au statut Actif durant la période sélectionnée.",
+      conversionRate: "Part des contacts créés durant la période ayant atteint le statut Actif.",
+      activeContacts: "Contacts ayant une date de dernier contact au cours des 30 derniers jours.",
       opportunities:
-        "Valeur cumulée des opportunités encore ouvertes dans le pipeline, pondérée par la probabilité.",
+        "Valeur cumulée des affaires encore dans le pipeline (pas encore Actif), pondérée par le niveau de confiance.",
     },
     revenueGrowth: "Croissance du revenu",
     current: "Actuel",
     previous: "Précédent",
+    noCompany: "Sélectionnez une société précise pour voir son analytique.",
+    noRevenueData: "Aucun revenu sur cette période pour l'instant.",
     leadSources: "Sources de leads",
     sources: {
       linkedin: "LinkedIn",
@@ -753,7 +753,7 @@ export const fr = {
     scheduleReminders: "Planifier des rappels →",
     renewalsTitle: "Renouvellements en approche",
     renewalsBody:
-      "12 abonnements « Premium » arrivent à échéance dans les 30 prochains jours. Valeur à risque : <0>5 400 €</0>.",
+      "{{count}} abonnements arrivent à échéance dans les 30 prochains jours. Valeur à risque : <0>{{value}}</0>.",
     seeList: "Voir la liste",
     ai: {
       title: "Analyse IA des performances",
