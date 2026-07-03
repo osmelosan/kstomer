@@ -3,27 +3,29 @@ import { useEffect, useState, useCallback } from "react";
 const STORAGE_KEY = "kstomer.revenueGoal";
 export const DEFAULT_REVENUE_GOAL = 16000;
 
-function read(): number {
-  if (typeof window === "undefined") return DEFAULT_REVENUE_GOAL;
+function readStored(): number | null {
+  if (typeof window === "undefined") return null;
   try {
     const raw = window.localStorage.getItem(STORAGE_KEY);
-    if (!raw) return DEFAULT_REVENUE_GOAL;
+    if (!raw) return null;
     const n = Number(raw);
-    return Number.isFinite(n) && n > 0 ? n : DEFAULT_REVENUE_GOAL;
+    return Number.isFinite(n) && n > 0 ? n : null;
   } catch {
-    return DEFAULT_REVENUE_GOAL;
+    return null;
   }
 }
 
 export function useRevenueGoal() {
-  const [goal, setGoalState] = useState<number>(DEFAULT_REVENUE_GOAL);
+  // `custom` is the user's explicitly saved goal, if any; `goal` always
+  // resolves to a display-safe number (falling back to the default).
+  const [custom, setCustom] = useState<number | null>(null);
 
   useEffect(() => {
-    setGoalState(read());
+    setCustom(readStored());
     const onStorage = (e: StorageEvent) => {
-      if (e.key === STORAGE_KEY) setGoalState(read());
+      if (e.key === STORAGE_KEY) setCustom(readStored());
     };
-    const onCustom = () => setGoalState(read());
+    const onCustom = () => setCustom(readStored());
     window.addEventListener("storage", onStorage);
     window.addEventListener("kstomer:revenueGoal", onCustom);
     return () => {
@@ -39,8 +41,8 @@ export function useRevenueGoal() {
     } catch {
       /* noop */
     }
-    setGoalState(next);
+    setCustom(next);
   }, []);
 
-  return { goal, setGoal };
+  return { goal: custom ?? DEFAULT_REVENUE_GOAL, hasCustomGoal: custom !== null, setGoal };
 }

@@ -1,5 +1,5 @@
 import { pageHead } from "@/lib/route-seo";
-import { createFileRoute, useParams, Link } from "@tanstack/react-router";
+import { createFileRoute, useParams, Link, notFound } from "@tanstack/react-router";
 import { AppShell } from "@/components/AppShell";
 import {
   BadgeCheck,
@@ -58,6 +58,7 @@ import {
 } from "@/components/ui/sheet";
 import { useAutosave, type AutosaveStatus } from "@/hooks/use-autosave";
 import { getQuickNotesFor } from "@/lib/quick-notes";
+import { getContactById } from "@/lib/mock-contacts";
 
 export const Route = createFileRoute("/_authenticated/contacts/$id")({
   head: ({ params }) =>
@@ -67,7 +68,17 @@ export const Route = createFileRoute("/_authenticated/contacts/$id")({
       path: `/contacts/${params.id}`,
       noindex: true,
     }),
+  loader: ({ params }) => {
+    const contact = getContactById(params.id);
+    if (!contact) throw notFound();
+    return { contact };
+  },
   component: ContactDetails,
+  notFoundComponent: () => (
+    <AppShell title="—">
+      <div className="k-card p-6 text-sm text-muted-foreground">{i18n.t("contactDetail.notFound")}</div>
+    </AppShell>
+  ),
 });
 
 type Status = "activeClient" | "hotProspect" | "inactive";
@@ -104,7 +115,7 @@ type Opportunity = {
 };
 
 function ContactDetails() {
-  const { id } = useParams({ from: "/contacts/$id" });
+  const { id } = useParams({ from: "/_authenticated/contacts/$id" });
   const { t } = useTranslation();
 
   const display = id

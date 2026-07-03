@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useCurrentUser } from "./use-current-user";
 
@@ -19,6 +19,13 @@ export function useOrganizations() {
   const [organizations, setOrganizations] = useState<Organization[]>([]);
   const [loading, setLoading] = useState(true);
 
+  // Read via ref (not an effect dependency) so a `profile` update — which
+  // resolves asynchronously after `user` — can't re-trigger the effect
+  // below and race a second "create default org" against the first.
+  const profileRef = useRef(profile);
+  profileRef.current = profile;
+  const creatingForUserRef = useRef<string | null>(null);
+
   const fetchOrgs = useCallback(async (userId: string) => {
     const { data } = await supabase
       .from("organizations")
@@ -34,18 +41,26 @@ export function useOrganizations() {
       setLoading(false);
       return;
     }
+    const userId = user.id;
     let cancelled = false;
     setLoading(true);
-    fetchOrgs(user.id).then(async (orgs) => {
+    fetchOrgs(userId).then(async (orgs) => {
       if (cancelled) return;
       if (orgs.length === 0) {
-        const defaultName =
-          profile?.full_name?.split(/\s+/)[0]
-            ? `Entreprise de ${profile.full_name.split(/\s+/)[0]}`
-            : "Mon entreprise";
+        if (creatingForUserRef.current === userId) {
+          // Another invocation is already creating the default org for this
+          // user — skip to avoid inserting a duplicate.
+          setLoading(false);
+          return;
+        }
+        creatingForUserRef.current = userId;
+        const fullName = profileRef.current?.full_name;
+        const defaultName = fullName?.split(/\s+/)[0]
+          ? `Entreprise de ${fullName.split(/\s+/)[0]}`
+          : "Mon entreprise";
         const { data: created } = await supabase
           .from("organizations")
-          .insert({ owner_id: user.id, name: defaultName })
+          .insert({ owner_id: userId, name: defaultName })
           .select()
           .single();
         if (!cancelled && created) setOrganizations([created as Organization]);
@@ -55,7 +70,8 @@ export function useOrganizations() {
       setLoading(false);
     });
     return () => { cancelled = true; };
-  }, [user, profile, fetchOrgs]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?.id, fetchOrgs]);
 
   const createOrg = useCallback(
     async (name: string, address?: string): Promise<Organization | null> => {
