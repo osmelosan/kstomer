@@ -27,11 +27,12 @@ import { Route as AuthenticatedArchivesRouteImport } from './routes/_authenticat
 import { Route as AuthenticatedAnalyticsRouteImport } from './routes/_authenticated/analytics'
 import { Route as AuthenticatedResellersIndexRouteImport } from './routes/_authenticated/resellers.index'
 import { Route as AuthenticatedContactsIndexRouteImport } from './routes/_authenticated/contacts.index'
-import { Route as AuthenticatedResellersSlugRouteImport } from './routes/_authenticated/resellers.$slug'
+import { Route as ApiCronWarmAiCacheRouteImport } from './routes/api/cron/warm-ai-cache'
+import { Route as AuthenticatedResellersNewRouteImport } from './routes/_authenticated/resellers.new'
+import { Route as AuthenticatedResellersIdRouteImport } from './routes/_authenticated/resellers.$id'
 import { Route as AuthenticatedContactsNewRouteImport } from './routes/_authenticated/contacts.new'
 import { Route as AuthenticatedContactsIdRouteImport } from './routes/_authenticated/contacts.$id'
 import { Route as ApiPublicPaymentsWebhookRouteImport } from './routes/api/public/payments/webhook'
-import { Route as ApiCronWarmAiCacheRouteImport } from './routes/api/cron/warm-ai-cache'
 
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   id: '/sitemap.xml',
@@ -124,10 +125,21 @@ const AuthenticatedContactsIndexRoute =
     path: '/contacts/',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
-const AuthenticatedResellersSlugRoute =
-  AuthenticatedResellersSlugRouteImport.update({
-    id: '/$slug',
-    path: '/$slug',
+const ApiCronWarmAiCacheRoute = ApiCronWarmAiCacheRouteImport.update({
+  id: '/api/cron/warm-ai-cache',
+  path: '/api/cron/warm-ai-cache',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedResellersNewRoute =
+  AuthenticatedResellersNewRouteImport.update({
+    id: '/new',
+    path: '/new',
+    getParentRoute: () => AuthenticatedResellersRoute,
+  } as any)
+const AuthenticatedResellersIdRoute =
+  AuthenticatedResellersIdRouteImport.update({
+    id: '/$id',
+    path: '/$id',
     getParentRoute: () => AuthenticatedResellersRoute,
   } as any)
 const AuthenticatedContactsNewRoute =
@@ -147,11 +159,6 @@ const ApiPublicPaymentsWebhookRoute =
     path: '/api/public/payments/webhook',
     getParentRoute: () => rootRouteImport,
   } as any)
-const ApiCronWarmAiCacheRoute = ApiCronWarmAiCacheRouteImport.update({
-  id: '/api/cron/warm-ai-cache',
-  path: '/api/cron/warm-ai-cache',
-  getParentRoute: () => rootRouteImport,
-} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -171,11 +178,12 @@ export interface FileRoutesByFullPath {
   '/checkout/return': typeof CheckoutReturnRoute
   '/contacts/$id': typeof AuthenticatedContactsIdRoute
   '/contacts/new': typeof AuthenticatedContactsNewRoute
-  '/resellers/$slug': typeof AuthenticatedResellersSlugRoute
+  '/resellers/$id': typeof AuthenticatedResellersIdRoute
+  '/resellers/new': typeof AuthenticatedResellersNewRoute
+  '/api/cron/warm-ai-cache': typeof ApiCronWarmAiCacheRoute
   '/contacts/': typeof AuthenticatedContactsIndexRoute
   '/resellers/': typeof AuthenticatedResellersIndexRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
-  '/api/cron/warm-ai-cache': typeof ApiCronWarmAiCacheRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -194,11 +202,12 @@ export interface FileRoutesByTo {
   '/checkout/return': typeof CheckoutReturnRoute
   '/contacts/$id': typeof AuthenticatedContactsIdRoute
   '/contacts/new': typeof AuthenticatedContactsNewRoute
-  '/resellers/$slug': typeof AuthenticatedResellersSlugRoute
+  '/resellers/$id': typeof AuthenticatedResellersIdRoute
+  '/resellers/new': typeof AuthenticatedResellersNewRoute
+  '/api/cron/warm-ai-cache': typeof ApiCronWarmAiCacheRoute
   '/contacts': typeof AuthenticatedContactsIndexRoute
   '/resellers': typeof AuthenticatedResellersIndexRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
-  '/api/cron/warm-ai-cache': typeof ApiCronWarmAiCacheRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -220,11 +229,12 @@ export interface FileRoutesById {
   '/checkout/return': typeof CheckoutReturnRoute
   '/_authenticated/contacts/$id': typeof AuthenticatedContactsIdRoute
   '/_authenticated/contacts/new': typeof AuthenticatedContactsNewRoute
-  '/_authenticated/resellers/$slug': typeof AuthenticatedResellersSlugRoute
+  '/_authenticated/resellers/$id': typeof AuthenticatedResellersIdRoute
+  '/_authenticated/resellers/new': typeof AuthenticatedResellersNewRoute
+  '/api/cron/warm-ai-cache': typeof ApiCronWarmAiCacheRoute
   '/_authenticated/contacts/': typeof AuthenticatedContactsIndexRoute
   '/_authenticated/resellers/': typeof AuthenticatedResellersIndexRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
-  '/api/cron/warm-ai-cache': typeof ApiCronWarmAiCacheRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -246,11 +256,12 @@ export interface FileRouteTypes {
     | '/checkout/return'
     | '/contacts/$id'
     | '/contacts/new'
-    | '/resellers/$slug'
+    | '/resellers/$id'
+    | '/resellers/new'
+    | '/api/cron/warm-ai-cache'
     | '/contacts/'
     | '/resellers/'
     | '/api/public/payments/webhook'
-    | '/api/cron/warm-ai-cache'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -269,11 +280,12 @@ export interface FileRouteTypes {
     | '/checkout/return'
     | '/contacts/$id'
     | '/contacts/new'
-    | '/resellers/$slug'
+    | '/resellers/$id'
+    | '/resellers/new'
+    | '/api/cron/warm-ai-cache'
     | '/contacts'
     | '/resellers'
     | '/api/public/payments/webhook'
-    | '/api/cron/warm-ai-cache'
   id:
     | '__root__'
     | '/'
@@ -294,11 +306,12 @@ export interface FileRouteTypes {
     | '/checkout/return'
     | '/_authenticated/contacts/$id'
     | '/_authenticated/contacts/new'
-    | '/_authenticated/resellers/$slug'
+    | '/_authenticated/resellers/$id'
+    | '/_authenticated/resellers/new'
+    | '/api/cron/warm-ai-cache'
     | '/_authenticated/contacts/'
     | '/_authenticated/resellers/'
     | '/api/public/payments/webhook'
-    | '/api/cron/warm-ai-cache'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -309,8 +322,8 @@ export interface RootRouteChildren {
   ResetPasswordRoute: typeof ResetPasswordRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   CheckoutReturnRoute: typeof CheckoutReturnRoute
-  ApiPublicPaymentsWebhookRoute: typeof ApiPublicPaymentsWebhookRoute
   ApiCronWarmAiCacheRoute: typeof ApiCronWarmAiCacheRoute
+  ApiPublicPaymentsWebhookRoute: typeof ApiPublicPaymentsWebhookRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -441,11 +454,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedContactsIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/_authenticated/resellers/$slug': {
-      id: '/_authenticated/resellers/$slug'
-      path: '/$slug'
-      fullPath: '/resellers/$slug'
-      preLoaderRoute: typeof AuthenticatedResellersSlugRouteImport
+    '/api/cron/warm-ai-cache': {
+      id: '/api/cron/warm-ai-cache'
+      path: '/api/cron/warm-ai-cache'
+      fullPath: '/api/cron/warm-ai-cache'
+      preLoaderRoute: typeof ApiCronWarmAiCacheRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/resellers/new': {
+      id: '/_authenticated/resellers/new'
+      path: '/new'
+      fullPath: '/resellers/new'
+      preLoaderRoute: typeof AuthenticatedResellersNewRouteImport
+      parentRoute: typeof AuthenticatedResellersRoute
+    }
+    '/_authenticated/resellers/$id': {
+      id: '/_authenticated/resellers/$id'
+      path: '/$id'
+      fullPath: '/resellers/$id'
+      preLoaderRoute: typeof AuthenticatedResellersIdRouteImport
       parentRoute: typeof AuthenticatedResellersRoute
     }
     '/_authenticated/contacts/new': {
@@ -469,24 +496,19 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicPaymentsWebhookRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/cron/warm-ai-cache': {
-      id: '/api/cron/warm-ai-cache'
-      path: '/api/cron/warm-ai-cache'
-      fullPath: '/api/cron/warm-ai-cache'
-      preLoaderRoute: typeof ApiCronWarmAiCacheRouteImport
-      parentRoute: typeof rootRouteImport
-    }
   }
 }
 
 interface AuthenticatedResellersRouteChildren {
-  AuthenticatedResellersSlugRoute: typeof AuthenticatedResellersSlugRoute
+  AuthenticatedResellersIdRoute: typeof AuthenticatedResellersIdRoute
+  AuthenticatedResellersNewRoute: typeof AuthenticatedResellersNewRoute
   AuthenticatedResellersIndexRoute: typeof AuthenticatedResellersIndexRoute
 }
 
 const AuthenticatedResellersRouteChildren: AuthenticatedResellersRouteChildren =
   {
-    AuthenticatedResellersSlugRoute: AuthenticatedResellersSlugRoute,
+    AuthenticatedResellersIdRoute: AuthenticatedResellersIdRoute,
+    AuthenticatedResellersNewRoute: AuthenticatedResellersNewRoute,
     AuthenticatedResellersIndexRoute: AuthenticatedResellersIndexRoute,
   }
 
@@ -544,8 +566,8 @@ const rootRouteChildren: RootRouteChildren = {
   ResetPasswordRoute: ResetPasswordRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   CheckoutReturnRoute: CheckoutReturnRoute,
-  ApiPublicPaymentsWebhookRoute: ApiPublicPaymentsWebhookRoute,
   ApiCronWarmAiCacheRoute: ApiCronWarmAiCacheRoute,
+  ApiPublicPaymentsWebhookRoute: ApiPublicPaymentsWebhookRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
