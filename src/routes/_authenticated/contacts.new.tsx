@@ -4,6 +4,9 @@ import { AppShell } from "@/components/AppShell";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import i18n from "@/lib/i18n";
+import { CONTACTS } from "@/lib/mock-contacts";
+
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export const Route = createFileRoute("/_authenticated/contacts/new")({
   head: () =>
@@ -28,22 +31,64 @@ function NewContact() {
     status: "prospect",
     notes: "",
   });
+  const [errors, setErrors] = useState<Record<string, string>>({});
+
+  function validate() {
+    const next: Record<string, string> = {};
+    if (!form.firstName.trim()) next.firstName = t("newContact.errors.required");
+    if (!form.lastName.trim()) next.lastName = t("newContact.errors.required");
+    if (!form.email.trim()) {
+      next.email = t("newContact.errors.required");
+    } else if (!EMAIL_RE.test(form.email.trim())) {
+      next.email = t("newContact.errors.invalidEmail");
+    } else if (CONTACTS.some((c) => c.email.toLowerCase() === form.email.trim().toLowerCase())) {
+      next.email = t("newContact.errors.duplicateEmail");
+    }
+    setErrors(next);
+    return Object.keys(next).length === 0;
+  }
 
   return (
     <AppShell title={t("newContact.title")} subtitle={t("newContact.subtitle")}>
       <form
         onSubmit={(e) => {
           e.preventDefault();
+          if (!validate()) return;
           nav({ to: "/contacts" });
         }}
+        noValidate
         className="k-card p-8 max-w-3xl space-y-6"
       >
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-          <Field label={t("newContact.firstName")} value={form.firstName} onChange={(v) => setForm({ ...form, firstName: v })} />
-          <Field label={t("newContact.lastName")} value={form.lastName} onChange={(v) => setForm({ ...form, lastName: v })} />
-          <Field label={t("newContact.email")} type="email" value={form.email} onChange={(v) => setForm({ ...form, email: v })} />
-          <Field label={t("newContact.phone")} value={form.phone} onChange={(v) => setForm({ ...form, phone: v })} />
-          <Field label={t("newContact.company")} value={form.company} onChange={(v) => setForm({ ...form, company: v })} />
+          <Field
+            label={t("newContact.firstName")}
+            value={form.firstName}
+            error={errors.firstName}
+            onChange={(v) => setForm({ ...form, firstName: v })}
+          />
+          <Field
+            label={t("newContact.lastName")}
+            value={form.lastName}
+            error={errors.lastName}
+            onChange={(v) => setForm({ ...form, lastName: v })}
+          />
+          <Field
+            label={t("newContact.email")}
+            type="email"
+            value={form.email}
+            error={errors.email}
+            onChange={(v) => setForm({ ...form, email: v })}
+          />
+          <Field
+            label={t("newContact.phone")}
+            value={form.phone}
+            onChange={(v) => setForm({ ...form, phone: v })}
+          />
+          <Field
+            label={t("newContact.company")}
+            value={form.company}
+            onChange={(v) => setForm({ ...form, company: v })}
+          />
           <div>
             <label className="block text-sm font-semibold mb-2">{t("newContact.status")}</label>
             <select
@@ -94,11 +139,13 @@ function Field({
   value,
   onChange,
   type = "text",
+  error,
 }: {
   label: string;
   value: string;
   onChange: (v: string) => void;
   type?: string;
+  error?: string;
 }) {
   return (
     <div>
@@ -107,8 +154,12 @@ function Field({
         type={type}
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="w-full h-11 px-3 rounded-md border border-input bg-card text-sm focus:ring-2 focus:ring-ring/40 focus:outline-none"
+        aria-invalid={!!error}
+        className={`w-full h-11 px-3 rounded-md border bg-card text-sm focus:ring-2 focus:ring-ring/40 focus:outline-none ${
+          error ? "border-destructive" : "border-input"
+        }`}
       />
+      {error && <p className="mt-1.5 text-xs text-destructive">{error}</p>}
     </div>
   );
 }

@@ -246,6 +246,10 @@ export const fr = {
     continue: "Continuer la configuration",
     skip: "Passer cette étape",
     privacy: "Vos données sont sécurisées et ne seront jamais partagées.",
+    errors: {
+      nameRequired: "Merci de renseigner votre nom complet.",
+      roleRequired: "Merci de sélectionner votre rôle.",
+    },
   },
   dashboard: {
     metaTitle: "Tableau de bord — Kstomer",
@@ -456,6 +460,11 @@ export const fr = {
       activeClient: "Client actif",
       inactive: "Inactif",
     },
+    errors: {
+      required: "Ce champ est obligatoire.",
+      invalidEmail: "Adresse email invalide.",
+      duplicateEmail: "Un contact existe déjà avec cet email.",
+    },
     cancel: "Annuler",
     create: "Créer le contact",
   },
@@ -489,6 +498,9 @@ export const fr = {
     editCard: "Modifier la carte",
     cardName: "Nom",
     amount: "Montant (€)",
+    errors: {
+      nameRequired: "Le nom est obligatoire.",
+    },
     confidence: "Confiance",
     notes: "Notes",
     tone: "Tonalité",
@@ -616,6 +628,8 @@ export const fr = {
       actions: "Actions",
     },
     restore: "Restaurer",
+    restored: "{{name}} a été restauré.",
+    empty: "Plus aucun élément archivé à afficher.",
     showing: "Affichage de <0>{{from}}</0> sur {{total}} éléments",
     types: {
       partner: "Partenaire",

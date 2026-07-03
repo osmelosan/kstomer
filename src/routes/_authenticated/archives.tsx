@@ -3,6 +3,8 @@ import { createFileRoute } from "@tanstack/react-router";
 import { AppShell } from "@/components/AppShell";
 import { Filter, ChevronDown, Building2, User2, DollarSign, History } from "lucide-react";
 import { useTranslation, Trans } from "react-i18next";
+import { useState } from "react";
+import { toast } from "sonner";
 import i18n from "@/lib/i18n";
 
 export const Route = createFileRoute("/_authenticated/archives")({
@@ -17,15 +19,47 @@ export const Route = createFileRoute("/_authenticated/archives")({
 });
 
 type Tone = "info" | "warning";
-const ROWS = [
-  { key: "acme", icon: Building2, date: "2023-10-12", typeKey: "archives.types.partner", reasonKey: "archives.reasons.contractExpired", tone: "info" as Tone },
-  { key: "dupont", icon: User2, date: "2023-11-04", typeKey: "archives.types.contact", reasonKey: "archives.reasons.inactive2y", tone: "info" as Tone },
-  { key: "aurora", icon: DollarSign, date: "2023-12-15", typeKey: "archives.types.opportunity", reasonKey: "archives.reasons.closedLost", tone: "warning" as Tone },
+const INITIAL_ROWS = [
+  {
+    key: "acme",
+    icon: Building2,
+    date: "2023-10-12",
+    typeKey: "archives.types.partner",
+    reasonKey: "archives.reasons.contractExpired",
+    tone: "info" as Tone,
+  },
+  {
+    key: "dupont",
+    icon: User2,
+    date: "2023-11-04",
+    typeKey: "archives.types.contact",
+    reasonKey: "archives.reasons.inactive2y",
+    tone: "info" as Tone,
+  },
+  {
+    key: "aurora",
+    icon: DollarSign,
+    date: "2023-12-15",
+    typeKey: "archives.types.opportunity",
+    reasonKey: "archives.reasons.closedLost",
+    tone: "warning" as Tone,
+  },
 ];
 
 function Archives() {
   const { t, i18n: i18nInst } = useTranslation();
-  const dateFmt = new Intl.DateTimeFormat(i18nInst.language, { year: "numeric", month: "short", day: "2-digit" });
+  const dateFmt = new Intl.DateTimeFormat(i18nInst.language, {
+    year: "numeric",
+    month: "short",
+    day: "2-digit",
+  });
+  const [rows, setRows] = useState(INITIAL_ROWS);
+
+  function restore(key: string) {
+    const row = rows.find((r) => r.key === key);
+    setRows((prev) => prev.filter((r) => r.key !== key));
+    if (row) toast.success(t("archives.restored", { name: t(`archives.rows.${row.key}`) }));
+  }
 
   return (
     <AppShell
@@ -36,7 +70,10 @@ function Archives() {
         <div className="ml-2 inline-flex items-center gap-2 h-10 px-3 rounded-md border border-border bg-card text-sm">
           <History className="h-4 w-4" />
           <span>
-            <Trans i18nKey="archives.storageEfficiency" components={[<strong className="text-success" />]} />
+            <Trans
+              i18nKey="archives.storageEfficiency"
+              components={[<strong className="text-success" />]}
+            />
           </span>
         </div>
       }
@@ -80,7 +117,14 @@ function Archives() {
             </tr>
           </thead>
           <tbody>
-            {ROWS.map((r) => (
+            {rows.length === 0 && (
+              <tr>
+                <td colSpan={5} className="p-8 text-center text-muted-foreground">
+                  {t("archives.empty")}
+                </td>
+              </tr>
+            )}
+            {rows.map((r) => (
               <tr key={r.key} className="border-b border-border last:border-0 hover:bg-muted/40">
                 <td className="p-4">
                   <div className="flex items-center gap-3">
@@ -104,7 +148,11 @@ function Archives() {
                 <td className="p-4">{dateFmt.format(new Date(r.date))}</td>
                 <td className="p-4 italic text-muted-foreground">{t(r.reasonKey)}</td>
                 <td className="p-4 text-right">
-                  <button className="text-secondary text-sm font-semibold hover:underline">
+                  <button
+                    type="button"
+                    onClick={() => restore(r.key)}
+                    className="text-secondary text-sm font-semibold hover:underline"
+                  >
                     {t("archives.restore")}
                   </button>
                 </td>
@@ -117,7 +165,7 @@ function Archives() {
           <div>
             <Trans
               i18nKey="archives.showing"
-              values={{ from: "1-3", total: "1 248" }}
+              values={{ from: rows.length ? `1-${rows.length}` : "0", total: "1 248" }}
               components={[<strong className="text-foreground" />]}
             />
           </div>
@@ -125,8 +173,14 @@ function Archives() {
             {[1, 2, 3].map((p) => (
               <button
                 key={p}
+                type="button"
+                disabled={p !== 1}
+                aria-disabled={p !== 1}
+                aria-current={p === 1 ? "page" : undefined}
                 className={`h-8 w-8 grid place-items-center rounded-md text-sm ${
-                  p === 1 ? "bg-secondary text-secondary-foreground" : "border border-input bg-card"
+                  p === 1
+                    ? "bg-secondary text-secondary-foreground"
+                    : "border border-input bg-card opacity-40 cursor-not-allowed"
                 }`}
               >
                 {p}

@@ -5,13 +5,13 @@ import { Filter, ChevronDown, Plus, LayoutGrid, List } from "lucide-react";
 import { useTranslation, Trans } from "react-i18next";
 import i18n from "@/lib/i18n";
 import { useState } from "react";
+import { CONTACTS, type ContactTone } from "@/lib/mock-contacts";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { CONTACTS, type ContactTone } from "@/lib/mock-contacts";
 
 export const Route = createFileRoute("/_authenticated/contacts/")({
   head: () =>
@@ -56,19 +56,15 @@ function Contacts() {
 
   const filtered = CONTACTS.filter((c) => {
     const statusMatch =
-      statusFilter === "all" ||
-      c.statusKey === `contacts.statuses.${statusFilter}`;
+      statusFilter === "all" || c.statusKey === `contacts.statuses.${statusFilter}`;
     const sourceMatch = sourceFilter === "all" || c.source === sourceFilter;
     return statusMatch && sourceMatch;
   });
 
   const statusLabel =
-    statusFilter === "all"
-      ? t("contacts.statusAll")
-      : t(`contacts.statuses.${statusFilter}`);
+    statusFilter === "all" ? t("contacts.statusAll") : t(`contacts.statuses.${statusFilter}`);
 
-  const sourceLabel =
-    SOURCE_OPTIONS.find((o) => o.value === sourceFilter)?.label ?? "Source: all";
+  const sourceLabel = SOURCE_OPTIONS.find((o) => o.value === sourceFilter)?.label ?? "Source: all";
 
   return (
     <AppShell
@@ -76,10 +72,10 @@ function Contacts() {
       title={t("contacts.title")}
       subtitle={t("contacts.subtitle")}
       actions={
-          <Link
-            to="/contacts/new"
-            className="ml-2 inline-flex items-center gap-2 h-10 px-4 rounded-md bg-secondary text-secondary-foreground text-sm font-semibold shadow-sm hover:bg-secondary/90 active:scale-[0.98] transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50"
-          >
+        <Link
+          to="/contacts/new"
+          className="ml-2 inline-flex items-center gap-2 h-10 px-4 rounded-md bg-secondary text-secondary-foreground text-sm font-semibold shadow-sm hover:bg-secondary/90 active:scale-[0.98] transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50"
+        >
           <Plus className="h-4 w-4" /> {t("contacts.newContact")}
         </Link>
       }
@@ -155,7 +151,11 @@ function Contacts() {
                   <input type="checkbox" className="h-4 w-4 rounded border-input" />
                 </td>
                 <td className="p-4">
-                  <Link to="/contacts/$id" params={{ id: c.id }} className="flex items-center gap-3">
+                  <Link
+                    to="/contacts/$id"
+                    params={{ id: c.id }}
+                    className="flex items-center gap-3"
+                  >
                     <div className="h-9 w-9 rounded-full bg-secondary/15 text-secondary text-xs font-bold grid place-items-center">
                       {c.initials}
                     </div>
@@ -167,7 +167,9 @@ function Contacts() {
                 </td>
                 <td className="p-4">{c.company}</td>
                 <td className="p-4">
-                  <span className={`inline-flex items-center text-xs font-semibold px-3 py-1 rounded-full border ${statusCls(c.tone)}`}>
+                  <span
+                    className={`inline-flex items-center text-xs font-semibold px-3 py-1 rounded-full border ${statusCls(c.tone)}`}
+                  >
                     {t(c.statusKey)}
                   </span>
                 </td>
@@ -182,12 +184,29 @@ function Contacts() {
             <Trans
               i18nKey="contacts.showing"
               values={{ from: filtered.length, total: CONTACTS.length }}
-              components={[<strong className="text-foreground" />, <strong className="text-foreground" />]}
+              components={[
+                <strong className="text-foreground" />,
+                <strong className="text-foreground" />,
+              ]}
             />
           </div>
           <div className="flex gap-2">
-            <button className="h-8 w-8 grid place-items-center rounded-md border border-input">‹</button>
-            <button className="h-8 w-8 grid place-items-center rounded-md border border-input">›</button>
+            <button
+              type="button"
+              disabled
+              aria-disabled="true"
+              className="h-8 w-8 grid place-items-center rounded-md border border-input disabled:opacity-40 disabled:cursor-not-allowed"
+            >
+              ‹
+            </button>
+            <button
+              type="button"
+              disabled
+              aria-disabled="true"
+              className="h-8 w-8 grid place-items-center rounded-md border border-input disabled:opacity-40 disabled:cursor-not-allowed"
+            >
+              ›
+            </button>
           </div>
         </div>
       </div>

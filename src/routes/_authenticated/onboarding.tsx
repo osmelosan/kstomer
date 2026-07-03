@@ -27,6 +27,15 @@ function Onboarding() {
   const [role, setRole] = useState("");
   const [taskReminders, setTaskReminders] = useState(true);
   const [prospect, setProspect] = useState(false);
+  const [errors, setErrors] = useState<{ name?: string; role?: string }>({});
+
+  function handleContinue() {
+    const next: { name?: string; role?: string } = {};
+    if (!name.trim()) next.name = t("onboarding.errors.nameRequired");
+    if (!role) next.role = t("onboarding.errors.roleRequired");
+    setErrors(next);
+    if (Object.keys(next).length === 0) nav({ to: "/dashboard" });
+  }
 
   useEffect(() => {
     const fullName =
@@ -67,8 +76,12 @@ function Onboarding() {
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder={t("onboarding.fullNamePlaceholder")}
-                className="w-full h-12 px-4 rounded-md border border-input bg-card text-sm focus:outline-none focus:ring-2 focus:ring-ring/50"
+                aria-invalid={!!errors.name}
+                className={`w-full h-12 px-4 rounded-md border bg-card text-sm focus:outline-none focus:ring-2 focus:ring-ring/50 ${
+                  errors.name ? "border-destructive" : "border-input"
+                }`}
               />
+              {errors.name && <p className="mt-1.5 text-xs text-destructive">{errors.name}</p>}
             </div>
 
             <div>
@@ -76,7 +89,10 @@ function Onboarding() {
               <select
                 value={role}
                 onChange={(e) => setRole(e.target.value)}
-                className="w-full h-12 px-4 rounded-md border border-input bg-card text-sm focus:outline-none focus:ring-2 focus:ring-ring/50"
+                aria-invalid={!!errors.role}
+                className={`w-full h-12 px-4 rounded-md border bg-card text-sm focus:outline-none focus:ring-2 focus:ring-ring/50 ${
+                  errors.role ? "border-destructive" : "border-input"
+                }`}
               >
                 <option value="">{t("onboarding.selectRole")}</option>
                 <option>{t("onboarding.roles.solopreneur")}</option>
@@ -84,6 +100,7 @@ function Onboarding() {
                 <option>{t("onboarding.roles.agency")}</option>
                 <option>{t("onboarding.roles.reseller")}</option>
               </select>
+              {errors.role && <p className="mt-1.5 text-xs text-destructive">{errors.role}</p>}
             </div>
 
             <div className="pt-4 border-t border-border">
@@ -104,7 +121,7 @@ function Onboarding() {
             </div>
 
             <button
-              onClick={() => nav({ to: "/dashboard" })}
+              onClick={handleContinue}
               className="mt-4 flex items-center justify-center gap-3 w-full h-13 py-4 rounded-md bg-secondary text-secondary-foreground font-semibold hover:bg-secondary/90 transition-colors"
             >
               {t("onboarding.continue")} <ArrowRight className="h-5 w-5" />

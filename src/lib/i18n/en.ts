@@ -223,6 +223,10 @@ export const en = {
     continue: "Continue setup",
     skip: "Skip this step",
     privacy: "Your data is secure and will never be shared.",
+    errors: {
+      nameRequired: "Please enter your full name.",
+      roleRequired: "Please select your role.",
+    },
   },
   dashboard: {
     metaTitle: "Dashboard — Kstomer",
@@ -432,6 +436,11 @@ export const en = {
       activeClient: "Active client",
       inactive: "Inactive",
     },
+    errors: {
+      required: "This field is required.",
+      invalidEmail: "Invalid email address.",
+      duplicateEmail: "A contact with this email already exists.",
+    },
     cancel: "Cancel",
     create: "Create contact",
   },
@@ -465,6 +474,9 @@ export const en = {
     editCard: "Edit card",
     cardName: "Name",
     amount: "Amount (€)",
+    errors: {
+      nameRequired: "Name is required.",
+    },
     confidence: "Confidence",
     notes: "Notes",
     tone: "Tone",
@@ -589,6 +601,8 @@ export const en = {
       actions: "Actions",
     },
     restore: "Restore",
+    restored: "{{name}} has been restored.",
+    empty: "No more archived items to show.",
     showing: "Showing <0>{{from}}</0> of {{total}} items",
     types: {
       partner: "Partner",

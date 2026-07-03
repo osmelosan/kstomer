@@ -4,16 +4,7 @@ import { AppShell } from "@/components/AppShell";
 import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import i18n from "@/lib/i18n";
-import {
-  MoreHorizontal,
-  Mail,
-  Plus,
-  Trash2,
-  Download,
-  GripVertical,
-  Check,
-  X,
-} from "lucide-react";
+import { MoreHorizontal, Mail, Plus, Trash2, Download, GripVertical, Check, X } from "lucide-react";
 
 import {
   DndContext,
@@ -51,13 +42,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-  SheetFooter,
-} from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetFooter } from "@/components/ui/sheet";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -86,7 +71,6 @@ export const Route = createFileRoute("/_authenticated/kanban")({
   component: KanbanPage,
 });
 
-
 // ---------- Types ----------
 type Tone = "success" | "warning" | "destructive";
 type Card = {
@@ -109,21 +93,13 @@ type Board = { columns: Column[]; cards: Record<string, Card> };
 
 type SortMode = "manual" | "name-asc" | "date-desc" | "date-asc";
 
-const ACCENTS = [
-  "#316bf3",
-  "#22C55E",
-  "#FBBF24",
-  "#a855f7",
-  "#ef4444",
-  "#0ea5e9",
-  "#64748b",
-];
+const ACCENTS = ["#316bf3", "#22C55E", "#FBBF24", "#a855f7", "#ef4444", "#0ea5e9", "#64748b"];
 
 const STORAGE_KEY = "kstomer.kanban.v1";
 
 // ---------- Initial data ----------
 function uid() {
-  return (globalThis.crypto?.randomUUID?.() ?? `id-${Math.random().toString(36).slice(2)}`);
+  return globalThis.crypto?.randomUUID?.() ?? `id-${Math.random().toString(36).slice(2)}`;
 }
 
 function initialBoard(): Board {
@@ -148,7 +124,15 @@ function initialBoard(): Board {
   const c1 = mk("Alice Lefebvre", 4500, "success", "NORMAL", 3, "Modifié il y a 2j", 2);
   const c2 = mk("TechFlow Solutions", 12000, "warning", "URGENT", 4, "Aujourd'hui", 0);
   const c3 = mk("Marc Antoine", 2300, "success", "SUIVI", 2, "Email envoyé hier", 1);
-  const c4 = mk("Cabinet Legrand", 8900, "warning", "ATTENTE", 5, "Version 2 de la proposition…", 4);
+  const c4 = mk(
+    "Cabinet Legrand",
+    8900,
+    "warning",
+    "ATTENTE",
+    5,
+    "Version 2 de la proposition…",
+    4,
+  );
 
   const cards: Record<string, Card> = { [c1.id]: c1, [c2.id]: c2, [c3.id]: c3, [c4.id]: c4 };
 
@@ -206,7 +190,9 @@ function findColumnIdByCard(board: Board, cardId: string): string | undefined {
 // ---------- Page ----------
 function KanbanPage() {
   const { t } = useTranslation();
-  const [board, setBoard] = useState<Board>(() => (typeof window !== "undefined" ? loadBoard() : initialBoard()));
+  const [board, setBoard] = useState<Board>(() =>
+    typeof window !== "undefined" ? loadBoard() : initialBoard(),
+  );
   const [sortMode, setSortMode] = useState<SortMode>("manual");
 
   const [search, setSearch] = useState("");
@@ -215,6 +201,10 @@ function KanbanPage() {
   const [compact, setCompact] = useState(false);
   const [activeId, setActiveId] = useState<string | null>(null);
   const [editingCardId, setEditingCardId] = useState<string | null>(null);
+  // Tracks a card that was just created via "Add card" but not yet confirmed —
+  // if the sheet is closed without saving, this card is removed instead of
+  // being left behind as a blank ghost card.
+  const [unsavedCardId, setUnsavedCardId] = useState<string | null>(null);
   const [deleteColumn, setDeleteColumn] = useState<Column | null>(null);
 
   // Persistence
@@ -240,7 +230,7 @@ function KanbanPage() {
       const q = search.toLowerCase();
       if (
         !c.name.toLowerCase().includes(q) &&
-        !(c.meta?.toLowerCase().includes(q)) &&
+        !c.meta?.toLowerCase().includes(q) &&
         !String(c.amount).includes(q)
       )
         return false;
@@ -357,22 +347,32 @@ function KanbanPage() {
       ...p,
       columns: [
         ...p.columns,
-        { id: uid(), title: i18n.t("kanban.newColumn"), cardIds: [], accent: ACCENTS[p.columns.length % ACCENTS.length] },
+        {
+          id: uid(),
+          title: i18n.t("kanban.newColumn"),
+          cardIds: [],
+          accent: ACCENTS[p.columns.length % ACCENTS.length],
+        },
       ],
     }));
   }
-
 
   function renameColumn(id: string, title: string) {
     setBoard((p) => ({ ...p, columns: p.columns.map((c) => (c.id === id ? { ...c, title } : c)) }));
   }
 
   function setColumnAccent(id: string, accent: string) {
-    setBoard((p) => ({ ...p, columns: p.columns.map((c) => (c.id === id ? { ...c, accent } : c)) }));
+    setBoard((p) => ({
+      ...p,
+      columns: p.columns.map((c) => (c.id === id ? { ...c, accent } : c)),
+    }));
   }
 
   function setColumnWip(id: string, wipLimit?: number) {
-    setBoard((p) => ({ ...p, columns: p.columns.map((c) => (c.id === id ? { ...c, wipLimit } : c)) }));
+    setBoard((p) => ({
+      ...p,
+      columns: p.columns.map((c) => (c.id === id ? { ...c, wipLimit } : c)),
+    }));
   }
 
   function deleteColumnConfirmed(col: Column, moveToId?: string) {
@@ -396,7 +396,7 @@ function KanbanPage() {
   function addCard(columnId: string) {
     const c: Card = {
       id: uid(),
-      name: i18n.t("kanban.newOpportunity"),
+      name: "",
       amount: 0,
       tag: { label: i18n.t("kanban.tags.normal"), tone: "success" },
       confidence: 3,
@@ -404,11 +404,24 @@ function KanbanPage() {
     };
     setBoard((p) => ({
       cards: { ...p.cards, [c.id]: c },
-      columns: p.columns.map((col) => (col.id === columnId ? { ...col, cardIds: [c.id, ...col.cardIds] } : col)),
+      columns: p.columns.map((col) =>
+        col.id === columnId ? { ...col, cardIds: [c.id, ...col.cardIds] } : col,
+      ),
     }));
+    setUnsavedCardId(c.id);
     setEditingCardId(c.id);
   }
 
+  // Closes the editor sheet. If it was closed without saving a brand-new
+  // card (Cancel / X / Escape / outside click), that card is discarded
+  // instead of being left behind as a blank ghost card.
+  function closeCardEditor(idBeingClosed: string | null, wasSaved: boolean) {
+    if (idBeingClosed && idBeingClosed === unsavedCardId && !wasSaved) {
+      deleteCard(idBeingClosed);
+    }
+    setUnsavedCardId((prev) => (prev === idBeingClosed ? null : prev));
+    setEditingCardId(null);
+  }
 
   function updateCard(card: Card) {
     setBoard((p) => ({ ...p, cards: { ...p.cards, [card.id]: card } }));
@@ -427,7 +440,17 @@ function KanbanPage() {
   }
 
   function exportCSV() {
-    const rows = [[t("kanban.csv.column"), t("kanban.csv.name"), t("kanban.csv.amount"), t("kanban.csv.tag"), t("kanban.csv.confidence"), t("kanban.csv.createdAt"), t("kanban.csv.notes")]];
+    const rows = [
+      [
+        t("kanban.csv.column"),
+        t("kanban.csv.name"),
+        t("kanban.csv.amount"),
+        t("kanban.csv.tag"),
+        t("kanban.csv.confidence"),
+        t("kanban.csv.createdAt"),
+        t("kanban.csv.notes"),
+      ],
+    ];
 
     board.columns.forEach((col) => {
       col.cardIds.forEach((id) => {
@@ -490,7 +513,9 @@ function KanbanPage() {
           <SelectContent>
             <SelectItem value="all">{t("kanban.allTags")}</SelectItem>
             {allTags.map((tg) => (
-              <SelectItem key={tg} value={tg}>{tg}</SelectItem>
+              <SelectItem key={tg} value={tg}>
+                {tg}
+              </SelectItem>
             ))}
           </SelectContent>
         </Select>
@@ -511,7 +536,9 @@ function KanbanPage() {
 
         <div className="flex items-center gap-2 text-sm">
           <Switch checked={compact} onCheckedChange={setCompact} id="compact" />
-          <label htmlFor="compact" className="text-muted-foreground cursor-pointer">{t("kanban.compactView")}</label>
+          <label htmlFor="compact" className="text-muted-foreground cursor-pointer">
+            {t("kanban.compactView")}
+          </label>
         </div>
 
         <div className="ml-auto flex items-center gap-2">
@@ -524,7 +551,6 @@ function KanbanPage() {
         </div>
       </div>
 
-
       <DndContext
         sensors={sensors}
         collisionDetection={closestCorners}
@@ -533,7 +559,10 @@ function KanbanPage() {
         onDragEnd={onDragEnd}
       >
         <div className="flex gap-5 overflow-x-auto pb-4">
-          <SortableContext items={board.columns.map((c) => c.id)} strategy={horizontalListSortingStrategy}>
+          <SortableContext
+            items={board.columns.map((c) => c.id)}
+            strategy={horizontalListSortingStrategy}
+          >
             {board.columns.map((col) => (
               <ColumnView
                 key={col.id}
@@ -560,15 +589,18 @@ function KanbanPage() {
       </DndContext>
 
       {/* Card editor */}
-      <Sheet open={!!editingCard} onOpenChange={(o) => !o && setEditingCardId(null)}>
+      <Sheet open={!!editingCard} onOpenChange={(o) => !o && closeCardEditor(editingCardId, false)}>
         <SheetContent className="w-full sm:max-w-md">
           {editingCard && (
             <CardEditor
               key={editingCard.id}
               card={editingCard}
-              onSave={updateCard}
+              onSave={(c) => {
+                updateCard(c);
+                closeCardEditor(editingCard.id, true);
+              }}
               onDelete={() => deleteCard(editingCard.id)}
-              onClose={() => setEditingCardId(null)}
+              onClose={() => closeCardEditor(editingCard.id, false)}
             />
           )}
         </SheetContent>
@@ -647,8 +679,11 @@ function ColumnView({
         </button>
         <span className="h-2 w-2 rounded-full shrink-0" style={{ background: column.accent }} />
         <EditableTitle value={column.title} onChange={onRename} />
-        <span className={`text-xs font-semibold rounded-full border px-2 py-0.5 ${wipOver ? "bg-destructive text-destructive-foreground border-destructive" : "bg-card border-border"}`}>
-          {cardIds.length}{column.wipLimit !== undefined ? `/${column.wipLimit}` : ""}
+        <span
+          className={`text-xs font-semibold rounded-full border px-2 py-0.5 ${wipOver ? "bg-destructive text-destructive-foreground border-destructive" : "bg-card border-border"}`}
+        >
+          {cardIds.length}
+          {column.wipLimit !== undefined ? `/${column.wipLimit}` : ""}
         </span>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -703,7 +738,6 @@ function ColumnView({
         {t("kanban.columnTotal")} · {fmtMoneyShort(total)}
       </div>
 
-
       <SortableContext items={cardIds} strategy={verticalListSortingStrategy}>
         <div className="space-y-3 flex-1">
           {cardIds.length === 0 ? (
@@ -736,10 +770,12 @@ function ColumnView({
   );
 }
 
-
 function DroppableEmpty({ columnId }: { columnId: string }) {
   const { t } = useTranslation();
-  const { setNodeRef, isOver } = useSortable({ id: `empty-${columnId}`, data: { type: "column", columnId } });
+  const { setNodeRef, isOver } = useSortable({
+    id: `empty-${columnId}`,
+    data: { type: "column", columnId },
+  });
   return (
     <div
       ref={setNodeRef}
@@ -749,7 +785,6 @@ function DroppableEmpty({ columnId }: { columnId: string }) {
     </div>
   );
 }
-
 
 // ---------- Editable title ----------
 function EditableTitle({ value, onChange }: { value: string; onChange: (v: string) => void }) {
@@ -791,7 +826,6 @@ function EditableTitle({ value, onChange }: { value: string; onChange: (v: strin
     </button>
   );
 }
-
 
 // ---------- Card ----------
 function SortableCard({
@@ -839,7 +873,9 @@ function CardView({
       style={{ borderLeftColor: accent }}
     >
       <div className="flex items-center justify-between">
-        <span className={`inline-flex items-center text-[10px] font-bold tracking-wider px-2 py-1 rounded-md ${tagCls(card.tag.tone)}`}>
+        <span
+          className={`inline-flex items-center text-[10px] font-bold tracking-wider px-2 py-1 rounded-md ${tagCls(card.tag.tone)}`}
+        >
           {card.tag.label}
         </span>
         <span className="text-sm font-bold">{fmtMoney(card.amount)}</span>
@@ -898,10 +934,17 @@ function CardEditor({
 }) {
   const { t, i18n: i18nInst } = useTranslation();
   const [draft, setDraft] = useState<Card>(card);
+  const [touched, setTouched] = useState(false);
+  const nameError = touched && !draft.name.trim() ? t("kanban.errors.nameRequired") : undefined;
 
   function save() {
-    onSave(draft);
-    onClose();
+    if (!draft.name.trim()) {
+      setTouched(true);
+      return;
+    }
+    // onSave is responsible for closing the sheet — it needs to know the
+    // save succeeded so it doesn't discard the card as an unsaved draft.
+    onSave({ ...draft, name: draft.name.trim(), amount: Math.max(0, draft.amount) });
   }
 
   return (
@@ -911,15 +954,27 @@ function CardEditor({
       </SheetHeader>
       <div className="space-y-4 py-4">
         <div className="space-y-1.5">
-          <label className="text-xs font-medium text-muted-foreground">{t("kanban.cardName")}</label>
-          <Input value={draft.name} onChange={(e) => setDraft({ ...draft, name: e.target.value })} />
+          <label className="text-xs font-medium text-muted-foreground">
+            {t("kanban.cardName")}
+          </label>
+          <Input
+            value={draft.name}
+            aria-invalid={!!nameError}
+            className={nameError ? "border-destructive" : undefined}
+            onChange={(e) => setDraft({ ...draft, name: e.target.value })}
+            onBlur={() => setTouched(true)}
+          />
+          {nameError && <p className="text-xs text-destructive">{nameError}</p>}
         </div>
         <div className="space-y-1.5">
           <label className="text-xs font-medium text-muted-foreground">{t("kanban.amount")}</label>
           <Input
             type="number"
+            min={0}
             value={draft.amount}
-            onChange={(e) => setDraft({ ...draft, amount: Number(e.target.value) || 0 })}
+            onChange={(e) =>
+              setDraft({ ...draft, amount: Math.max(0, Number(e.target.value) || 0) })
+            }
           />
         </div>
         <div className="grid grid-cols-2 gap-3">
@@ -927,7 +982,9 @@ function CardEditor({
             <label className="text-xs font-medium text-muted-foreground">{t("kanban.tag")}</label>
             <Input
               value={draft.tag.label}
-              onChange={(e) => setDraft({ ...draft, tag: { ...draft.tag, label: e.target.value.toUpperCase() } })}
+              onChange={(e) =>
+                setDraft({ ...draft, tag: { ...draft.tag, label: e.target.value.toUpperCase() } })
+              }
             />
           </div>
           <div className="space-y-1.5">
@@ -936,7 +993,9 @@ function CardEditor({
               value={draft.tag.tone}
               onValueChange={(v) => setDraft({ ...draft, tag: { ...draft.tag, tone: v as Tone } })}
             >
-              <SelectTrigger><SelectValue /></SelectTrigger>
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
               <SelectContent>
                 <SelectItem value="success">{t("kanban.toneSuccess")}</SelectItem>
                 <SelectItem value="warning">{t("kanban.toneWarning")}</SelectItem>
@@ -946,7 +1005,9 @@ function CardEditor({
           </div>
         </div>
         <div className="space-y-1.5">
-          <label className="text-xs font-medium text-muted-foreground">{t("kanban.confidence")} : {draft.confidence}/5</label>
+          <label className="text-xs font-medium text-muted-foreground">
+            {t("kanban.confidence")} : {draft.confidence}/5
+          </label>
           <Slider
             value={[draft.confidence]}
             min={1}
@@ -964,18 +1025,24 @@ function CardEditor({
           />
         </div>
         <div className="text-xs text-muted-foreground">
-          {t("kanban.createdOn", { date: new Date(card.createdAt).toLocaleDateString(i18nInst.language) })}
+          {t("kanban.createdOn", {
+            date: new Date(card.createdAt).toLocaleDateString(i18nInst.language),
+          })}
         </div>
       </div>
       <SheetFooter className="flex flex-row justify-between gap-2 sm:justify-between">
-        <Button variant="ghost" className="text-destructive hover:text-destructive" onClick={onDelete}>
+        <Button
+          variant="ghost"
+          className="text-destructive hover:text-destructive"
+          onClick={onDelete}
+        >
           <Trash2 className="h-4 w-4 mr-1.5" /> {t("kanban.delete")}
         </Button>
         <div className="flex gap-2">
           <Button variant="outline" onClick={onClose}>
             <X className="h-4 w-4 mr-1.5" /> {t("kanban.cancel")}
           </Button>
-          <Button onClick={save}>
+          <Button onClick={save} disabled={!!nameError}>
             <Check className="h-4 w-4 mr-1.5" /> {t("kanban.save")}
           </Button>
         </div>
@@ -983,7 +1050,6 @@ function CardEditor({
     </>
   );
 }
-
 
 // ---------- Delete column dialog ----------
 function DeleteColumnDialog({
@@ -1022,7 +1088,9 @@ function DeleteColumnDialog({
               </SelectTrigger>
               <SelectContent>
                 {otherColumns.map((c) => (
-                  <SelectItem key={c.id} value={c.id}>{c.title}</SelectItem>
+                  <SelectItem key={c.id} value={c.id}>
+                    {c.title}
+                  </SelectItem>
                 ))}
               </SelectContent>
             </Select>
@@ -1046,4 +1114,3 @@ function DeleteColumnDialog({
     </>
   );
 }
-

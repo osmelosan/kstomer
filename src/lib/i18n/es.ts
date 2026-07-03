@@ -223,6 +223,10 @@ export const es = {
     continue: "Continuar la configuración",
     skip: "Omitir este paso",
     privacy: "Tus datos están seguros y nunca serán compartidos.",
+    errors: {
+      nameRequired: "Introduce tu nombre completo.",
+      roleRequired: "Selecciona tu rol.",
+    },
   },
   dashboard: {
     metaTitle: "Panel — Kstomer",
@@ -432,6 +436,11 @@ export const es = {
       activeClient: "Cliente activo",
       inactive: "Inactivo",
     },
+    errors: {
+      required: "Este campo es obligatorio.",
+      invalidEmail: "Dirección de email inválida.",
+      duplicateEmail: "Ya existe un contacto con este email.",
+    },
     cancel: "Cancelar",
     create: "Crear contacto",
   },
@@ -465,6 +474,9 @@ export const es = {
     editCard: "Editar tarjeta",
     cardName: "Nombre",
     amount: "Importe (€)",
+    errors: {
+      nameRequired: "El nombre es obligatorio.",
+    },
     confidence: "Confianza",
     notes: "Notas",
     tone: "Tono",
@@ -589,6 +601,8 @@ export const es = {
       actions: "Acciones",
     },
     restore: "Restaurar",
+    restored: "{{name}} se ha restaurado.",
+    empty: "No hay más elementos archivados que mostrar.",
     showing: "Mostrando <0>{{from}}</0> de {{total}} elementos",
     types: {
       partner: "Socio",
