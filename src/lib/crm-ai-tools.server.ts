@@ -1,14 +1,21 @@
-import { tool } from "ai";
-import { z } from "zod";
+import type Anthropic from "@anthropic-ai/sdk";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "@/integrations/supabase/types";
 
 type Supa = SupabaseClient<Database>;
 
-export function getPipelineSummaryTool(supabase: Supa) {
-  return tool({
-    description: "Get the count of contacts by pipeline stage",
-    parameters: z.object({}),
+export type CrmTool = {
+  definition: Anthropic.Tool;
+  execute: () => Promise<unknown>;
+};
+
+export function getPipelineSummaryTool(supabase: Supa): CrmTool {
+  return {
+    definition: {
+      name: "getPipelineSummary",
+      description: "Get the count of contacts by pipeline stage",
+      input_schema: { type: "object", properties: {} },
+    },
     execute: async () => {
       const { data: contacts } = await supabase
         .from("contacts")
@@ -21,13 +28,16 @@ export function getPipelineSummaryTool(supabase: Supa) {
       }
       return { stages, total: contacts.length };
     },
-  });
+  };
 }
 
-export function getAtRiskContactsTool(supabase: Supa) {
-  return tool({
-    description: "Get contacts in the at_risk stage that need urgent attention",
-    parameters: z.object({}),
+export function getAtRiskContactsTool(supabase: Supa): CrmTool {
+  return {
+    definition: {
+      name: "getAtRiskContacts",
+      description: "Get contacts in the at_risk stage that need urgent attention",
+      input_schema: { type: "object", properties: {} },
+    },
     execute: async () => {
       const { data: contacts } = await supabase
         .from("contacts")
@@ -38,14 +48,17 @@ export function getAtRiskContactsTool(supabase: Supa) {
         .limit(10);
       return { contacts: contacts ?? [], count: contacts?.length ?? 0 };
     },
-  });
+  };
 }
 
-export function getTaskSummaryTool(supabase: Supa, userId: string) {
-  return tool({
-    description:
-      "Get the count of the current user's tasks by status and priority, plus the overdue count",
-    parameters: z.object({}),
+export function getTaskSummaryTool(supabase: Supa, userId: string): CrmTool {
+  return {
+    definition: {
+      name: "getTaskSummary",
+      description:
+        "Get the count of the current user's tasks by status and priority, plus the overdue count",
+      input_schema: { type: "object", properties: {} },
+    },
     execute: async () => {
       const { data: tasks } = await supabase
         .from("tasks")
@@ -63,14 +76,17 @@ export function getTaskSummaryTool(supabase: Supa, userId: string) {
       }
       return { byStatus, byPriority, overdue, total: tasks.length };
     },
-  });
+  };
 }
 
-export function getOverdueTasksTool(supabase: Supa, userId: string) {
-  return tool({
-    description:
-      "Get the current user's overdue, not-done tasks with title, due date, priority and linked contact",
-    parameters: z.object({}),
+export function getOverdueTasksTool(supabase: Supa, userId: string): CrmTool {
+  return {
+    definition: {
+      name: "getOverdueTasks",
+      description:
+        "Get the current user's overdue, not-done tasks with title, due date, priority and linked contact",
+      input_schema: { type: "object", properties: {} },
+    },
     execute: async () => {
       const { data: tasks } = await supabase
         .from("tasks")
@@ -82,14 +98,17 @@ export function getOverdueTasksTool(supabase: Supa, userId: string) {
         .limit(10);
       return { tasks: tasks ?? [], count: tasks?.length ?? 0 };
     },
-  });
+  };
 }
 
-export function getUpcomingTasksTool(supabase: Supa, userId: string) {
-  return tool({
-    description:
-      "Get the current user's not-done tasks due in the next 7 days, with title, due date and priority",
-    parameters: z.object({}),
+export function getUpcomingTasksTool(supabase: Supa, userId: string): CrmTool {
+  return {
+    definition: {
+      name: "getUpcomingTasks",
+      description:
+        "Get the current user's not-done tasks due in the next 7 days, with title, due date and priority",
+      input_schema: { type: "object", properties: {} },
+    },
     execute: async () => {
       const until = new Date();
       until.setDate(until.getDate() + 7);
@@ -104,5 +123,100 @@ export function getUpcomingTasksTool(supabase: Supa, userId: string) {
         .limit(10);
       return { tasks: tasks ?? [], count: tasks?.length ?? 0 };
     },
-  });
+  };
+}
+
+export function getResellersTool(supabase: Supa): CrmTool {
+  return {
+    definition: {
+      name: "getResellers",
+      description:
+        "Get all active resellers with their name, company, confidence level, and number of contacts",
+      input_schema: { type: "object", properties: {} },
+    },
+    execute: async () => {
+      const { data: resellers } = await supabase
+        .from("resellers")
+        .select("id, name, company, confidence_level, reseller_contacts(count)")
+        .is("archived_at", null)
+        .order("created_at", { ascending: false });
+      return { resellers: resellers ?? [], count: resellers?.length ?? 0 };
+    },
+  };
+}
+
+export function getResellerRevenueTool(supabase: Supa): CrmTool {
+  return {
+    definition: {
+      name: "getResellerRevenue",
+      description: "Get MRR and deal value aggregated per reseller via their contacts",
+      input_schema: { type: "object", properties: {} },
+    },
+    execute: async () => {
+      const { data: rc } = await supabase
+        .from("reseller_contacts")
+        .select("reseller_id, resellers(name), contacts(subscription_details(deal_value, mrr))");
+      if (!rc) return { resellerRevenue: [] };
+
+      const byReseller: Record<
+        string,
+        { name: string; totalMrr: number; totalDeal: number; contacts: number }
+      > = {};
+      for (const row of rc) {
+        const rid = row.reseller_id;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const rname = (row.resellers as any)?.name ?? "Unknown";
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const subs = (row.contacts as any)?.subscription_details;
+        const mrr = Number(subs?.mrr) || 0;
+        const deal = Number(subs?.deal_value) || 0;
+        if (!byReseller[rid])
+          byReseller[rid] = { name: rname, totalMrr: 0, totalDeal: 0, contacts: 0 };
+        byReseller[rid].totalMrr += mrr;
+        byReseller[rid].totalDeal += deal;
+        byReseller[rid].contacts += 1;
+      }
+      return { resellerRevenue: Object.values(byReseller) };
+    },
+  };
+}
+
+export function getRevenueMetricsTool(supabase: Supa): CrmTool {
+  return {
+    definition: {
+      name: "getRevenueMetrics",
+      description:
+        "Get revenue metrics: total MRR, total deal value, count of active subscriptions",
+      input_schema: { type: "object", properties: {} },
+    },
+    execute: async () => {
+      const { data: subs } = await supabase.from("subscription_details").select("deal_value, mrr");
+      if (!subs) return { totalMrr: 0, totalDealValue: 0, count: 0 };
+      const totalMrr = subs.reduce((acc, s) => acc + (Number(s.mrr) || 0), 0);
+      const totalDealValue = subs.reduce((acc, s) => acc + (Number(s.deal_value) || 0), 0);
+      return { totalMrr, totalDealValue, count: subs.length };
+    },
+  };
+}
+
+export function getUpcomingRenewalsTool(supabase: Supa): CrmTool {
+  return {
+    definition: {
+      name: "getUpcomingRenewals",
+      description: "Get contacts with renewal dates in the next 30 days",
+      input_schema: { type: "object", properties: {} },
+    },
+    execute: async () => {
+      const until = new Date();
+      until.setDate(until.getDate() + 30);
+      const { data: contacts } = await supabase
+        .from("contacts")
+        .select("contact_name, company_name, renewal_date")
+        .gte("renewal_date", new Date().toISOString())
+        .lte("renewal_date", until.toISOString())
+        .is("archived_at", null)
+        .order("renewal_date", { ascending: true });
+      return { contacts: contacts ?? [], count: contacts?.length ?? 0 };
+    },
+  };
 }

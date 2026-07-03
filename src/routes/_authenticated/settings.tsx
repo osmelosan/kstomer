@@ -228,7 +228,7 @@ function ProfileSection() {
 function CompanySection() {
   const { t } = useTranslation();
   const { companies, loading, maxCompanies, createOrg, updateOrg, deleteOrg } = useCompany();
-  type DraftField = "name" | "address" | "city" | "postal_code" | "country";
+  type DraftField = "name" | "address" | "city" | "postal_code" | "country" | "description";
   const [drafts, setDrafts] = useState<Record<string, Record<DraftField, string>>>({});
   const [saving, setSaving] = useState<Record<string, boolean>>({});
   const [newName, setNewName] = useState("");
@@ -248,6 +248,7 @@ function CompanySection() {
         city: getDraft(id, "city"),
         postal_code: getDraft(id, "postal_code"),
         country: getDraft(id, "country"),
+        description: getDraft(id, "description"),
         [field]: value,
       },
     }));
@@ -261,6 +262,7 @@ function CompanySection() {
       city: getDraft(id, "city") || null,
       postal_code: getDraft(id, "postal_code") || null,
       country: getDraft(id, "country") || null,
+      description: getDraft(id, "description") || null,
     });
     setSaving((s) => ({ ...s, [id]: false }));
     toast.success(t("settings.saved"));
@@ -319,6 +321,21 @@ function CompanySection() {
                 value={getDraft(c.id, "country")}
                 onChange={(v) => setDraft(c.id, "country", v)}
               />
+            </div>
+            <div className="md:col-span-2">
+              <label className="block text-sm font-semibold mb-2">
+                {t("settings.company.description")}
+              </label>
+              <textarea
+                rows={4}
+                value={getDraft(c.id, "description")}
+                onChange={(e) => setDraft(c.id, "description", e.target.value)}
+                placeholder={t("settings.company.descriptionPlaceholder")}
+                className="w-full rounded-md border border-input bg-card p-3 text-sm focus:ring-2 focus:ring-ring/40 focus:outline-none"
+              />
+              <p className="text-xs text-muted-foreground mt-1.5">
+                {t("settings.company.descriptionHint")}
+              </p>
             </div>
           </div>
           <div className="flex justify-between items-center mt-5">

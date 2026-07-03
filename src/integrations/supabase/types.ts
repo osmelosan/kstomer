@@ -14,12 +14,395 @@ export type Database = {
   }
   public: {
     Tables: {
+      account_members: {
+        Row: {
+          account_id: string
+          created_at: string
+          id: string
+          role: Database["public"]["Enums"]["account_role"]
+          user_id: string
+        }
+        Insert: {
+          account_id: string
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["account_role"]
+          user_id: string
+        }
+        Update: {
+          account_id?: string
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["account_role"]
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "account_members_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "accounts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      accounts: {
+        Row: {
+          archived_at: string | null
+          created_at: string
+          id: string
+          is_test: boolean
+          name: string
+        }
+        Insert: {
+          archived_at?: string | null
+          created_at?: string
+          id?: string
+          is_test?: boolean
+          name: string
+        }
+        Update: {
+          archived_at?: string | null
+          created_at?: string
+          id?: string
+          is_test?: boolean
+          name?: string
+        }
+        Relationships: []
+      }
+      agent_logs: {
+        Row: {
+          agent_name: string
+          cost_usd: number | null
+          created_at: string
+          duration_ms: number | null
+          error_message: string | null
+          id: string
+          input: Json | null
+          output: Json | null
+          status: string
+          tokens_input: number | null
+          tokens_output: number | null
+          trigger_type: string
+        }
+        Insert: {
+          agent_name: string
+          cost_usd?: number | null
+          created_at?: string
+          duration_ms?: number | null
+          error_message?: string | null
+          id?: string
+          input?: Json | null
+          output?: Json | null
+          status: string
+          tokens_input?: number | null
+          tokens_output?: number | null
+          trigger_type: string
+        }
+        Update: {
+          agent_name?: string
+          cost_usd?: number | null
+          created_at?: string
+          duration_ms?: number | null
+          error_message?: string | null
+          id?: string
+          input?: Json | null
+          output?: Json | null
+          status?: string
+          tokens_input?: number | null
+          tokens_output?: number | null
+          trigger_type?: string
+        }
+        Relationships: []
+      }
+      ai_insights: {
+        Row: {
+          account_id: string
+          contact_id: string
+          content: string
+          created_at: string
+          id: string
+          insight_type: Database["public"]["Enums"]["ai_insight_type"]
+          model_used: string | null
+          score: number | null
+        }
+        Insert: {
+          account_id: string
+          contact_id: string
+          content: string
+          created_at?: string
+          id?: string
+          insight_type: Database["public"]["Enums"]["ai_insight_type"]
+          model_used?: string | null
+          score?: number | null
+        }
+        Update: {
+          account_id?: string
+          contact_id?: string
+          content?: string
+          created_at?: string
+          id?: string
+          insight_type?: Database["public"]["Enums"]["ai_insight_type"]
+          model_used?: string | null
+          score?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ai_insights_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "accounts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ai_insights_contact_id_fkey"
+            columns: ["contact_id"]
+            isOneToOne: false
+            referencedRelation: "contacts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ai_prompt_cache: {
+        Row: {
+          account_id: string
+          cache_key: string
+          cached_content: string
+          contact_id: string | null
+          expires_at: string | null
+          generated_at: string
+          id: string
+        }
+        Insert: {
+          account_id: string
+          cache_key: string
+          cached_content: string
+          contact_id?: string | null
+          expires_at?: string | null
+          generated_at?: string
+          id?: string
+        }
+        Update: {
+          account_id?: string
+          cache_key?: string
+          cached_content?: string
+          contact_id?: string | null
+          expires_at?: string | null
+          generated_at?: string
+          id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ai_prompt_cache_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "accounts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ai_prompt_cache_contact_id_fkey"
+            columns: ["contact_id"]
+            isOneToOne: false
+            referencedRelation: "contacts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      contacts: {
+        Row: {
+          account_id: string
+          archived_at: string | null
+          company_name: string | null
+          confidence_level: number | null
+          contact_name: string
+          created_at: string
+          created_by_user_id: string
+          email: string | null
+          id: string
+          last_contact_date: string | null
+          notes_count: number
+          owner_user_id: string
+          phone: string | null
+          renewal_date: string | null
+          stage: Database["public"]["Enums"]["contact_stage"]
+          updated_at: string
+        }
+        Insert: {
+          account_id: string
+          archived_at?: string | null
+          company_name?: string | null
+          confidence_level?: number | null
+          contact_name: string
+          created_at?: string
+          created_by_user_id: string
+          email?: string | null
+          id?: string
+          last_contact_date?: string | null
+          notes_count?: number
+          owner_user_id: string
+          phone?: string | null
+          renewal_date?: string | null
+          stage?: Database["public"]["Enums"]["contact_stage"]
+          updated_at?: string
+        }
+        Update: {
+          account_id?: string
+          archived_at?: string | null
+          company_name?: string | null
+          confidence_level?: number | null
+          contact_name?: string
+          created_at?: string
+          created_by_user_id?: string
+          email?: string | null
+          id?: string
+          last_contact_date?: string | null
+          notes_count?: number
+          owner_user_id?: string
+          phone?: string | null
+          renewal_date?: string | null
+          stage?: Database["public"]["Enums"]["contact_stage"]
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "contacts_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "accounts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      note_edit_history: {
+        Row: {
+          edited_at: string
+          id: string
+          note_id: string
+          previous_text: string
+        }
+        Insert: {
+          edited_at?: string
+          id?: string
+          note_id: string
+          previous_text: string
+        }
+        Update: {
+          edited_at?: string
+          id?: string
+          note_id?: string
+          previous_text?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "note_edit_history_note_id_fkey"
+            columns: ["note_id"]
+            isOneToOne: false
+            referencedRelation: "notes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      notes: {
+        Row: {
+          account_id: string
+          contact_id: string | null
+          created_at: string
+          edited: boolean
+          id: string
+          note_text: string
+          reseller_id: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          account_id: string
+          contact_id?: string | null
+          created_at?: string
+          edited?: boolean
+          id?: string
+          note_text: string
+          reseller_id?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          account_id?: string
+          contact_id?: string | null
+          created_at?: string
+          edited?: boolean
+          id?: string
+          note_text?: string
+          reseller_id?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "notes_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "accounts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "notes_contact_id_fkey"
+            columns: ["contact_id"]
+            isOneToOne: false
+            referencedRelation: "contacts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "notes_reseller_id_fkey"
+            columns: ["reseller_id"]
+            isOneToOne: false
+            referencedRelation: "resellers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      notifications: {
+        Row: {
+          account_id: string
+          contact_id: string | null
+          id: string
+          sent_at: string
+          type: Database["public"]["Enums"]["notification_type"]
+        }
+        Insert: {
+          account_id: string
+          contact_id?: string | null
+          id?: string
+          sent_at?: string
+          type: Database["public"]["Enums"]["notification_type"]
+        }
+        Update: {
+          account_id?: string
+          contact_id?: string | null
+          id?: string
+          sent_at?: string
+          type?: Database["public"]["Enums"]["notification_type"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "notifications_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "accounts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "notifications_contact_id_fkey"
+            columns: ["contact_id"]
+            isOneToOne: false
+            referencedRelation: "contacts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       organizations: {
         Row: {
           address: string | null
           city: string | null
           country: string | null
           created_at: string
+          description: string | null
           id: string
           name: string
           owner_id: string
@@ -31,6 +414,7 @@ export type Database = {
           city?: string | null
           country?: string | null
           created_at?: string
+          description?: string | null
           id?: string
           name: string
           owner_id: string
@@ -42,6 +426,7 @@ export type Database = {
           city?: string | null
           country?: string | null
           created_at?: string
+          description?: string | null
           id?: string
           name?: string
           owner_id?: string
@@ -79,6 +464,310 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      projets: {
+        Row: {
+          created_at: string | null
+          id: string
+          statut: string | null
+          titre: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          statut?: string | null
+          titre: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          statut?: string | null
+          titre?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      reminders: {
+        Row: {
+          account_id: string
+          contact_id: string
+          id: string
+          is_active: boolean
+          reminder_date: string
+          sent_at: string | null
+          trigger_offset_days: number
+        }
+        Insert: {
+          account_id: string
+          contact_id: string
+          id?: string
+          is_active?: boolean
+          reminder_date: string
+          sent_at?: string | null
+          trigger_offset_days: number
+        }
+        Update: {
+          account_id?: string
+          contact_id?: string
+          id?: string
+          is_active?: boolean
+          reminder_date?: string
+          sent_at?: string | null
+          trigger_offset_days?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reminders_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "accounts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "reminders_contact_id_fkey"
+            columns: ["contact_id"]
+            isOneToOne: false
+            referencedRelation: "contacts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      reseller_contact_history: {
+        Row: {
+          account_id: string
+          contact_id: string
+          ended_at: string | null
+          id: string
+          reseller_id: string
+          started_at: string
+        }
+        Insert: {
+          account_id: string
+          contact_id: string
+          ended_at?: string | null
+          id?: string
+          reseller_id: string
+          started_at: string
+        }
+        Update: {
+          account_id?: string
+          contact_id?: string
+          ended_at?: string | null
+          id?: string
+          reseller_id?: string
+          started_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reseller_contact_history_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "accounts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "reseller_contact_history_contact_id_fkey"
+            columns: ["contact_id"]
+            isOneToOne: false
+            referencedRelation: "contacts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "reseller_contact_history_reseller_id_fkey"
+            columns: ["reseller_id"]
+            isOneToOne: false
+            referencedRelation: "resellers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      reseller_contacts: {
+        Row: {
+          account_id: string
+          contact_id: string
+          id: string
+          reseller_id: string
+        }
+        Insert: {
+          account_id: string
+          contact_id: string
+          id?: string
+          reseller_id: string
+        }
+        Update: {
+          account_id?: string
+          contact_id?: string
+          id?: string
+          reseller_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reseller_contacts_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "accounts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "reseller_contacts_contact_id_fkey"
+            columns: ["contact_id"]
+            isOneToOne: true
+            referencedRelation: "contacts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "reseller_contacts_reseller_id_fkey"
+            columns: ["reseller_id"]
+            isOneToOne: false
+            referencedRelation: "resellers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      resellers: {
+        Row: {
+          account_id: string
+          archived_at: string | null
+          company: string | null
+          confidence_level: number | null
+          created_at: string
+          created_by_user_id: string
+          email: string | null
+          id: string
+          name: string
+          owner_user_id: string
+          phone: string | null
+        }
+        Insert: {
+          account_id: string
+          archived_at?: string | null
+          company?: string | null
+          confidence_level?: number | null
+          created_at?: string
+          created_by_user_id: string
+          email?: string | null
+          id?: string
+          name: string
+          owner_user_id: string
+          phone?: string | null
+        }
+        Update: {
+          account_id?: string
+          archived_at?: string | null
+          company?: string | null
+          confidence_level?: number | null
+          created_at?: string
+          created_by_user_id?: string
+          email?: string | null
+          id?: string
+          name?: string
+          owner_user_id?: string
+          phone?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "resellers_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "accounts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      stage_history: {
+        Row: {
+          account_id: string
+          changed_at: string
+          changed_by_user_id: string | null
+          contact_id: string
+          from_stage: Database["public"]["Enums"]["contact_stage"] | null
+          id: string
+          to_stage: Database["public"]["Enums"]["contact_stage"]
+        }
+        Insert: {
+          account_id: string
+          changed_at?: string
+          changed_by_user_id?: string | null
+          contact_id: string
+          from_stage?: Database["public"]["Enums"]["contact_stage"] | null
+          id?: string
+          to_stage: Database["public"]["Enums"]["contact_stage"]
+        }
+        Update: {
+          account_id?: string
+          changed_at?: string
+          changed_by_user_id?: string | null
+          contact_id?: string
+          from_stage?: Database["public"]["Enums"]["contact_stage"] | null
+          id?: string
+          to_stage?: Database["public"]["Enums"]["contact_stage"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "stage_history_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "accounts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "stage_history_contact_id_fkey"
+            columns: ["contact_id"]
+            isOneToOne: false
+            referencedRelation: "contacts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      subscription_details: {
+        Row: {
+          account_id: string
+          contact_id: string
+          deal_value: number | null
+          id: string
+          mrr: number | null
+          plan_name: string | null
+          subscription_start_date: string | null
+          updated_at: string
+        }
+        Insert: {
+          account_id: string
+          contact_id: string
+          deal_value?: number | null
+          id?: string
+          mrr?: number | null
+          plan_name?: string | null
+          subscription_start_date?: string | null
+          updated_at?: string
+        }
+        Update: {
+          account_id?: string
+          contact_id?: string
+          deal_value?: number | null
+          id?: string
+          mrr?: number | null
+          plan_name?: string | null
+          subscription_start_date?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "subscription_details_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "accounts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "subscription_details_contact_id_fkey"
+            columns: ["contact_id"]
+            isOneToOne: true
+            referencedRelation: "contacts"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       subscriptions: {
         Row: {
@@ -201,9 +890,21 @@ export type Database = {
         }
         Returns: boolean
       }
+      has_write_access: { Args: { p_account_id: string }; Returns: boolean }
+      is_account_admin: { Args: { p_account_id: string }; Returns: boolean }
+      is_account_member: { Args: { p_account_id: string }; Returns: boolean }
     }
     Enums: {
+      account_role: "owner" | "admin" | "member" | "viewer"
+      ai_insight_type: "score" | "summary" | "suggested_action"
       app_role: "admin" | "tester" | "user"
+      contact_stage:
+        | "new_lead"
+        | "contacted"
+        | "proposal"
+        | "active"
+        | "at_risk"
+      notification_type: "reminder_sent" | "renewal_date_changed"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -331,7 +1032,11 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      account_role: ["owner", "admin", "member", "viewer"],
+      ai_insight_type: ["score", "summary", "suggested_action"],
       app_role: ["admin", "tester", "user"],
+      contact_stage: ["new_lead", "contacted", "proposal", "active", "at_risk"],
+      notification_type: ["reminder_sent", "renewal_date_changed"],
     },
   },
 } as const

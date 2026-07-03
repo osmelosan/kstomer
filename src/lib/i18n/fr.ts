@@ -20,12 +20,14 @@ export const fr = {
     updatePassword: "Mettre à jour le mot de passe",
     backToSignIn: "Retour à la connexion",
     checkInbox: "Vérifiez votre boîte mail",
-    verifySent: "Un lien de vérification a été envoyé à {{email}}. Cliquez dessus pour activer votre compte.",
+    verifySent:
+      "Un lien de vérification a été envoyé à {{email}}. Cliquez dessus pour activer votre compte.",
     resetSent: "Si un compte existe pour {{email}}, vous recevrez un lien de réinitialisation.",
     resetTitle: "Choisir un nouveau mot de passe",
     resetIntro: "Saisissez un nouveau mot de passe pour votre compte.",
     resetInvalidTitle: "Lien invalide ou expiré",
-    resetInvalidMessage: "Ce lien de réinitialisation est invalide ou a expiré. Redemandez un nouveau lien pour continuer.",
+    resetInvalidMessage:
+      "Ce lien de réinitialisation est invalide ou a expiré. Redemandez un nouveau lien pour continuer.",
     resetRequestNew: "Redemander un lien",
     passwordUpdated: "Mot de passe mis à jour.",
     signedIn: "Bienvenue !",
@@ -33,7 +35,8 @@ export const fr = {
     invalidCredentials: "Email ou mot de passe incorrect.",
     emailNotConfirmed: "Email non vérifié. Consultez votre boîte mail.",
     emailExists: "Un compte existe déjà avec cet email.",
-    emailDomainNotSupported: "Ce domaine d'email n'est pas pris en charge. Utilisez une adresse email réelle.",
+    emailDomainNotSupported:
+      "Ce domaine d'email n'est pas pris en charge. Utilisez une adresse email réelle.",
     passwordTooShort: "Le mot de passe doit faire au moins 8 caractères.",
     passwordsDontMatch: "Les mots de passe ne correspondent pas.",
     googleError: "Impossible de se connecter avec Google.",
@@ -42,7 +45,8 @@ export const fr = {
     backToHome: "Accueil",
     backToPricing: "Retour aux tarifs",
     heading: "Choisissez votre plan",
-    subheading: "Essai gratuit 14 jours sur tous les plans. Sans engagement, annulez à tout moment.",
+    subheading:
+      "Essai gratuit 14 jours sur tous les plans. Sans engagement, annulez à tout moment.",
     monthly: "Mensuel",
     yearly: "Annuel",
     billedYearly: "Facturé annuellement",
@@ -56,7 +60,8 @@ export const fr = {
     securePayments: "Paiements sécurisés.",
     testModeBanner: "Tous les paiements en aperçu sont en mode test.",
     testModeLearnMore: "En savoir plus",
-    testModeNotConfigured: "Paiements en production non configurés. Terminez l'activation Stripe pour accepter de vrais paiements.",
+    testModeNotConfigured:
+      "Paiements en production non configurés. Terminez l'activation Stripe pour accepter de vrais paiements.",
     checkoutReturn: {
       activating: "Activation de votre abonnement…",
       confirmed: "Paiement confirmé",
@@ -99,11 +104,26 @@ export const fr = {
     markAllRead: "Tout marquer comme lu",
     seeAll: "Voir toutes les notifications",
     items: {
-      dealWon: { title: "Affaire gagnée : StartUp Vision", body: "Le contrat SaaS de 12 000 € a été signé." },
-      newMessage: { title: "Nouveau message de Maelis B.", body: "« Disponible pour un call demain ? »" },
-      overdue: { title: "Relance en retard", body: "Jean Dupont — dernière interaction il y a 8 jours." },
-      newContact: { title: "Nouveau contact ajouté", body: "Marc Lemaire a été ajouté à vos contacts." },
-      renewal: { title: "Renouvellement à venir", body: "3 abonnements arrivent à échéance ce mois." },
+      dealWon: {
+        title: "Affaire gagnée : StartUp Vision",
+        body: "Le contrat SaaS de 12 000 € a été signé.",
+      },
+      newMessage: {
+        title: "Nouveau message de Maelis B.",
+        body: "« Disponible pour un call demain ? »",
+      },
+      overdue: {
+        title: "Relance en retard",
+        body: "Jean Dupont — dernière interaction il y a 8 jours.",
+      },
+      newContact: {
+        title: "Nouveau contact ajouté",
+        body: "Marc Lemaire a été ajouté à vos contacts.",
+      },
+      renewal: {
+        title: "Renouvellement à venir",
+        body: "3 abonnements arrivent à échéance ce mois.",
+      },
     },
   },
   help: {
@@ -182,15 +202,18 @@ export const fr = {
   },
   error: {
     title: "Cette page n'a pas pu se charger",
-    message: "Quelque chose s'est mal passé de notre côté. Essayez de rafraîchir ou revenez à l'accueil.",
+    message:
+      "Quelque chose s'est mal passé de notre côté. Essayez de rafraîchir ou revenez à l'accueil.",
     tryAgain: "Réessayer",
     goHome: "Retour à l'accueil",
   },
   welcome: {
     metaTitle: "Bienvenue chez Kstomer — Smart CRM",
-    metaDescription: "Le CRM efficace, précis et sans bruit pour solopreneurs. Configuration en 2 minutes.",
+    metaDescription:
+      "Le CRM efficace, précis et sans bruit pour solopreneurs. Configuration en 2 minutes.",
     heading: "Bienvenue chez\nKstomer.",
-    intro: "Prenez le contrôle en 10 minutes. Kstomer et son IA font le travail pour que vous ayez une vue claire de votre pipeline et signiez plus, sans effort d'organisation.",
+    intro:
+      "Prenez le contrôle en 10 minutes. Kstomer et son IA font le travail pour que vous ayez une vue claire de votre pipeline et signiez plus, sans effort d'organisation.",
     testimonial: "« Un gain de temps incroyable pour mon activité » — Marc A.",
     chosenBy: "CHOISI PAR 1 200+ FONDATEURS",
     cta: "Commencer l'aventure",
@@ -255,25 +278,20 @@ export const fr = {
     },
     aiSuggested: "Prospects suggérés par l'IA",
     refresh: "Actualiser",
-    basedOn: "Basé sur",
-    basedOnList: "Refonte identité visuelle · Consulting UX/UI · Audit SEO",
     fit: "FIT",
     match: "Match",
-    updatedAgo: "Mis à jour il y a 4 min · 3 nouveaux signaux détectés",
-    prospects: {
-      maelisSector: "Marque cosmétique D2C · 12 employés",
-      maelisReason: "Refonte de site annoncée sur LinkedIn la semaine dernière",
-      maelisMatch: "Refonte identité",
-      northgateSector: "SaaS B2B logistique · 45 employés",
-      northgateReason: "Levée de fonds Série A — recrute un Head of Design",
-      northgateMatch: "Consulting UX/UI",
-      bakerySector: "Réseau franchisé · 8 boutiques",
-      bakeryReason: "Trafic organique en baisse de 22% sur 90 jours",
-      bakeryMatch: "Audit SEO",
+    prospectsAi: {
+      loading: "Recherche en cours…",
+      empty: "Aucun prospect trouvé à proximité pour le moment.",
+      noCompany: "Sélectionnez une société précise pour obtenir des suggestions de prospects.",
+      missingProfile:
+        "Ajoutez la description et la localisation de votre entreprise pour obtenir des suggestions de prospects personnalisées.",
+      missingProfileCta: "Aller dans Paramètres → Entreprise",
+      disclaimer: "Généré par IA à partir d'une recherche web — à vérifier avant de contacter.",
+      errorGeneric: "Impossible de générer des suggestions. Réessayez.",
+      errorRate: "Trop de requêtes. Merci de patienter un instant.",
+      errorCredits: "Crédits IA épuisés. Rechargez votre espace de travail.",
     },
-    contactEmail: "Envoyer un email",
-    contactPhone: "Appeler",
-    contactWebsite: "Voir le site web",
     ai: {
       title: "Briefing IA du jour",
       disclaimer: "Généré par IA — à vérifier avant d'agir.",
@@ -317,7 +335,8 @@ export const fr = {
     title: "Détails du contact",
     back: "← Retour aux contacts",
     notFound: "Contact introuvable.",
-    sampleNote: "Julien est intéressé par le pack Premium CRM. Il souhaite intégrer son équipe de 3 personnes d'ici le mois prochain. Discussion prévue pour les remises sur volume.\n\nDernier point : validation du budget Q4 confirmée.",
+    sampleNote:
+      "Julien est intéressé par le pack Premium CRM. Il souhaite intégrer son équipe de 3 personnes d'ici le mois prochain. Discussion prévue pour les remises sur volume.\n\nDernier point : validation du budget Q4 confirmée.",
     role: "CEO chez Beaumont Digital",
     editProfile: "Modifier le profil",
     workEmail: "Email professionnel",
@@ -564,10 +583,13 @@ export const fr = {
       call: "Appeler",
       notFound: "Revendeur introuvable.",
       info: {
-        activeDeals: "Nombre d'affaires actuellement ouvertes dans le pipeline de ce partenaire (hors Gagné et Perdu).",
-        revenue: "Cumul du chiffre d'affaires généré par ce partenaire depuis sa date d'entrée (affaires gagnées uniquement).",
+        activeDeals:
+          "Nombre d'affaires actuellement ouvertes dans le pipeline de ce partenaire (hors Gagné et Perdu).",
+        revenue:
+          "Cumul du chiffre d'affaires généré par ce partenaire depuis sa date d'entrée (affaires gagnées uniquement).",
         tier: "Niveau attribué automatiquement selon le revenu cumulé et l'ancienneté : Bronze (< 100k€), Silver (100k–500k€), Gold (> 500k€).",
-        health: "Score composite (1–5) basé sur l'activité récente, la vélocité des affaires et la date du dernier contact.",
+        health:
+          "Score composite (1–5) basé sur l'activité récente, la vélocité des affaires et la date du dernier contact.",
       },
     },
   },
@@ -631,10 +653,14 @@ export const fr = {
     opportunities: "Opportunités",
     vsLastMonth: "vs mois dernier",
     infos: {
-      totalRevenue: "Somme du chiffre d'affaires encaissé sur la période sélectionnée (deals gagnés, hors taxes).",
-      conversionRate: "Part des opportunités gagnées sur le total clôturé (gagnées + perdues) durant la période.",
-      activeContacts: "Contacts ayant eu au moins une interaction (email, appel, note) au cours des 30 derniers jours.",
-      opportunities: "Valeur cumulée des opportunités encore ouvertes dans le pipeline, pondérée par la probabilité.",
+      totalRevenue:
+        "Somme du chiffre d'affaires encaissé sur la période sélectionnée (deals gagnés, hors taxes).",
+      conversionRate:
+        "Part des opportunités gagnées sur le total clôturé (gagnées + perdues) durant la période.",
+      activeContacts:
+        "Contacts ayant eu au moins une interaction (email, appel, note) au cours des 30 derniers jours.",
+      opportunities:
+        "Valeur cumulée des opportunités encore ouvertes dans le pipeline, pondérée par la probabilité.",
     },
     revenueGrowth: "Croissance du revenu",
     current: "Actuel",
@@ -646,7 +672,8 @@ export const fr = {
       directSearch: "Recherche directe",
       others: "Autres",
     },
-    quote: "« LinkedIn reste votre canal le plus performant avec un taux d'engagement 15% supérieur à la moyenne. »",
+    quote:
+      "« LinkedIn reste votre canal le plus performant avec un taux d'engagement 15% supérieur à la moyenne. »",
     segmentsPerformance: "Performance des segments",
     exportCsv: "Exporter CSV",
     th: {
@@ -666,10 +693,12 @@ export const fr = {
     },
     aiOpportunity: "OPPORTUNITÉ IA",
     maximizeEvenings: "Maximisez vos soirées",
-    eveningsBody: "Nos données indiquent que vos prospects SaaS sont 40% plus susceptibles de répondre entre 18h et 19h30.",
+    eveningsBody:
+      "Nos données indiquent que vos prospects SaaS sont 40% plus susceptibles de répondre entre 18h et 19h30.",
     scheduleReminders: "Planifier des rappels →",
     renewalsTitle: "Renouvellements en approche",
-    renewalsBody: "12 abonnements « Premium » arrivent à échéance dans les 30 prochains jours. Valeur à risque : <0>5 400 €</0>.",
+    renewalsBody:
+      "12 abonnements « Premium » arrivent à échéance dans les 30 prochains jours. Valeur à risque : <0>5 400 €</0>.",
     seeList: "Voir la liste",
     ai: {
       title: "Analyse IA des performances",
@@ -715,6 +744,10 @@ export const fr = {
       city: "Ville",
       postalCode: "Code postal",
       country: "Pays",
+      description: "Description de l'activité",
+      descriptionPlaceholder: "Que fait votre entreprise ? Qui sont vos clients ?",
+      descriptionHint:
+        "Utilisée par l'IA pour suggérer des prospects proches correspondant à votre activité.",
       addCompany: "Ajouter une société",
       delete: "Supprimer cette société",
       upgradeHint: "Passez au plan Expansion pour gérer plusieurs sociétés.",
@@ -741,7 +774,8 @@ export const fr = {
       expires: "Expire le",
       invoices: "Historique des factures",
       download: "Télécharger",
-      noSubscription: "Aucun abonnement actif. Choisissez un plan pour débloquer toutes les fonctionnalités.",
+      noSubscription:
+        "Aucun abonnement actif. Choisissez un plan pour débloquer toutes les fonctionnalités.",
       viewPricing: "Voir les tarifs",
     },
     security: {

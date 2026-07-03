@@ -4,8 +4,6 @@ import { AppShell } from "@/components/AppShell";
 import {
   Plus,
   Mail,
-  Phone,
-  Globe,
   FileText,
   TrendingUp,
   Sparkles,
@@ -18,8 +16,10 @@ import i18n from "@/lib/i18n";
 import { useEffect, useState } from "react";
 import { useRevenueGoal } from "@/hooks/use-revenue-goal";
 import { useCurrentUser } from "@/hooks/use-current-user";
+import { useCompany } from "@/lib/company-context";
 import { useServerFn } from "@tanstack/react-start";
 import { analyzeDashboard } from "@/lib/dashboard-ai.functions";
+import { analyzeProspects, type Prospect } from "@/lib/prospects-ai.functions";
 import ReactMarkdown from "react-markdown";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
@@ -121,58 +121,7 @@ function Dashboard() {
           </div>
         </section>
 
-        <section className="space-y-4">
-          <div className="flex items-center justify-between">
-            <h2 className="text-xs font-semibold text-foreground uppercase tracking-[0.08em] inline-flex items-center gap-2">
-              <Sparkles className="h-3.5 w-3.5 text-secondary" />
-              {t("dashboard.aiSuggested")}
-            </h2>
-            <button className="text-xs font-medium text-secondary hover:underline inline-flex items-center gap-1">
-              <RefreshCw className="h-3 w-3" /> {t("dashboard.refresh")}
-            </button>
-          </div>
-            <div className="bg-card rounded-2xl border border-border shadow-card overflow-hidden">
-            <div className="divide-y divide-border">
-              <ProspectRow
-                company="Studio Maelis"
-                sector={t("dashboard.prospects.maelisSector")}
-                fit={94}
-                reason={t("dashboard.prospects.maelisReason")}
-                match={t("dashboard.prospects.maelisMatch")}
-                contactName="Camille Roux — Directrice"
-                email="camille@studiomaelis.fr"
-                phone="+33 6 12 34 56 78"
-                website="https://studiomaelis.fr"
-              />
-              <ProspectRow
-                company="Northgate Logistics"
-                sector={t("dashboard.prospects.northgateSector")}
-                fit={87}
-                reason={t("dashboard.prospects.northgateReason")}
-                match={t("dashboard.prospects.northgateMatch")}
-                contactName="Marc Delvaux — Head of Design"
-                email="m.delvaux@northgate.io"
-                phone="+33 6 98 76 54 32"
-                website="https://northgate.io"
-              />
-              <ProspectRow
-                company="Boulangerie Lumen"
-                sector={t("dashboard.prospects.bakerySector")}
-                fit={79}
-                reason={t("dashboard.prospects.bakeryReason")}
-                match={t("dashboard.prospects.bakeryMatch")}
-                contactName="Inès Marchand — Fondatrice"
-                email="ines@lumen-bakery.fr"
-                phone="+33 7 22 11 33 44"
-                website="https://lumen-bakery.fr"
-              />
-
-            </div>
-            <div className="px-4 py-2 border-t border-border bg-muted/30 text-[10px] text-muted-foreground">
-              {t("dashboard.updatedAgo")}
-            </div>
-          </div>
-        </section>
+        <AIProspectsCard />
       </div>
     </AppShell>
   );
@@ -294,27 +243,7 @@ function ActionRow({
   return <div className={className}>{content}</div>;
 }
 
-function ProspectRow({
-  company,
-  sector,
-  fit,
-  reason,
-  match,
-  contactName,
-  email,
-  phone,
-  website,
-}: {
-  company: string;
-  sector: string;
-  fit: number;
-  reason: string;
-  match: string;
-  contactName: string;
-  email: string;
-  phone: string;
-  website: string;
-}) {
+function ProspectRow({ company, sector, fit, reason, match }: Prospect) {
   const { t } = useTranslation();
   const tone: Tone = fit >= 90 ? "success" : fit >= 80 ? "info" : "warning";
   return (
@@ -337,39 +266,122 @@ function ProspectRow({
         <p className="text-[10px] text-muted-foreground mt-1 uppercase tracking-wider">
           {t("dashboard.match")} : <span className="text-secondary font-semibold">{match}</span>
         </p>
-        <div className="mt-2 pt-2 border-t border-border/60 space-y-1">
-          <p className="text-[11px] font-medium text-foreground truncate">{contactName}</p>
-          <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
-            <a
-              href={`mailto:${email}`}
-              title={t("dashboard.contactEmail")}
-              className="inline-flex items-center gap-1 text-[11px] text-secondary hover:underline truncate"
-            >
-              <Mail className="h-3 w-3 shrink-0" />
-              <span className="truncate">{email}</span>
-            </a>
-            <a
-              href={`tel:${phone.replace(/\s/g, "")}`}
-              title={t("dashboard.contactPhone")}
-              className="inline-flex items-center gap-1 text-[11px] text-secondary hover:underline"
-            >
-              <Phone className="h-3 w-3 shrink-0" />
-              <span className="tabular-nums">{phone}</span>
-            </a>
-            <a
-              href={website}
-              target="_blank"
-              rel="noopener noreferrer"
-              title={t("dashboard.contactWebsite")}
-              className="inline-flex items-center gap-1 text-[11px] text-secondary hover:underline truncate"
-            >
-              <Globe className="h-3 w-3 shrink-0" />
-              <span className="truncate">{website.replace(/^https?:\/\//, "")}</span>
-            </a>
-          </div>
-        </div>
       </div>
     </div>
+  );
+}
+
+type ProspectsStatus = "idle" | "loading" | "ready" | "error" | "missingProfile" | "noCompany";
+
+function AIProspectsCard() {
+  const { t, i18n: i18nInstance } = useTranslation();
+  const { current } = useCompany();
+  const analyze = useServerFn(analyzeProspects);
+  const [status, setStatus] = useState<ProspectsStatus>("idle");
+  const [prospects, setProspects] = useState<Prospect[]>([]);
+  const [errorKey, setErrorKey] = useState<string>("dashboard.prospectsAi.errorGeneric");
+
+  const run = async () => {
+    if (current.id === "all") {
+      setStatus("noCompany");
+      return;
+    }
+    setStatus("loading");
+    try {
+      const lang = (i18nInstance.language?.slice(0, 2) ?? "fr") as "fr" | "en" | "es";
+      const safeLang = (["fr", "en", "es"] as const).includes(lang) ? lang : "fr";
+      const result = await analyze({
+        data: {
+          language: safeLang,
+          companyId: current.id,
+        },
+      });
+      setProspects(result.prospects);
+      setStatus("ready");
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "";
+      if (msg.includes("MISSING_PROFILE")) {
+        setStatus("missingProfile");
+        return;
+      }
+      if (msg.includes("RATE_LIMIT")) setErrorKey("dashboard.prospectsAi.errorRate");
+      else if (msg.includes("CREDITS_EXHAUSTED")) setErrorKey("dashboard.prospectsAi.errorCredits");
+      else setErrorKey("dashboard.prospectsAi.errorGeneric");
+      setStatus("error");
+    }
+  };
+
+  useEffect(() => {
+    void run();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [current.id]);
+
+  return (
+    <section className="space-y-4">
+      <div className="flex items-center justify-between">
+        <h2 className="text-xs font-semibold text-foreground uppercase tracking-[0.08em] inline-flex items-center gap-2">
+          <Sparkles className="h-3.5 w-3.5 text-secondary" />
+          {t("dashboard.aiSuggested")}
+        </h2>
+        <button
+          type="button"
+          onClick={run}
+          disabled={status === "loading"}
+          className="text-xs font-medium text-secondary hover:underline inline-flex items-center gap-1 disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          <RefreshCw className={`h-3 w-3 ${status === "loading" ? "animate-spin" : ""}`} />
+          {t("dashboard.refresh")}
+        </button>
+      </div>
+      <div className="bg-card rounded-2xl border border-border shadow-card overflow-hidden">
+        {status === "loading" && (
+          <div className="p-4 space-y-2 animate-pulse">
+            <div className="h-3 bg-muted rounded w-3/4" />
+            <div className="h-3 bg-muted rounded w-full" />
+            <div className="h-3 bg-muted rounded w-5/6" />
+          </div>
+        )}
+
+        {status === "noCompany" && (
+          <p className="p-4 text-sm text-muted-foreground">
+            {t("dashboard.prospectsAi.noCompany")}
+          </p>
+        )}
+
+        {status === "missingProfile" && (
+          <div className="p-4 text-sm text-muted-foreground">
+            <p>{t("dashboard.prospectsAi.missingProfile")}</p>
+            <Link to="/settings" className="text-secondary font-semibold hover:underline">
+              {t("dashboard.prospectsAi.missingProfileCta")}
+            </Link>
+          </div>
+        )}
+
+        {status === "error" && (
+          <div className="p-4 flex items-start gap-2 text-sm text-error">
+            <AlertCircle className="h-4 w-4 mt-0.5 shrink-0" />
+            <span>{t(errorKey)}</span>
+          </div>
+        )}
+
+        {status === "ready" && prospects.length === 0 && (
+          <p className="p-4 text-sm text-muted-foreground">{t("dashboard.prospectsAi.empty")}</p>
+        )}
+
+        {status === "ready" && prospects.length > 0 && (
+          <>
+            <div className="divide-y divide-border">
+              {prospects.map((p, i) => (
+                <ProspectRow key={`${p.company}-${i}`} {...p} />
+              ))}
+            </div>
+            <div className="px-4 py-2 border-t border-border bg-muted/30 text-[10px] text-muted-foreground">
+              {t("dashboard.prospectsAi.disclaimer")}
+            </div>
+          </>
+        )}
+      </div>
+    </section>
   );
 }
 

@@ -1,5 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
-import { generateText } from "ai";
+import Anthropic from "@anthropic-ai/sdk";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import {
@@ -8,6 +8,7 @@ import {
   getPipelineSummaryTool,
   getTaskSummaryTool,
 } from "@/lib/crm-ai-tools.server";
+import { runCrmAgent } from "@/lib/run-crm-agent.server";
 
 const InputSchema = z.object({
   language: z.enum(["fr", "en", "es"]).default("fr"),
@@ -29,38 +30,32 @@ export const analyzeDashboard = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) => InputSchema.parse(input))
   .handler(async ({ data, context }) => {
-    const key = process.env.LOVABLE_API_KEY;
+    const key = process.env.ANTHROPIC_API_KEY;
     if (!key) {
-      console.error("[dashboard-ai] Missing LOVABLE_API_KEY");
-      throw new Error("Missing LOVABLE_API_KEY");
+      console.error("[dashboard-ai] Missing ANTHROPIC_API_KEY");
+      throw new Error("Missing ANTHROPIC_API_KEY");
     }
 
     const { supabase, userId } = context;
-    const { createLovableAiGatewayProvider } = await import("./ai-gateway.server");
-    const gateway = createLovableAiGatewayProvider(key);
-
-    const tools = {
-      getTaskSummary: getTaskSummaryTool(supabase, userId),
-      getOverdueTasks: getOverdueTasksTool(supabase, userId),
-      getPipelineSummary: getPipelineSummaryTool(supabase),
-      getAtRiskContacts: getAtRiskContactsTool(supabase),
-    };
 
     try {
-      const { text } = await generateText({
-        model: gateway("google/gemini-3-flash-preview"),
+      const markdown = await runCrmAgent({
+        apiKey: key,
         system: SYSTEM_PROMPTS[data.language],
         prompt: USER_PROMPTS[data.language],
-        tools,
-        maxSteps: 5,
-        maxOutputTokens: 300,
+        tools: [
+          getTaskSummaryTool(supabase, userId),
+          getOverdueTasksTool(supabase, userId),
+          getPipelineSummaryTool(supabase),
+          getAtRiskContactsTool(supabase),
+        ],
+        maxTokens: 1024,
       });
-      return { markdown: text };
+      return { markdown };
     } catch (err: unknown) {
-      console.error("[dashboard-ai] generateText failed:", err);
-      const message = err instanceof Error ? err.message : String(err);
-      if (message.includes("429")) throw new Error("RATE_LIMIT");
-      if (message.includes("402")) throw new Error("CREDITS_EXHAUSTED");
+      console.error("[dashboard-ai] agent run failed:", err);
+      if (err instanceof Anthropic.RateLimitError) throw new Error("RATE_LIMIT");
+      if (err instanceof Anthropic.PermissionDeniedError) throw new Error("CREDITS_EXHAUSTED");
       throw new Error("AI_ERROR");
     }
   });
