@@ -33,6 +33,7 @@ export const es = {
     invalidCredentials: "Email o contraseña incorrectos.",
     emailNotConfirmed: "Email no verificado. Revisa tu bandeja.",
     emailExists: "Ya existe una cuenta con este email.",
+    emailDomainNotSupported: "Ese dominio de email no es compatible. Usa una dirección de email real.",
     passwordTooShort: "La contraseña debe tener al menos 8 caracteres.",
     passwordsDontMatch: "Las contraseñas no coinciden.",
     googleError: "No se pudo iniciar sesión con Google.",

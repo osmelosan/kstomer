@@ -33,6 +33,7 @@ export const fr = {
     invalidCredentials: "Email ou mot de passe incorrect.",
     emailNotConfirmed: "Email non vérifié. Consultez votre boîte mail.",
     emailExists: "Un compte existe déjà avec cet email.",
+    emailDomainNotSupported: "Ce domaine d'email n'est pas pris en charge. Utilisez une adresse email réelle.",
     passwordTooShort: "Le mot de passe doit faire au moins 8 caractères.",
     passwordsDontMatch: "Les mots de passe ne correspondent pas.",
     googleError: "Impossible de se connecter avec Google.",

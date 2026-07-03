@@ -273,7 +273,9 @@ function SignUpForm() {
       toast.error(
         error.message.includes("already registered")
           ? t("auth.emailExists")
-          : error.message,
+          : error.code === "email_address_invalid" || error.message.includes("is invalid")
+            ? t("auth.emailDomainNotSupported")
+            : error.message,
       );
       return;
     }
