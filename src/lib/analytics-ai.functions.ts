@@ -1,7 +1,14 @@
 import { createServerFn } from "@tanstack/react-start";
-import { generateText, tool } from "ai";
+import Anthropic from "@anthropic-ai/sdk";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import {
+  getAtRiskContactsTool,
+  getPipelineSummaryTool,
+  getRevenueMetricsTool,
+  getUpcomingRenewalsTool,
+} from "@/lib/crm-ai-tools.server";
+import { runCrmAgent } from "@/lib/run-crm-agent.server";
 
 const InputSchema = z.object({
   language: z.enum(["fr", "en", "es"]).default("fr"),
@@ -23,93 +30,32 @@ export const analyzeAnalytics = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) => InputSchema.parse(input))
   .handler(async ({ data, context }) => {
-    const key = process.env.LOVABLE_API_KEY;
+    const key = process.env.ANTHROPIC_API_KEY;
     if (!key) {
-      console.error("[analytics-ai] Missing LOVABLE_API_KEY");
-      throw new Error("Missing LOVABLE_API_KEY");
+      console.error("[analytics-ai] Missing ANTHROPIC_API_KEY");
+      throw new Error("Missing ANTHROPIC_API_KEY");
     }
 
     const { supabase } = context;
-    const { createLovableAiGatewayProvider } = await import("./ai-gateway.server");
-    const gateway = createLovableAiGatewayProvider(key);
-
-    const tools = {
-      getPipelineSummary: tool({
-        description: "Get the count of contacts by pipeline stage",
-        parameters: z.object({}),
-        execute: async () => {
-          const { data: contacts } = await supabase
-            .from("contacts")
-            .select("stage")
-            .is("archived_at", null);
-          if (!contacts) return { stages: {}, total: 0 };
-          const stages: Record<string, number> = {};
-          for (const c of contacts) {
-            stages[c.stage] = (stages[c.stage] ?? 0) + 1;
-          }
-          return { stages, total: contacts.length };
-        },
-      }),
-      getRevenueMetrics: tool({
-        description: "Get revenue metrics: total MRR, total deal value, count of active subscriptions",
-        parameters: z.object({}),
-        execute: async () => {
-          const { data: subs } = await supabase
-            .from("subscription_details")
-            .select("deal_value, mrr");
-          if (!subs) return { totalMrr: 0, totalDealValue: 0, count: 0 };
-          const totalMrr = subs.reduce((acc, s) => acc + (Number(s.mrr) || 0), 0);
-          const totalDealValue = subs.reduce((acc, s) => acc + (Number(s.deal_value) || 0), 0);
-          return { totalMrr, totalDealValue, count: subs.length };
-        },
-      }),
-      getAtRiskContacts: tool({
-        description: "Get contacts in the at_risk stage that need urgent attention",
-        parameters: z.object({}),
-        execute: async () => {
-          const { data: contacts } = await supabase
-            .from("contacts")
-            .select("contact_name, company_name, last_contact_date, confidence_level")
-            .eq("stage", "at_risk")
-            .is("archived_at", null)
-            .order("last_contact_date", { ascending: true })
-            .limit(10);
-          return { contacts: contacts ?? [], count: contacts?.length ?? 0 };
-        },
-      }),
-      getUpcomingRenewals: tool({
-        description: "Get contacts with renewal dates in the next 30 days",
-        parameters: z.object({}),
-        execute: async () => {
-          const until = new Date();
-          until.setDate(until.getDate() + 30);
-          const { data: contacts } = await supabase
-            .from("contacts")
-            .select("contact_name, company_name, renewal_date")
-            .gte("renewal_date", new Date().toISOString())
-            .lte("renewal_date", until.toISOString())
-            .is("archived_at", null)
-            .order("renewal_date", { ascending: true });
-          return { contacts: contacts ?? [], count: contacts?.length ?? 0 };
-        },
-      }),
-    };
 
     try {
-      const { text } = await generateText({
-        model: gateway("google/gemini-3-flash-preview"),
+      const markdown = await runCrmAgent({
+        apiKey: key,
         system: SYSTEM_PROMPTS[data.language],
         prompt: USER_PROMPTS[data.language],
-        tools,
-        maxSteps: 5,
-        maxOutputTokens: 300,
+        tools: [
+          getPipelineSummaryTool(supabase),
+          getRevenueMetricsTool(supabase),
+          getAtRiskContactsTool(supabase),
+          getUpcomingRenewalsTool(supabase),
+        ],
+        maxTokens: 1024,
       });
-      return { markdown: text };
+      return { markdown };
     } catch (err: unknown) {
-      console.error("[analytics-ai] generateText failed:", err);
-      const message = err instanceof Error ? err.message : String(err);
-      if (message.includes("429")) throw new Error("RATE_LIMIT");
-      if (message.includes("402")) throw new Error("CREDITS_EXHAUSTED");
+      console.error("[analytics-ai] agent run failed:", err);
+      if (err instanceof Anthropic.RateLimitError) throw new Error("RATE_LIMIT");
+      if (err instanceof Anthropic.PermissionDeniedError) throw new Error("CREDITS_EXHAUSTED");
       throw new Error("AI_ERROR");
     }
   });

@@ -29,7 +29,7 @@ Kstomer helps solo founders and consultants take control of their sales in minut
 - 🗂️ **Kanban pipeline** — drag-and-drop deal tracking (`@dnd-kit`)
 - 📇 **Unified contact book** — one place for every prospect and client
 - ✅ **Tasks & follow-up reminders** — never drop a deal
-- 📊 **AI-assisted insights** — tool-calling AI diagnoses and next steps on the Dashboard, Tasks, Analytics, and Resellers pages, powered by the Vercel AI SDK
+- 📊 **AI-assisted insights** — Claude tool-calling agent diagnoses and next steps on the Dashboard, Tasks, Analytics, and Resellers pages
 - 🤝 **Reseller / portfolio management** — track partners and their pipelines
 - 🏢 **Multi-organization support** — switch between companies, with a guided onboarding flow
 - 💳 **Built-in billing** — Stripe Checkout, embedded checkout, and subscription management
@@ -44,7 +44,7 @@ Kstomer helps solo founders and consultants take control of their sales in minut
 | **Data & forms** | TanStack Query, `react-hook-form` + `zod` |
 | **Backend** | [Supabase](https://supabase.com) — Postgres, Auth, Row Level Security |
 | **Payments** | [Stripe](https://stripe.com) SDK, used directly (no gateway abstraction) |
-| **AI** | Vercel AI SDK (`ai`, `@ai-sdk/openai-compatible`) via the Lovable AI gateway |
+| **AI** | Claude (`@anthropic-ai/sdk`), called directly — tool-calling agent loop, no gateway abstraction |
 | **i18n** | `i18next` / `react-i18next` (en, es, fr) |
 | **Tooling** | TypeScript (strict), ESLint 9 (flat config), Prettier, Bun |
 
@@ -118,7 +118,7 @@ Non-secret config and empty placeholders live in the committed `.env`; secrets a
 | `STRIPE_SECRET_KEY` | Vercel + local `.env.development` | Test key: `sk_test_…` |
 | `STRIPE_LIVE_SECRET_KEY` | Vercel only | Live key: `sk_live_…` (when going live) |
 | `VITE_PAYMENTS_CLIENT_TOKEN` | `.env.development` / Vercel | Stripe publishable key (`pk_test_…` or `pk_live_…`) — sandbox vs. live is inferred from this prefix |
-| `LOVABLE_API_KEY` | Vercel only | Server-only secret — powers the AI gateway used by the Dashboard, Tasks, Analytics, and Reseller AI insights functions |
+| `ANTHROPIC_API_KEY` | Vercel only | Server-only secret — Claude API key used by the Dashboard, Tasks, Analytics, and Reseller AI insights functions |
 
 ## Database
 
