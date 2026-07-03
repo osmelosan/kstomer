@@ -274,6 +274,15 @@ export const en = {
     contactEmail: "Send email",
     contactPhone: "Call",
     contactWebsite: "Visit website",
+    ai: {
+      title: "AI daily briefing",
+      disclaimer: "AI-generated — verify before acting.",
+      regenerate: "Regenerate",
+      loading: "Analyzing…",
+      errorGeneric: "Could not generate analysis. Try again.",
+      errorRate: "Too many requests. Please wait a moment.",
+      errorCredits: "AI credits exhausted. Top up your workspace.",
+    },
   },
   contacts: {
     metaTitle: "Contacts — Kstomer",
@@ -805,6 +814,15 @@ export const en = {
       demoSub: "Slides + sandbox access",
       contractTitle: "Sign the annual contract",
       contractSub: "Gold renewal",
+    },
+    ai: {
+      title: "AI workload analysis",
+      disclaimer: "AI-generated — verify before acting.",
+      regenerate: "Regenerate",
+      loading: "Analyzing…",
+      errorGeneric: "Could not generate analysis. Try again.",
+      errorRate: "Too many requests. Please wait a moment.",
+      errorCredits: "AI credits exhausted. Top up your workspace.",
     },
   },
 };

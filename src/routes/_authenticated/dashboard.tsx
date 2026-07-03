@@ -11,11 +11,16 @@ import {
   Sparkles,
   Building2,
   RefreshCw,
+  AlertCircle,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import i18n from "@/lib/i18n";
+import { useEffect, useState } from "react";
 import { useRevenueGoal } from "@/hooks/use-revenue-goal";
 import { useCurrentUser } from "@/hooks/use-current-user";
+import { useServerFn } from "@tanstack/react-start";
+import { analyzeDashboard } from "@/lib/dashboard-ai.functions";
+import ReactMarkdown from "react-markdown";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
   head: () =>
@@ -85,6 +90,8 @@ function Dashboard() {
           footer={t("dashboard.avgCycle")}
         />
       </div>
+
+      <AIInsightsCard />
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8">
         <section className="space-y-4">
@@ -362,6 +369,89 @@ function ProspectRow({
           </div>
         </div>
       </div>
+    </div>
+  );
+}
+
+type AIStatus = "idle" | "loading" | "ready" | "error";
+
+function AIInsightsCard() {
+  const { t, i18n: i18nInstance } = useTranslation();
+  const analyze = useServerFn(analyzeDashboard);
+  const [status, setStatus] = useState<AIStatus>("idle");
+  const [markdown, setMarkdown] = useState<string>("");
+  const [errorKey, setErrorKey] = useState<string>("dashboard.ai.errorGeneric");
+
+  const run = async () => {
+    setStatus("loading");
+    try {
+      const lang = (i18nInstance.language?.slice(0, 2) ?? "fr") as "fr" | "en" | "es";
+      const safeLang = (["fr", "en", "es"] as const).includes(lang) ? lang : "fr";
+      const result = await analyze({
+        data: {
+          language: safeLang,
+        },
+      });
+      setMarkdown(result.markdown);
+      setStatus("ready");
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "";
+      if (msg.includes("RATE_LIMIT")) setErrorKey("dashboard.ai.errorRate");
+      else if (msg.includes("CREDITS_EXHAUSTED")) setErrorKey("dashboard.ai.errorCredits");
+      else setErrorKey("dashboard.ai.errorGeneric");
+      setStatus("error");
+    }
+  };
+
+  useEffect(() => {
+    void run();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  return (
+    <div className="k-card p-6 mb-8 border-l-4 border-l-secondary">
+      <div className="flex items-start justify-between mb-4 gap-4">
+        <div className="flex items-center gap-2.5">
+          <div className="h-9 w-9 rounded-md bg-secondary/10 text-secondary grid place-items-center">
+            <Sparkles className="h-4 w-4" />
+          </div>
+          <div>
+            <h3 className="font-semibold text-[15px] tracking-tight">{t("dashboard.ai.title")}</h3>
+            <p className="text-xs text-muted-foreground mt-0.5">{t("dashboard.ai.disclaimer")}</p>
+          </div>
+        </div>
+        <button
+          type="button"
+          onClick={run}
+          disabled={status === "loading"}
+          className="inline-flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-md border border-border hover:bg-muted/60 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+        >
+          <RefreshCw className={`h-3.5 w-3.5 ${status === "loading" ? "animate-spin" : ""}`} />
+          {status === "loading" ? t("dashboard.ai.loading") : t("dashboard.ai.regenerate")}
+        </button>
+      </div>
+
+      {status === "loading" && (
+        <div className="space-y-2 animate-pulse">
+          <div className="h-3 bg-muted rounded w-3/4" />
+          <div className="h-3 bg-muted rounded w-full" />
+          <div className="h-3 bg-muted rounded w-5/6" />
+          <div className="h-3 bg-muted rounded w-2/3" />
+        </div>
+      )}
+
+      {status === "error" && (
+        <div className="flex items-start gap-2 text-sm text-error">
+          <AlertCircle className="h-4 w-4 mt-0.5 shrink-0" />
+          <span>{t(errorKey)}</span>
+        </div>
+      )}
+
+      {status === "ready" && (
+        <div className="prose prose-sm max-w-none text-foreground prose-headings:text-foreground prose-strong:text-foreground prose-p:my-2 prose-ul:my-2 prose-ol:my-2 prose-li:my-0.5">
+          <ReactMarkdown>{markdown}</ReactMarkdown>
+        </div>
+      )}
     </div>
   );
 }
