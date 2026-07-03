@@ -119,6 +119,10 @@ Non-secret config and empty placeholders live in the committed `.env`; secrets a
 
 Backed by Supabase Postgres. Every table (`profiles`, `user_roles`, `organizations`, `subscriptions`, `tasks`) has Row Level Security enabled with per-user/per-owner policies. Schema changes live as SQL migrations in `supabase/migrations/`.
 
+`profiles` (`id`, `email`, `full_name`, `avatar_url`, `phone`) is populated automatically on signup via an `on_auth_user_created` trigger on `auth.users`.
+
+> **Note:** the live Supabase project also has a second, unused set of tables (`accounts`, `contacts`, `resellers`, `notes`, `reminders`, `stage_history`, `ai_insights`, …) from an accounts-based CRM schema that predates the current app. They're empty and nothing in `src/` queries them yet — the Kanban, Contacts, Dashboard, Resellers, Archives and Analytics pages currently render static/mock data, not live records. Only `/tasks`, Settings → Company, and the billing/paywall are wired to real tables. Building those pages against the real schema (or removing the unused tables) is still open work.
+
 ## Pricing
 
 Plans are defined in [`src/lib/pricing-plans.ts`](src/lib/pricing-plans.ts) and billed in EUR via Stripe. Price IDs are Stripe **lookup keys** — matching lookup keys must exist in the Stripe dashboard for each price.
