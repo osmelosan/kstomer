@@ -281,7 +281,7 @@ function AIProspectsCard() {
   const [prospects, setProspects] = useState<Prospect[]>([]);
   const [errorKey, setErrorKey] = useState<string>("dashboard.prospectsAi.errorGeneric");
 
-  const run = async () => {
+  const run = async (force: boolean) => {
     if (current.id === "all") {
       setStatus("noCompany");
       return;
@@ -294,6 +294,7 @@ function AIProspectsCard() {
         data: {
           language: safeLang,
           companyId: current.id,
+          force,
         },
       });
       setProspects(result.prospects);
@@ -312,7 +313,7 @@ function AIProspectsCard() {
   };
 
   useEffect(() => {
-    void run();
+    void run(false);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [current.id]);
 
@@ -325,7 +326,7 @@ function AIProspectsCard() {
         </h2>
         <button
           type="button"
-          onClick={run}
+          onClick={() => run(true)}
           disabled={status === "loading"}
           className="text-xs font-medium text-secondary hover:underline inline-flex items-center gap-1 disabled:opacity-50 disabled:cursor-not-allowed"
         >
@@ -394,7 +395,7 @@ function AIInsightsCard() {
   const [markdown, setMarkdown] = useState<string>("");
   const [errorKey, setErrorKey] = useState<string>("dashboard.ai.errorGeneric");
 
-  const run = async () => {
+  const run = async (force: boolean) => {
     setStatus("loading");
     try {
       const lang = (i18nInstance.language?.slice(0, 2) ?? "fr") as "fr" | "en" | "es";
@@ -402,6 +403,7 @@ function AIInsightsCard() {
       const result = await analyze({
         data: {
           language: safeLang,
+          force,
         },
       });
       setMarkdown(result.markdown);
@@ -416,7 +418,7 @@ function AIInsightsCard() {
   };
 
   useEffect(() => {
-    void run();
+    void run(false);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -434,7 +436,7 @@ function AIInsightsCard() {
         </div>
         <button
           type="button"
-          onClick={run}
+          onClick={() => run(true)}
           disabled={status === "loading"}
           className="inline-flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-md border border-border hover:bg-muted/60 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
         >

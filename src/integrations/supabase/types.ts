@@ -115,6 +115,33 @@ export type Database = {
         }
         Relationships: []
       }
+      ai_insight_cache: {
+        Row: {
+          content: Json
+          feature: string
+          generated_at: string
+          id: string
+          scope_id: string
+          user_id: string
+        }
+        Insert: {
+          content: Json
+          feature: string
+          generated_at?: string
+          id?: string
+          scope_id?: string
+          user_id: string
+        }
+        Update: {
+          content?: Json
+          feature?: string
+          generated_at?: string
+          id?: string
+          scope_id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       ai_insights: {
         Row: {
           account_id: string
