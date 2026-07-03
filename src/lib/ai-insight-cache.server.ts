@@ -3,7 +3,7 @@ import type { Database, Json } from "@/integrations/supabase/types";
 
 type Supa = SupabaseClient<Database>;
 
-const REFRESH_HOUR_UTC = 6;
+const REFRESH_HOUR_UTC = 4;
 
 function lastRefreshBoundary(now: Date): Date {
   const boundary = new Date(
