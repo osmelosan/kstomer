@@ -30,7 +30,10 @@ export const analyzeDashboard = createServerFn({ method: "POST" })
   .inputValidator((input: unknown) => InputSchema.parse(input))
   .handler(async ({ data, context }) => {
     const key = process.env.LOVABLE_API_KEY;
-    if (!key) throw new Error("Missing LOVABLE_API_KEY");
+    if (!key) {
+      console.error("[dashboard-ai] Missing LOVABLE_API_KEY");
+      throw new Error("Missing LOVABLE_API_KEY");
+    }
 
     const { supabase, userId } = context;
     const { createLovableAiGatewayProvider } = await import("./ai-gateway.server");
@@ -54,6 +57,7 @@ export const analyzeDashboard = createServerFn({ method: "POST" })
       });
       return { markdown: text };
     } catch (err: unknown) {
+      console.error("[dashboard-ai] generateText failed:", err);
       const message = err instanceof Error ? err.message : String(err);
       if (message.includes("429")) throw new Error("RATE_LIMIT");
       if (message.includes("402")) throw new Error("CREDITS_EXHAUSTED");
