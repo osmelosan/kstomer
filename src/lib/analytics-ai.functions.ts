@@ -9,9 +9,11 @@ import {
   getUpcomingRenewalsTool,
 } from "@/lib/crm-ai-tools.server";
 import { runCrmAgent } from "@/lib/run-crm-agent.server";
+import { getCachedOrGenerate } from "@/lib/ai-insight-cache.server";
 
 const InputSchema = z.object({
   language: z.enum(["fr", "en", "es"]).default("fr"),
+  force: z.boolean().default(false),
 });
 
 const SYSTEM_PROMPTS = {
@@ -36,22 +38,31 @@ export const analyzeAnalytics = createServerFn({ method: "POST" })
       throw new Error("Missing ANTHROPIC_API_KEY");
     }
 
-    const { supabase } = context;
+    const { supabase, userId } = context;
 
     try {
-      const markdown = await runCrmAgent({
-        apiKey: key,
-        system: SYSTEM_PROMPTS[data.language],
-        prompt: USER_PROMPTS[data.language],
-        tools: [
-          getPipelineSummaryTool(supabase),
-          getRevenueMetricsTool(supabase),
-          getAtRiskContactsTool(supabase),
-          getUpcomingRenewalsTool(supabase),
-        ],
-        maxTokens: 1024,
-      });
-      return { markdown };
+      return await getCachedOrGenerate(
+        supabase,
+        userId,
+        "analytics",
+        data.language,
+        data.force,
+        async () => {
+          const markdown = await runCrmAgent({
+            apiKey: key,
+            system: SYSTEM_PROMPTS[data.language],
+            prompt: USER_PROMPTS[data.language],
+            tools: [
+              getPipelineSummaryTool(supabase),
+              getRevenueMetricsTool(supabase),
+              getAtRiskContactsTool(supabase),
+              getUpcomingRenewalsTool(supabase),
+            ],
+            maxTokens: 1024,
+          });
+          return { markdown };
+        },
+      );
     } catch (err: unknown) {
       console.error("[analytics-ai] agent run failed:", err);
       if (err instanceof Anthropic.RateLimitError) throw new Error("RATE_LIMIT");

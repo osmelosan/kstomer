@@ -9,9 +9,11 @@ import {
   getTaskSummaryTool,
 } from "@/lib/crm-ai-tools.server";
 import { runCrmAgent } from "@/lib/run-crm-agent.server";
+import { getCachedOrGenerate } from "@/lib/ai-insight-cache.server";
 
 const InputSchema = z.object({
   language: z.enum(["fr", "en", "es"]).default("fr"),
+  force: z.boolean().default(false),
 });
 
 const SYSTEM_PROMPTS = {
@@ -39,19 +41,28 @@ export const analyzeDashboard = createServerFn({ method: "POST" })
     const { supabase, userId } = context;
 
     try {
-      const markdown = await runCrmAgent({
-        apiKey: key,
-        system: SYSTEM_PROMPTS[data.language],
-        prompt: USER_PROMPTS[data.language],
-        tools: [
-          getTaskSummaryTool(supabase, userId),
-          getOverdueTasksTool(supabase, userId),
-          getPipelineSummaryTool(supabase),
-          getAtRiskContactsTool(supabase),
-        ],
-        maxTokens: 1024,
-      });
-      return { markdown };
+      return await getCachedOrGenerate(
+        supabase,
+        userId,
+        "dashboard",
+        data.language,
+        data.force,
+        async () => {
+          const markdown = await runCrmAgent({
+            apiKey: key,
+            system: SYSTEM_PROMPTS[data.language],
+            prompt: USER_PROMPTS[data.language],
+            tools: [
+              getTaskSummaryTool(supabase, userId),
+              getOverdueTasksTool(supabase, userId),
+              getPipelineSummaryTool(supabase),
+              getAtRiskContactsTool(supabase),
+            ],
+            maxTokens: 1024,
+          });
+          return { markdown };
+        },
+      );
     } catch (err: unknown) {
       console.error("[dashboard-ai] agent run failed:", err);
       if (err instanceof Anthropic.RateLimitError) throw new Error("RATE_LIMIT");

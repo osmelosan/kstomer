@@ -2,10 +2,12 @@ import { createServerFn } from "@tanstack/react-start";
 import Anthropic from "@anthropic-ai/sdk";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { getCachedOrGenerate } from "@/lib/ai-insight-cache.server";
 
 const InputSchema = z.object({
   language: z.enum(["fr", "en", "es"]).default("fr"),
   companyId: z.string(),
+  force: z.boolean().default(false),
 });
 
 const MODEL = "claude-opus-4-8";
@@ -92,7 +94,7 @@ export const analyzeProspects = createServerFn({ method: "POST" })
       throw new Error("Missing ANTHROPIC_API_KEY");
     }
 
-    const { supabase } = context;
+    const { supabase, userId } = context;
     const { data: org } = await supabase
       .from("organizations")
       .select("name, description, city, country")
@@ -103,43 +105,52 @@ export const analyzeProspects = createServerFn({ method: "POST" })
       throw new Error("MISSING_PROFILE");
     }
 
-    const client = new Anthropic({ apiKey: key });
-    const messages: Anthropic.MessageParam[] = [
-      { role: "user", content: buildUserPrompt(data.language, org) },
-    ];
-
     try {
-      for (let step = 0; step < MAX_STEPS; step++) {
-        const response = await client.messages.create({
-          model: MODEL,
-          max_tokens: 2048,
-          thinking: { type: "adaptive" },
-          system: SYSTEM_PROMPTS[data.language],
-          tools: [{ type: "web_search_20260209", name: "web_search" }, RETURN_PROSPECTS_TOOL],
-          messages,
-        });
+      return await getCachedOrGenerate(
+        supabase,
+        userId,
+        "prospects",
+        `${data.companyId}:${data.language}`,
+        data.force,
+        async () => {
+          const client = new Anthropic({ apiKey: key });
+          const messages: Anthropic.MessageParam[] = [
+            { role: "user", content: buildUserPrompt(data.language, org) },
+          ];
 
-        if (response.stop_reason === "refusal") {
+          for (let step = 0; step < MAX_STEPS; step++) {
+            const response = await client.messages.create({
+              model: MODEL,
+              max_tokens: 2048,
+              thinking: { type: "adaptive" },
+              system: SYSTEM_PROMPTS[data.language],
+              tools: [{ type: "web_search_20260209", name: "web_search" }, RETURN_PROSPECTS_TOOL],
+              messages,
+            });
+
+            if (response.stop_reason === "refusal") {
+              throw new Error("AI_ERROR");
+            }
+
+            const returnCall = response.content.find(
+              (block): block is Anthropic.ToolUseBlock =>
+                block.type === "tool_use" && block.name === "return_prospects",
+            );
+            if (returnCall) {
+              const parsed = returnCall.input as { prospects: Prospect[] };
+              return { prospects: parsed.prospects.slice(0, 5) };
+            }
+
+            messages.push({ role: "assistant", content: response.content });
+            messages.push({
+              role: "user",
+              content: "Call return_prospects now with your best current findings.",
+            });
+          }
+
           throw new Error("AI_ERROR");
-        }
-
-        const returnCall = response.content.find(
-          (block): block is Anthropic.ToolUseBlock =>
-            block.type === "tool_use" && block.name === "return_prospects",
-        );
-        if (returnCall) {
-          const parsed = returnCall.input as { prospects: Prospect[] };
-          return { prospects: parsed.prospects.slice(0, 5) };
-        }
-
-        messages.push({ role: "assistant", content: response.content });
-        messages.push({
-          role: "user",
-          content: "Call return_prospects now with your best current findings.",
-        });
-      }
-
-      throw new Error("AI_ERROR");
+        },
+      );
     } catch (err: unknown) {
       if (err instanceof Error && err.message === "AI_ERROR") throw err;
       console.error("[prospects-ai] agent run failed:", err);

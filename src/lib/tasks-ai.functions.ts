@@ -8,9 +8,11 @@ import {
   getUpcomingTasksTool,
 } from "@/lib/crm-ai-tools.server";
 import { runCrmAgent } from "@/lib/run-crm-agent.server";
+import { getCachedOrGenerate } from "@/lib/ai-insight-cache.server";
 
 const InputSchema = z.object({
   language: z.enum(["fr", "en", "es"]).default("fr"),
+  force: z.boolean().default(false),
 });
 
 const SYSTEM_PROMPTS = {
@@ -38,18 +40,27 @@ export const analyzeTasks = createServerFn({ method: "POST" })
     const { supabase, userId } = context;
 
     try {
-      const markdown = await runCrmAgent({
-        apiKey: key,
-        system: SYSTEM_PROMPTS[data.language],
-        prompt: USER_PROMPTS[data.language],
-        tools: [
-          getTaskSummaryTool(supabase, userId),
-          getOverdueTasksTool(supabase, userId),
-          getUpcomingTasksTool(supabase, userId),
-        ],
-        maxTokens: 1024,
-      });
-      return { markdown };
+      return await getCachedOrGenerate(
+        supabase,
+        userId,
+        "tasks",
+        data.language,
+        data.force,
+        async () => {
+          const markdown = await runCrmAgent({
+            apiKey: key,
+            system: SYSTEM_PROMPTS[data.language],
+            prompt: USER_PROMPTS[data.language],
+            tools: [
+              getTaskSummaryTool(supabase, userId),
+              getOverdueTasksTool(supabase, userId),
+              getUpcomingTasksTool(supabase, userId),
+            ],
+            maxTokens: 1024,
+          });
+          return { markdown };
+        },
+      );
     } catch (err: unknown) {
       console.error("[tasks-ai] agent run failed:", err);
       if (err instanceof Anthropic.RateLimitError) throw new Error("RATE_LIMIT");
