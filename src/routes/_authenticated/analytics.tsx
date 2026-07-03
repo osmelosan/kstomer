@@ -36,6 +36,7 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useServerFn } from "@tanstack/react-start";
 import { analyzeAnalytics } from "@/lib/analytics-ai.functions";
+import { useCompany } from "@/lib/company-context";
 import ReactMarkdown from "react-markdown";
 
 export const Route = createFileRoute("/_authenticated/analytics")({
@@ -117,13 +118,12 @@ function Analytics() {
                 variant="outline"
                 className={cn(
                   "h-10 gap-2 text-sm font-normal",
-                  selected === "custom" && "bg-secondary text-secondary-foreground font-semibold border-secondary hover:bg-secondary hover:text-secondary-foreground",
+                  selected === "custom" &&
+                    "bg-secondary text-secondary-foreground font-semibold border-secondary hover:bg-secondary hover:text-secondary-foreground",
                 )}
               >
                 <CalendarIcon className="h-4 w-4" />
-                {selected === "custom" && range
-                  ? formatRange(range)
-                  : t("analytics.custom")}
+                {selected === "custom" && range ? formatRange(range) : t("analytics.custom")}
               </Button>
             </PopoverTrigger>
             <PopoverContent className="w-auto p-0" align="end">
@@ -165,17 +165,44 @@ function Analytics() {
     >
       <TooltipProvider delayDuration={150}>
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-5 mb-8">
-          <Kpi label={t("analytics.totalRevenue")} value="45 280,00 €" icon={<Wallet className="h-4 w-4" />} delta="+12.5%" info={t("analytics.infos.totalRevenue")} />
-          <Kpi label={t("analytics.conversionRate")} value="24.8%" icon={<MousePointerClick className="h-4 w-4" />} delta="+3.2%" info={t("analytics.infos.conversionRate")} />
-          <Kpi label={t("analytics.activeContacts")} value="1 284" icon={<Users className="h-4 w-4" />} delta={t("analytics.vsLastMonth")} neutral info={t("analytics.infos.activeContacts")} />
-          <Kpi label={t("analytics.opportunities")} value="128 500 €" icon={<TrendingUp className="h-4 w-4" />} delta="+8k €" info={t("analytics.infos.opportunities")} />
+          <Kpi
+            label={t("analytics.totalRevenue")}
+            value="45 280,00 €"
+            icon={<Wallet className="h-4 w-4" />}
+            delta="+12.5%"
+            info={t("analytics.infos.totalRevenue")}
+          />
+          <Kpi
+            label={t("analytics.conversionRate")}
+            value="24.8%"
+            icon={<MousePointerClick className="h-4 w-4" />}
+            delta="+3.2%"
+            info={t("analytics.infos.conversionRate")}
+          />
+          <Kpi
+            label={t("analytics.activeContacts")}
+            value="1 284"
+            icon={<Users className="h-4 w-4" />}
+            delta={t("analytics.vsLastMonth")}
+            neutral
+            info={t("analytics.infos.activeContacts")}
+          />
+          <Kpi
+            label={t("analytics.opportunities")}
+            value="128 500 €"
+            icon={<TrendingUp className="h-4 w-4" />}
+            delta="+8k €"
+            info={t("analytics.infos.opportunities")}
+          />
         </div>
       </TooltipProvider>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 mb-8">
         <div className="k-card p-6 lg:col-span-2">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-[18px] font-semibold tracking-tight">{t("analytics.revenueGrowth")}</h3>
+            <h3 className="text-[18px] font-semibold tracking-tight">
+              {t("analytics.revenueGrowth")}
+            </h3>
             <div className="flex items-center gap-3 text-xs text-muted-foreground">
               <Legend dot="var(--color-secondary)">{t("analytics.current")}</Legend>
               <Legend dot="color-mix(in oklab, var(--color-secondary) 30%, white)">
@@ -193,17 +220,42 @@ function Analytics() {
                   </linearGradient>
                 </defs>
                 <CartesianGrid stroke="var(--color-border)" vertical={false} />
-                <XAxis dataKey="m" stroke="var(--color-muted-foreground)" fontSize={12} axisLine={false} tickLine={false} />
-                <YAxis stroke="var(--color-muted-foreground)" fontSize={12} axisLine={false} tickLine={false} />
-                <RechartsTooltip contentStyle={{ background: "var(--color-card)", border: "1px solid var(--color-border)", borderRadius: 8 }} />
-                <Area type="monotone" dataKey="v" stroke="var(--color-secondary)" fill="url(#g)" strokeWidth={2.5} />
+                <XAxis
+                  dataKey="m"
+                  stroke="var(--color-muted-foreground)"
+                  fontSize={12}
+                  axisLine={false}
+                  tickLine={false}
+                />
+                <YAxis
+                  stroke="var(--color-muted-foreground)"
+                  fontSize={12}
+                  axisLine={false}
+                  tickLine={false}
+                />
+                <RechartsTooltip
+                  contentStyle={{
+                    background: "var(--color-card)",
+                    border: "1px solid var(--color-border)",
+                    borderRadius: 8,
+                  }}
+                />
+                <Area
+                  type="monotone"
+                  dataKey="v"
+                  stroke="var(--color-secondary)"
+                  fill="url(#g)"
+                  strokeWidth={2.5}
+                />
               </AreaChart>
             </ResponsiveContainer>
           </div>
         </div>
 
         <div className="k-card p-6">
-          <h3 className="text-[18px] font-semibold tracking-tight mb-4">{t("analytics.leadSources")}</h3>
+          <h3 className="text-[18px] font-semibold tracking-tight mb-4">
+            {t("analytics.leadSources")}
+          </h3>
           <div className="space-y-4">
             {SOURCES.map((s) => (
               <div key={s.label}>
@@ -212,7 +264,10 @@ function Analytics() {
                   <span className="font-semibold">{s.value}%</span>
                 </div>
                 <div className="h-2 rounded-full bg-secondary/10 overflow-hidden">
-                  <div className="h-full bg-secondary" style={{ width: `${s.value * 2.2}%`, maxWidth: "100%" }} />
+                  <div
+                    className="h-full bg-secondary"
+                    style={{ width: `${s.value * 2.2}%`, maxWidth: "100%" }}
+                  />
                 </div>
               </div>
             ))}
@@ -229,7 +284,9 @@ function Analytics() {
             <BarChart3 className="h-5 w-5 text-secondary" />
             {t("analytics.segmentsPerformance")}
           </h3>
-          <button className="text-secondary text-sm font-semibold hover:underline">{t("analytics.exportCsv")}</button>
+          <button className="text-secondary text-sm font-semibold hover:underline">
+            {t("analytics.exportCsv")}
+          </button>
         </div>
         <table className="w-full text-sm">
           <thead>
@@ -243,9 +300,30 @@ function Analytics() {
           </thead>
           <tbody>
             {[
-              { tKey: "analytics.segments.saas", sKey: "analytics.segments.saasSub", v: 42, c: "32.4%", avg: "1 240 €", h: 4 },
-              { tKey: "analytics.segments.solo", sKey: "analytics.segments.soloSub", v: 156, c: "18.2%", avg: "450 €", h: 3 },
-              { tKey: "analytics.segments.agencies", sKey: "analytics.segments.agenciesSub", v: 28, c: "26.1%", avg: "2 100 €", h: 5 },
+              {
+                tKey: "analytics.segments.saas",
+                sKey: "analytics.segments.saasSub",
+                v: 42,
+                c: "32.4%",
+                avg: "1 240 €",
+                h: 4,
+              },
+              {
+                tKey: "analytics.segments.solo",
+                sKey: "analytics.segments.soloSub",
+                v: 156,
+                c: "18.2%",
+                avg: "450 €",
+                h: 3,
+              },
+              {
+                tKey: "analytics.segments.agencies",
+                sKey: "analytics.segments.agenciesSub",
+                v: 28,
+                c: "26.1%",
+                avg: "2 100 €",
+                h: 5,
+              },
             ].map((r) => (
               <tr key={r.tKey} className="border-b border-border last:border-0">
                 <td className="py-4">
@@ -285,9 +363,14 @@ function Analytics() {
 
       <div className="rounded-2xl bg-warning-soft border border-warning/30 p-7">
         <AlertTriangle className="h-6 w-6 text-warning-foreground" />
-        <h3 className="mt-3 text-[20px] font-bold tracking-tight">{t("analytics.renewalsTitle")}</h3>
+        <h3 className="mt-3 text-[20px] font-bold tracking-tight">
+          {t("analytics.renewalsTitle")}
+        </h3>
         <p className="mt-2 text-sm text-foreground/80">
-          <Trans i18nKey="analytics.renewalsBody" components={[<strong className="text-foreground" />]} />
+          <Trans
+            i18nKey="analytics.renewalsBody"
+            components={[<strong className="text-foreground" />]}
+          />
         </p>
         <button className="mt-5 inline-flex items-center gap-2 h-10 px-4 rounded-md bg-warning text-warning-foreground text-sm font-semibold">
           {t("analytics.seeList")}
@@ -315,7 +398,9 @@ function Kpi({
   return (
     <div className="k-card p-6">
       <div className="flex items-center justify-between">
-        <div className="h-9 w-9 rounded-md bg-secondary/10 text-secondary grid place-items-center">{icon}</div>
+        <div className="h-9 w-9 rounded-md bg-secondary/10 text-secondary grid place-items-center">
+          {icon}
+        </div>
         <span
           className={`inline-flex items-center gap-1 text-xs font-semibold rounded-md px-2 py-1 ${
             neutral ? "bg-muted text-muted-foreground" : "bg-success-soft text-success"
@@ -362,6 +447,7 @@ type AIStatus = "idle" | "loading" | "ready" | "error";
 
 function AIInsightsCard() {
   const { t, i18n: i18nInstance } = useTranslation();
+  const { current } = useCompany();
   const analyze = useServerFn(analyzeAnalytics);
   const [status, setStatus] = useState<AIStatus>("idle");
   const [markdown, setMarkdown] = useState<string>("");
@@ -376,6 +462,7 @@ function AIInsightsCard() {
         data: {
           language: safeLang,
           force,
+          organizationId: current.id === "all" ? null : current.id,
         },
       });
       setMarkdown(result.markdown);
@@ -392,7 +479,7 @@ function AIInsightsCard() {
   useEffect(() => {
     void run(false);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [current.id]);
 
   return (
     <div className="k-card p-6 mb-5 border-l-4 border-l-secondary">

@@ -9,6 +9,7 @@ import { getCachedOrGenerate } from "@/lib/ai-insight-cache.server";
 const InputSchema = z.object({
   language: z.enum(["fr", "en", "es"]).default("fr"),
   force: z.boolean().default(false),
+  organizationId: z.string().nullable().default(null),
 });
 
 const SYSTEM_PROMPTS = {
@@ -40,14 +41,17 @@ export const analyzeResellers = createServerFn({ method: "POST" })
         supabase,
         userId,
         "resellers",
-        data.language,
+        `${data.organizationId ?? "all"}:${data.language}`,
         data.force,
         async () => {
           const markdown = await runCrmAgent({
             apiKey: key,
             system: SYSTEM_PROMPTS[data.language],
             prompt: USER_PROMPTS[data.language],
-            tools: [getResellersTool(supabase), getResellerRevenueTool(supabase)],
+            tools: [
+              getResellersTool(supabase, data.organizationId),
+              getResellerRevenueTool(supabase, data.organizationId),
+            ],
             maxTokens: 1024,
           });
           return { markdown };

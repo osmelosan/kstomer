@@ -9,7 +9,7 @@ export type CrmTool = {
   execute: () => Promise<unknown>;
 };
 
-export function getPipelineSummaryTool(supabase: Supa): CrmTool {
+export function getPipelineSummaryTool(supabase: Supa, organizationId: string | null): CrmTool {
   return {
     definition: {
       name: "getPipelineSummary",
@@ -17,10 +17,9 @@ export function getPipelineSummaryTool(supabase: Supa): CrmTool {
       input_schema: { type: "object", properties: {} },
     },
     execute: async () => {
-      const { data: contacts } = await supabase
-        .from("contacts")
-        .select("stage")
-        .is("archived_at", null);
+      let q = supabase.from("contacts").select("stage").is("archived_at", null);
+      if (organizationId) q = q.eq("organization_id", organizationId);
+      const { data: contacts } = await q;
       if (!contacts) return { stages: {}, total: 0 };
       const stages: Record<string, number> = {};
       for (const c of contacts) {
@@ -31,7 +30,7 @@ export function getPipelineSummaryTool(supabase: Supa): CrmTool {
   };
 }
 
-export function getAtRiskContactsTool(supabase: Supa): CrmTool {
+export function getAtRiskContactsTool(supabase: Supa, organizationId: string | null): CrmTool {
   return {
     definition: {
       name: "getAtRiskContacts",
@@ -39,13 +38,15 @@ export function getAtRiskContactsTool(supabase: Supa): CrmTool {
       input_schema: { type: "object", properties: {} },
     },
     execute: async () => {
-      const { data: contacts } = await supabase
+      let q = supabase
         .from("contacts")
         .select("contact_name, company_name, last_contact_date, confidence_level")
         .eq("stage", "at_risk")
         .is("archived_at", null)
         .order("last_contact_date", { ascending: true })
         .limit(10);
+      if (organizationId) q = q.eq("organization_id", organizationId);
+      const { data: contacts } = await q;
       return { contacts: contacts ?? [], count: contacts?.length ?? 0 };
     },
   };
@@ -126,7 +127,7 @@ export function getUpcomingTasksTool(supabase: Supa, userId: string): CrmTool {
   };
 }
 
-export function getResellersTool(supabase: Supa): CrmTool {
+export function getResellersTool(supabase: Supa, organizationId: string | null): CrmTool {
   return {
     definition: {
       name: "getResellers",
@@ -135,17 +136,19 @@ export function getResellersTool(supabase: Supa): CrmTool {
       input_schema: { type: "object", properties: {} },
     },
     execute: async () => {
-      const { data: resellers } = await supabase
+      let q = supabase
         .from("resellers")
         .select("id, name, company, confidence_level, reseller_contacts(count)")
         .is("archived_at", null)
         .order("created_at", { ascending: false });
+      if (organizationId) q = q.eq("organization_id", organizationId);
+      const { data: resellers } = await q;
       return { resellers: resellers ?? [], count: resellers?.length ?? 0 };
     },
   };
 }
 
-export function getResellerRevenueTool(supabase: Supa): CrmTool {
+export function getResellerRevenueTool(supabase: Supa, organizationId: string | null): CrmTool {
   return {
     definition: {
       name: "getResellerRevenue",
@@ -153,9 +156,11 @@ export function getResellerRevenueTool(supabase: Supa): CrmTool {
       input_schema: { type: "object", properties: {} },
     },
     execute: async () => {
-      const { data: rc } = await supabase
+      let q = supabase
         .from("reseller_contacts")
         .select("reseller_id, resellers(name), contacts(subscription_details(deal_value, mrr))");
+      if (organizationId) q = q.eq("organization_id", organizationId);
+      const { data: rc } = await q;
       if (!rc) return { resellerRevenue: [] };
 
       const byReseller: Record<
@@ -181,7 +186,7 @@ export function getResellerRevenueTool(supabase: Supa): CrmTool {
   };
 }
 
-export function getRevenueMetricsTool(supabase: Supa): CrmTool {
+export function getRevenueMetricsTool(supabase: Supa, organizationId: string | null): CrmTool {
   return {
     definition: {
       name: "getRevenueMetrics",
@@ -190,7 +195,9 @@ export function getRevenueMetricsTool(supabase: Supa): CrmTool {
       input_schema: { type: "object", properties: {} },
     },
     execute: async () => {
-      const { data: subs } = await supabase.from("subscription_details").select("deal_value, mrr");
+      let q = supabase.from("subscription_details").select("deal_value, mrr");
+      if (organizationId) q = q.eq("organization_id", organizationId);
+      const { data: subs } = await q;
       if (!subs) return { totalMrr: 0, totalDealValue: 0, count: 0 };
       const totalMrr = subs.reduce((acc, s) => acc + (Number(s.mrr) || 0), 0);
       const totalDealValue = subs.reduce((acc, s) => acc + (Number(s.deal_value) || 0), 0);
@@ -199,7 +206,7 @@ export function getRevenueMetricsTool(supabase: Supa): CrmTool {
   };
 }
 
-export function getUpcomingRenewalsTool(supabase: Supa): CrmTool {
+export function getUpcomingRenewalsTool(supabase: Supa, organizationId: string | null): CrmTool {
   return {
     definition: {
       name: "getUpcomingRenewals",
@@ -209,13 +216,15 @@ export function getUpcomingRenewalsTool(supabase: Supa): CrmTool {
     execute: async () => {
       const until = new Date();
       until.setDate(until.getDate() + 30);
-      const { data: contacts } = await supabase
+      let q = supabase
         .from("contacts")
         .select("contact_name, company_name, renewal_date")
         .gte("renewal_date", new Date().toISOString())
         .lte("renewal_date", until.toISOString())
         .is("archived_at", null)
         .order("renewal_date", { ascending: true });
+      if (organizationId) q = q.eq("organization_id", organizationId);
+      const { data: contacts } = await q;
       return { contacts: contacts ?? [], count: contacts?.length ?? 0 };
     },
   };

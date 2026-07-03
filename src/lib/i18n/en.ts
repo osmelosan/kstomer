@@ -25,7 +25,8 @@ export const en = {
     resetTitle: "Choose a new password",
     resetIntro: "Set a new password for your account.",
     resetInvalidTitle: "Invalid or expired link",
-    resetInvalidMessage: "This password reset link is invalid or has expired. Request a new one to continue.",
+    resetInvalidMessage:
+      "This password reset link is invalid or has expired. Request a new one to continue.",
     resetRequestNew: "Request a new link",
     passwordUpdated: "Password updated.",
     signedIn: "Welcome back!",
@@ -56,7 +57,8 @@ export const en = {
     securePayments: "Secure payments.",
     testModeBanner: "Payments in preview are all in test mode.",
     testModeLearnMore: "Learn more",
-    testModeNotConfigured: "Production payments aren't configured yet. Finish Stripe activation to accept real payments.",
+    testModeNotConfigured:
+      "Production payments aren't configured yet. Finish Stripe activation to accept real payments.",
     checkoutReturn: {
       activating: "Activating your subscription…",
       confirmed: "Payment confirmed",
@@ -99,7 +101,10 @@ export const en = {
     markAllRead: "Mark all as read",
     seeAll: "See all notifications",
     items: {
-      dealWon: { title: "Deal won: StartUp Vision", body: "The €12,000 SaaS contract has been signed." },
+      dealWon: {
+        title: "Deal won: StartUp Vision",
+        body: "The €12,000 SaaS contract has been signed.",
+      },
       newMessage: { title: "New message from Maelis B.", body: "“Available for a call tomorrow?”" },
       overdue: { title: "Overdue follow-up", body: "Jean Dupont — last interaction 8 days ago." },
       newContact: { title: "New contact added", body: "Marc Lemaire was added to your contacts." },
@@ -190,7 +195,8 @@ export const en = {
     metaTitle: "Welcome to Kstomer — Smart CRM",
     metaDescription: "The efficient, precise, no-noise CRM for solopreneurs. 2-minute setup.",
     heading: "Welcome to\nKstomer.",
-    intro: "Take control in 10 minutes. Kstomer and its AI do the work so you get a clear view of your pipeline and close more deals — without the busywork.",
+    intro:
+      "Take control in 10 minutes. Kstomer and its AI do the work so you get a clear view of your pipeline and close more deals — without the busywork.",
     testimonial: "“An incredible time-saver for my business” — Marc A.",
     chosenBy: "CHOSEN BY 1,200+ FOUNDERS",
     cta: "Start the journey",
@@ -292,10 +298,11 @@ export const en = {
     filters: "Filters",
     statusAll: "Status: all",
     sourceAll: "Source: all",
+    stageAll: "Stage: all",
     th: {
       name: "Name",
       company: "Company",
-      status: "Status",
+      status: "Stage",
       lastActivity: "Last activity",
       actions: "Actions",
     },
@@ -304,11 +311,19 @@ export const en = {
       hotProspect: "Hot prospect",
       inactive: "Inactive",
     },
+    stages: {
+      new_lead: "New lead",
+      contacted: "Contacted",
+      proposal: "Proposal",
+      active: "Active",
+      at_risk: "At risk",
+    },
     activities: {
       twoDays: "2 days ago",
       today: "Today, 10:30",
       twoMonths: "2 months ago",
     },
+    empty: "No contacts yet.",
     showing: "Showing <0>{{from}}</0> of <1>{{total}}</1> contacts",
   },
   contactDetail: {
@@ -316,13 +331,15 @@ export const en = {
     title: "Contact details",
     back: "← Back to contacts",
     notFound: "Contact not found.",
-    sampleNote: "Julien is interested in the Premium CRM pack. He wants to onboard his 3-person team within the next month. Volume discount discussion scheduled.\n\nLatest: Q4 budget validation confirmed.",
+    sampleNote:
+      "Julien is interested in the Premium CRM pack. He wants to onboard his 3-person team within the next month. Volume discount discussion scheduled.\n\nLatest: Q4 budget validation confirmed.",
     role: "CEO at Beaumont Digital",
     editProfile: "Edit profile",
     workEmail: "Work email",
     phone: "Phone",
     confidenceLevel: "Confidence level",
     confidenceLabel: "4 / 5 — Very confident",
+    noConfidence: "Not set",
     projectNotes: "Project notes",
     modified: "Modified",
     versionHistory: "Version history",
@@ -408,8 +425,8 @@ export const en = {
       },
     },
     meta: {
-      created: "Created on March 12, 2024",
-      lastInteraction: "Last interaction 2 days ago",
+      created: "Created on {{date}}",
+      lastInteraction: "Last interaction on {{date}}",
       owner: "Owner: Thomas Melo",
     },
     autosave: {
@@ -441,6 +458,8 @@ export const en = {
       invalidEmail: "Invalid email address.",
       duplicateEmail: "A contact with this email already exists.",
     },
+    noCompany: "Select a specific company before creating a contact.",
+    noCompanyCta: "Go to Settings →",
     cancel: "Cancel",
     create: "Create contact",
   },
@@ -571,10 +590,13 @@ export const en = {
       call: "Call",
       notFound: "Reseller not found.",
       info: {
-        activeDeals: "Number of deals currently open in this partner's pipeline (excluding Won and Lost).",
-        revenue: "Cumulative revenue generated by this partner since their start date (won deals only).",
+        activeDeals:
+          "Number of deals currently open in this partner's pipeline (excluding Won and Lost).",
+        revenue:
+          "Cumulative revenue generated by this partner since their start date (won deals only).",
         tier: "Level assigned automatically from cumulative revenue and tenure: Bronze (< €100k), Silver (€100k–500k), Gold (> €500k).",
-        health: "Composite score (1–5) based on recent activity, deal velocity, and date of last contact.",
+        health:
+          "Composite score (1–5) based on recent activity, deal velocity, and date of last contact.",
       },
     },
   },
@@ -640,10 +662,14 @@ export const en = {
     opportunities: "Opportunities",
     vsLastMonth: "vs last month",
     infos: {
-      totalRevenue: "Sum of revenue collected over the selected period (won deals, excluding taxes).",
-      conversionRate: "Share of opportunities won versus the total closed (won + lost) during the period.",
-      activeContacts: "Contacts with at least one interaction (email, call, note) in the last 30 days.",
-      opportunities: "Cumulative value of opportunities still open in the pipeline, weighted by probability.",
+      totalRevenue:
+        "Sum of revenue collected over the selected period (won deals, excluding taxes).",
+      conversionRate:
+        "Share of opportunities won versus the total closed (won + lost) during the period.",
+      activeContacts:
+        "Contacts with at least one interaction (email, call, note) in the last 30 days.",
+      opportunities:
+        "Cumulative value of opportunities still open in the pipeline, weighted by probability.",
     },
     revenueGrowth: "Revenue growth",
     current: "Current",
@@ -675,10 +701,12 @@ export const en = {
     },
     aiOpportunity: "AI OPPORTUNITY",
     maximizeEvenings: "Maximize your evenings",
-    eveningsBody: "Our data shows your SaaS prospects are 40% more likely to reply between 6 PM and 7:30 PM.",
+    eveningsBody:
+      "Our data shows your SaaS prospects are 40% more likely to reply between 6 PM and 7:30 PM.",
     scheduleReminders: "Schedule reminders →",
     renewalsTitle: "Upcoming renewals",
-    renewalsBody: "12 “Premium” subscriptions are due in the next 30 days. Value at risk: <0>€5,400</0>.",
+    renewalsBody:
+      "12 “Premium” subscriptions are due in the next 30 days. Value at risk: <0>€5,400</0>.",
     seeList: "See the list",
     ai: {
       title: "AI performance analysis",

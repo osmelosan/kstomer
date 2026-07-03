@@ -1,10 +1,12 @@
 import { pageHead } from "@/lib/route-seo";
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { AppShell } from "@/components/AppShell";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import i18n from "@/lib/i18n";
-import { CONTACTS } from "@/lib/mock-contacts";
+import { useContacts } from "@/hooks/use-contacts";
+import { useCompany } from "@/lib/company-context";
+import { supabase } from "@/integrations/supabase/client";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -22,16 +24,31 @@ export const Route = createFileRoute("/_authenticated/contacts/new")({
 function NewContact() {
   const nav = useNavigate();
   const { t } = useTranslation();
+  const { current } = useCompany();
+  const { contacts, createContact } = useContacts();
   const [form, setForm] = useState({
     firstName: "",
     lastName: "",
     email: "",
     phone: "",
     company: "",
-    status: "prospect",
     notes: "",
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [submitting, setSubmitting] = useState(false);
+
+  if (current.id === "all") {
+    return (
+      <AppShell title={t("newContact.title")} subtitle={t("newContact.subtitle")}>
+        <div className="k-card p-8 max-w-3xl text-sm text-muted-foreground">
+          <p>{t("newContact.noCompany")}</p>
+          <Link to="/settings" className="text-secondary font-semibold hover:underline">
+            {t("newContact.noCompanyCta")}
+          </Link>
+        </div>
+      </AppShell>
+    );
+  }
 
   function validate() {
     const next: Record<string, string> = {};
@@ -41,24 +58,46 @@ function NewContact() {
       next.email = t("newContact.errors.required");
     } else if (!EMAIL_RE.test(form.email.trim())) {
       next.email = t("newContact.errors.invalidEmail");
-    } else if (CONTACTS.some((c) => c.email.toLowerCase() === form.email.trim().toLowerCase())) {
+    } else if (contacts.some((c) => c.email?.toLowerCase() === form.email.trim().toLowerCase())) {
       next.email = t("newContact.errors.duplicateEmail");
     }
     setErrors(next);
     return Object.keys(next).length === 0;
   }
 
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    if (!validate()) return;
+    setSubmitting(true);
+    try {
+      const created = await createContact({
+        contact_name: `${form.firstName.trim()} ${form.lastName.trim()}`.trim(),
+        company_name: form.company.trim() || null,
+        email: form.email.trim(),
+        phone: form.phone.trim() || null,
+      });
+      if (!created) return;
+      if (form.notes.trim()) {
+        await supabase.from("notes").insert({
+          organization_id: created.organization_id,
+          contact_id: created.id,
+          note_text: form.notes.trim(),
+        });
+      }
+      nav({ to: "/contacts/$id", params: { id: created.id } });
+    } catch (err: unknown) {
+      const pgError = err as { code?: string };
+      if (pgError.code === "23505") {
+        setErrors((prev) => ({ ...prev, email: t("newContact.errors.duplicateEmail") }));
+      }
+    } finally {
+      setSubmitting(false);
+    }
+  }
+
   return (
     <AppShell title={t("newContact.title")} subtitle={t("newContact.subtitle")}>
-      <form
-        onSubmit={(e) => {
-          e.preventDefault();
-          if (!validate()) return;
-          nav({ to: "/contacts" });
-        }}
-        noValidate
-        className="k-card p-8 max-w-3xl space-y-6"
-      >
+      <form onSubmit={handleSubmit} noValidate className="k-card p-8 max-w-3xl space-y-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
           <Field
             label={t("newContact.firstName")}
@@ -89,19 +128,6 @@ function NewContact() {
             value={form.company}
             onChange={(v) => setForm({ ...form, company: v })}
           />
-          <div>
-            <label className="block text-sm font-semibold mb-2">{t("newContact.status")}</label>
-            <select
-              value={form.status}
-              onChange={(e) => setForm({ ...form, status: e.target.value })}
-              className="w-full h-11 px-3 rounded-md border border-input bg-card text-sm focus:ring-2 focus:ring-ring/40 focus:outline-none"
-            >
-              <option value="prospect">{t("newContact.statusOptions.prospect")}</option>
-              <option value="hotProspect">{t("newContact.statusOptions.hotProspect")}</option>
-              <option value="activeClient">{t("newContact.statusOptions.activeClient")}</option>
-              <option value="inactive">{t("newContact.statusOptions.inactive")}</option>
-            </select>
-          </div>
         </div>
 
         <div>
@@ -124,7 +150,8 @@ function NewContact() {
           </button>
           <button
             type="submit"
-            className="h-10 px-5 rounded-md bg-primary text-primary-foreground text-sm font-semibold hover:bg-primary/90"
+            disabled={submitting}
+            className="h-10 px-5 rounded-md bg-primary text-primary-foreground text-sm font-semibold hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {t("newContact.create")}
           </button>

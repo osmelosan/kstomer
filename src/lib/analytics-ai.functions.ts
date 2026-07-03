@@ -14,6 +14,7 @@ import { getCachedOrGenerate } from "@/lib/ai-insight-cache.server";
 const InputSchema = z.object({
   language: z.enum(["fr", "en", "es"]).default("fr"),
   force: z.boolean().default(false),
+  organizationId: z.string().nullable().default(null),
 });
 
 const SYSTEM_PROMPTS = {
@@ -45,7 +46,7 @@ export const analyzeAnalytics = createServerFn({ method: "POST" })
         supabase,
         userId,
         "analytics",
-        data.language,
+        `${data.organizationId ?? "all"}:${data.language}`,
         data.force,
         async () => {
           const markdown = await runCrmAgent({
@@ -53,10 +54,10 @@ export const analyzeAnalytics = createServerFn({ method: "POST" })
             system: SYSTEM_PROMPTS[data.language],
             prompt: USER_PROMPTS[data.language],
             tools: [
-              getPipelineSummaryTool(supabase),
-              getRevenueMetricsTool(supabase),
-              getAtRiskContactsTool(supabase),
-              getUpcomingRenewalsTool(supabase),
+              getPipelineSummaryTool(supabase, data.organizationId),
+              getRevenueMetricsTool(supabase, data.organizationId),
+              getAtRiskContactsTool(supabase, data.organizationId),
+              getUpcomingRenewalsTool(supabase, data.organizationId),
             ],
             maxTokens: 1024,
           });

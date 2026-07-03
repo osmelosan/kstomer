@@ -25,7 +25,8 @@ export const es = {
     resetTitle: "Elige una nueva contraseña",
     resetIntro: "Define una nueva contraseña para tu cuenta.",
     resetInvalidTitle: "Enlace no válido o caducado",
-    resetInvalidMessage: "Este enlace de restablecimiento no es válido o ha caducado. Solicita uno nuevo para continuar.",
+    resetInvalidMessage:
+      "Este enlace de restablecimiento no es válido o ha caducado. Solicita uno nuevo para continuar.",
     resetRequestNew: "Solicitar un nuevo enlace",
     passwordUpdated: "Contraseña actualizada.",
     signedIn: "¡Bienvenido!",
@@ -33,7 +34,8 @@ export const es = {
     invalidCredentials: "Email o contraseña incorrectos.",
     emailNotConfirmed: "Email no verificado. Revisa tu bandeja.",
     emailExists: "Ya existe una cuenta con este email.",
-    emailDomainNotSupported: "Ese dominio de email no es compatible. Usa una dirección de email real.",
+    emailDomainNotSupported:
+      "Ese dominio de email no es compatible. Usa una dirección de email real.",
     passwordTooShort: "La contraseña debe tener al menos 8 caracteres.",
     passwordsDontMatch: "Las contraseñas no coinciden.",
     googleError: "No se pudo iniciar sesión con Google.",
@@ -42,7 +44,8 @@ export const es = {
     backToHome: "Inicio",
     backToPricing: "Volver a tarifas",
     heading: "Elige tu plan",
-    subheading: "Prueba gratis de 14 días en todos los planes. Sin compromiso, cancela cuando quieras.",
+    subheading:
+      "Prueba gratis de 14 días en todos los planes. Sin compromiso, cancela cuando quieras.",
     monthly: "Mensual",
     yearly: "Anual",
     billedYearly: "Facturado anualmente",
@@ -56,7 +59,8 @@ export const es = {
     securePayments: "Pagos seguros.",
     testModeBanner: "Todos los pagos en la vista previa están en modo de prueba.",
     testModeLearnMore: "Más información",
-    testModeNotConfigured: "Los pagos de producción aún no están configurados. Termina la activación de Stripe para aceptar pagos reales.",
+    testModeNotConfigured:
+      "Los pagos de producción aún no están configurados. Termina la activación de Stripe para aceptar pagos reales.",
     checkoutReturn: {
       activating: "Activando tu suscripción…",
       confirmed: "Pago confirmado",
@@ -99,10 +103,22 @@ export const es = {
     markAllRead: "Marcar todo como leído",
     seeAll: "Ver todas las notificaciones",
     items: {
-      dealWon: { title: "Negocio ganado: StartUp Vision", body: "El contrato SaaS de 12 000 € ha sido firmado." },
-      newMessage: { title: "Nuevo mensaje de Maelis B.", body: "«¿Disponible para una llamada mañana?»" },
-      overdue: { title: "Seguimiento atrasado", body: "Jean Dupont — última interacción hace 8 días." },
-      newContact: { title: "Nuevo contacto añadido", body: "Marc Lemaire ha sido añadido a tus contactos." },
+      dealWon: {
+        title: "Negocio ganado: StartUp Vision",
+        body: "El contrato SaaS de 12 000 € ha sido firmado.",
+      },
+      newMessage: {
+        title: "Nuevo mensaje de Maelis B.",
+        body: "«¿Disponible para una llamada mañana?»",
+      },
+      overdue: {
+        title: "Seguimiento atrasado",
+        body: "Jean Dupont — última interacción hace 8 días.",
+      },
+      newContact: {
+        title: "Nuevo contacto añadido",
+        body: "Marc Lemaire ha sido añadido a tus contactos.",
+      },
       renewal: { title: "Renovación próxima", body: "3 suscripciones vencen este mes." },
     },
   },
@@ -188,9 +204,11 @@ export const es = {
   },
   welcome: {
     metaTitle: "Bienvenido a Kstomer — CRM Inteligente",
-    metaDescription: "El CRM eficiente, preciso y sin ruido para solopreneurs. Configuración en 2 minutos.",
+    metaDescription:
+      "El CRM eficiente, preciso y sin ruido para solopreneurs. Configuración en 2 minutos.",
     heading: "Bienvenido a\nKstomer.",
-    intro: "Toma el control en 10 minutos. Kstomer y su IA hacen el trabajo para que tengas una visión clara de tu pipeline y cierres más, sin esfuerzo de organización.",
+    intro:
+      "Toma el control en 10 minutos. Kstomer y su IA hacen el trabajo para que tengas una visión clara de tu pipeline y cierres más, sin esfuerzo de organización.",
     testimonial: "«Un ahorro de tiempo increíble para mi actividad» — Marc A.",
     chosenBy: "ELEGIDO POR 1.200+ FUNDADORES",
     cta: "Comenzar la aventura",
@@ -292,10 +310,11 @@ export const es = {
     filters: "Filtros",
     statusAll: "Estado: todos",
     sourceAll: "Origen: todos",
+    stageAll: "Etapa: todas",
     th: {
       name: "Nombre y apellido",
       company: "Empresa",
-      status: "Estado",
+      status: "Etapa",
       lastActivity: "Última actividad",
       actions: "Acciones",
     },
@@ -304,11 +323,19 @@ export const es = {
       hotProspect: "Prospecto caliente",
       inactive: "Inactivo",
     },
+    stages: {
+      new_lead: "Nuevo lead",
+      contacted: "Contactado",
+      proposal: "Propuesta",
+      active: "Activo",
+      at_risk: "En riesgo",
+    },
     activities: {
       twoDays: "Hace 2 días",
       today: "Hoy, 10:30",
       twoMonths: "Hace 2 meses",
     },
+    empty: "Todavía no hay contactos.",
     showing: "Mostrando <0>{{from}}</0> de <1>{{total}}</1> contactos",
   },
   contactDetail: {
@@ -316,13 +343,15 @@ export const es = {
     title: "Detalle del contacto",
     back: "← Volver a contactos",
     notFound: "Contacto no encontrado.",
-    sampleNote: "Julien está interesado en el pack Premium CRM. Quiere incorporar a su equipo de 3 personas el próximo mes. Conversación pendiente sobre descuentos por volumen.\n\nÚltimo punto: validación del presupuesto Q4 confirmada.",
+    sampleNote:
+      "Julien está interesado en el pack Premium CRM. Quiere incorporar a su equipo de 3 personas el próximo mes. Conversación pendiente sobre descuentos por volumen.\n\nÚltimo punto: validación del presupuesto Q4 confirmada.",
     role: "CEO en Beaumont Digital",
     editProfile: "Editar perfil",
     workEmail: "Email profesional",
     phone: "Teléfono",
     confidenceLevel: "Nivel de confianza",
     confidenceLabel: "4 / 5 — Muy confiado",
+    noConfidence: "Sin definir",
     projectNotes: "Notas del proyecto",
     modified: "Modificado",
     versionHistory: "Historial de versiones",
@@ -408,8 +437,8 @@ export const es = {
       },
     },
     meta: {
-      created: "Creado el 12 de marzo de 2024",
-      lastInteraction: "Última interacción hace 2 días",
+      created: "Creado el {{date}}",
+      lastInteraction: "Última interacción el {{date}}",
       owner: "Propietario: Thomas Melo",
     },
     autosave: {
@@ -441,6 +470,8 @@ export const es = {
       invalidEmail: "Dirección de email inválida.",
       duplicateEmail: "Ya existe un contacto con este email.",
     },
+    noCompany: "Selecciona una empresa concreta antes de crear un contacto.",
+    noCompanyCta: "Ir a ajustes →",
     cancel: "Cancelar",
     create: "Crear contacto",
   },
@@ -571,10 +602,13 @@ export const es = {
       call: "Llamar",
       notFound: "Revendedor no encontrado.",
       info: {
-        activeDeals: "Número de operaciones actualmente abiertas en el pipeline de este socio (excluyendo Ganadas y Perdidas).",
-        revenue: "Ingresos acumulados generados por este socio desde su fecha de alta (solo operaciones ganadas).",
+        activeDeals:
+          "Número de operaciones actualmente abiertas en el pipeline de este socio (excluyendo Ganadas y Perdidas).",
+        revenue:
+          "Ingresos acumulados generados por este socio desde su fecha de alta (solo operaciones ganadas).",
         tier: "Nivel asignado automáticamente según ingresos acumulados y antigüedad: Bronze (< 100k€), Silver (100k–500k€), Gold (> 500k€).",
-        health: "Puntuación compuesta (1–5) basada en actividad reciente, velocidad de operaciones y fecha del último contacto.",
+        health:
+          "Puntuación compuesta (1–5) basada en actividad reciente, velocidad de operaciones y fecha del último contacto.",
       },
     },
   },
@@ -640,10 +674,14 @@ export const es = {
     opportunities: "Oportunidades",
     vsLastMonth: "vs mes pasado",
     infos: {
-      totalRevenue: "Suma de los ingresos cobrados durante el periodo seleccionado (negocios ganados, sin impuestos).",
-      conversionRate: "Proporción de oportunidades ganadas sobre el total cerrado (ganadas + perdidas) en el periodo.",
-      activeContacts: "Contactos con al menos una interacción (email, llamada, nota) en los últimos 30 días.",
-      opportunities: "Valor acumulado de las oportunidades aún abiertas en el pipeline, ponderado por probabilidad.",
+      totalRevenue:
+        "Suma de los ingresos cobrados durante el periodo seleccionado (negocios ganados, sin impuestos).",
+      conversionRate:
+        "Proporción de oportunidades ganadas sobre el total cerrado (ganadas + perdidas) en el periodo.",
+      activeContacts:
+        "Contactos con al menos una interacción (email, llamada, nota) en los últimos 30 días.",
+      opportunities:
+        "Valor acumulado de las oportunidades aún abiertas en el pipeline, ponderado por probabilidad.",
     },
     revenueGrowth: "Crecimiento de ingresos",
     current: "Actual",
@@ -675,10 +713,12 @@ export const es = {
     },
     aiOpportunity: "OPORTUNIDAD IA",
     maximizeEvenings: "Aprovecha tus tardes",
-    eveningsBody: "Nuestros datos indican que tus prospectos SaaS tienen un 40% más de probabilidad de responder entre las 18:00 y las 19:30.",
+    eveningsBody:
+      "Nuestros datos indican que tus prospectos SaaS tienen un 40% más de probabilidad de responder entre las 18:00 y las 19:30.",
     scheduleReminders: "Programar recordatorios →",
     renewalsTitle: "Renovaciones próximas",
-    renewalsBody: "12 suscripciones «Premium» vencen en los próximos 30 días. Valor en riesgo: <0>5.400 €</0>.",
+    renewalsBody:
+      "12 suscripciones «Premium» vencen en los próximos 30 días. Valor en riesgo: <0>5.400 €</0>.",
     seeList: "Ver la lista",
     ai: {
       title: "Análisis IA del rendimiento",

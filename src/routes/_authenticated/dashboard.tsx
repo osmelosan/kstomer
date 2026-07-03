@@ -95,7 +95,11 @@ function Dashboard() {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8">
         <section className="space-y-4">
-          <SectionHeader title={t("dashboard.priorityActions")} cta={t("dashboard.seeAll")} ctaTo="/tasks" />
+          <SectionHeader
+            title={t("dashboard.priorityActions")}
+            cta={t("dashboard.seeAll")}
+            ctaTo="/tasks"
+          />
           <div className="bg-card rounded-2xl border border-border divide-y divide-border overflow-hidden shadow-card">
             <ActionRow
               taskId="t1"
@@ -162,15 +166,22 @@ function MetricCard({
       <div className="flex justify-between items-start gap-3">
         <p className="text-sm font-medium text-muted-foreground">{label}</p>
         {accent && (
-          <span className={`shrink-0 px-2 py-1 text-[10px] font-bold rounded-full uppercase tracking-wider border ${toneClasses(accent.tone)}`}>
+          <span
+            className={`shrink-0 px-2 py-1 text-[10px] font-bold rounded-full uppercase tracking-wider border ${toneClasses(accent.tone)}`}
+          >
             {accent.label}
           </span>
         )}
       </div>
-      <p className="text-[30px] font-bold leading-tight mt-2 tabular-nums tracking-tight">{value}</p>
+      <p className="text-[30px] font-bold leading-tight mt-2 tabular-nums tracking-tight">
+        {value}
+      </p>
       {typeof progress === "number" && (
         <div className="mt-4 h-1 w-full bg-muted rounded-full overflow-hidden">
-          <div className="h-full bg-secondary rounded-full transition-all" style={{ width: `${progress}%` }} />
+          <div
+            className="h-full bg-secondary rounded-full transition-all"
+            style={{ width: `${progress}%` }}
+          />
         </div>
       )}
       {footer && <p className="text-[11px] text-muted-foreground mt-2">{footer}</p>}
@@ -211,20 +222,25 @@ function ActionRow({
 }) {
   const content = (
     <>
-      <div className="h-10 w-10 rounded-full bg-muted flex items-center justify-center shrink-0">{icon}</div>
+      <div className="h-10 w-10 rounded-full bg-muted flex items-center justify-center shrink-0">
+        {icon}
+      </div>
       <div className="flex-1 min-w-0">
         <p className="text-sm font-semibold truncate">{title}</p>
         <p className="text-xs text-muted-foreground truncate">{subtitle}</p>
       </div>
       <div className="flex items-center gap-2 shrink-0">
-        <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold tracking-wider border ${toneClasses(tag.tone)}`}>
+        <span
+          className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold tracking-wider border ${toneClasses(tag.tone)}`}
+        >
           {tag.label}
         </span>
       </div>
     </>
   );
 
-  const className = "p-4 hover:bg-muted/50 transition-colors flex items-center gap-4 group cursor-pointer";
+  const className =
+    "p-4 hover:bg-muted/50 transition-colors flex items-center gap-4 group cursor-pointer";
 
   if (taskId) {
     return (
@@ -254,7 +270,9 @@ function ProspectRow({ company, sector, fit, reason, match }: Prospect) {
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2">
           <p className="text-sm font-semibold truncate">{company}</p>
-          <span className={`px-1.5 py-0.5 rounded-full text-[9px] font-bold tracking-wider border tabular-nums ${toneClasses(tone)}`}>
+          <span
+            className={`px-1.5 py-0.5 rounded-full text-[9px] font-bold tracking-wider border tabular-nums ${toneClasses(tone)}`}
+          >
             {fit}% {t("dashboard.fit")}
           </span>
         </div>
@@ -390,6 +408,7 @@ type AIStatus = "idle" | "loading" | "ready" | "error";
 
 function AIInsightsCard() {
   const { t, i18n: i18nInstance } = useTranslation();
+  const { current } = useCompany();
   const analyze = useServerFn(analyzeDashboard);
   const [status, setStatus] = useState<AIStatus>("idle");
   const [markdown, setMarkdown] = useState<string>("");
@@ -404,6 +423,7 @@ function AIInsightsCard() {
         data: {
           language: safeLang,
           force,
+          organizationId: current.id === "all" ? null : current.id,
         },
       });
       setMarkdown(result.markdown);
@@ -420,7 +440,7 @@ function AIInsightsCard() {
   useEffect(() => {
     void run(false);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [current.id]);
 
   return (
     <div className="k-card p-6 mb-8 border-l-4 border-l-secondary">

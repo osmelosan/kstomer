@@ -9,8 +9,7 @@ import ReactMarkdown from "react-markdown";
 import i18n from "@/lib/i18n";
 import { analyzeResellers } from "@/lib/resellers-ai.functions";
 import { RESELLERS } from "@/lib/mock-resellers";
-
-
+import { useCompany } from "@/lib/company-context";
 
 export const Route = createFileRoute("/_authenticated/resellers/")({
   head: () =>
@@ -23,7 +22,6 @@ export const Route = createFileRoute("/_authenticated/resellers/")({
   component: Resellers,
 });
 
-
 function Resellers() {
   const { t } = useTranslation();
   return (
@@ -33,8 +31,16 @@ function Resellers() {
       search={{ placeholder: t("resellers.searchPlaceholder") }}
     >
       <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-6">
-        <Kpi label={t("resellers.activePartners")} value="14" icon={<Store className="h-4 w-4" />} />
-        <Kpi label={t("resellers.partnerRevenue")} value="34 400 €" icon={<TrendingUp className="h-4 w-4" />} />
+        <Kpi
+          label={t("resellers.activePartners")}
+          value="14"
+          icon={<Store className="h-4 w-4" />}
+        />
+        <Kpi
+          label={t("resellers.partnerRevenue")}
+          value="34 400 €"
+          icon={<TrendingUp className="h-4 w-4" />}
+        />
       </div>
 
       <AIInsightsCard />
@@ -52,7 +58,10 @@ function Resellers() {
           </thead>
           <tbody>
             {RESELLERS.map((r) => (
-              <tr key={r.slug} className="border-b border-border last:border-0 hover:bg-muted/40 cursor-pointer">
+              <tr
+                key={r.slug}
+                className="border-b border-border last:border-0 hover:bg-muted/40 cursor-pointer"
+              >
                 <td className="p-4 font-semibold">
                   <Link
                     to="/resellers/$slug"
@@ -63,7 +72,6 @@ function Resellers() {
                   </Link>
                 </td>
                 <td className="p-4">
-
                   <span
                     className={`inline-flex items-center text-xs font-semibold px-3 py-1 rounded-full ${
                       r.tier === "Gold"
@@ -108,7 +116,9 @@ function Kpi({ label, value, icon }: { label: string; value: string; icon: React
     <div className="k-card p-6">
       <div className="flex items-center justify-between">
         <div className="k-label">{label}</div>
-        <div className="h-9 w-9 rounded-md bg-secondary/10 text-secondary grid place-items-center">{icon}</div>
+        <div className="h-9 w-9 rounded-md bg-secondary/10 text-secondary grid place-items-center">
+          {icon}
+        </div>
       </div>
       <div className="text-[28px] font-bold mt-2 tracking-tight">{value}</div>
     </div>
@@ -119,6 +129,7 @@ type AIStatus = "idle" | "loading" | "ready" | "error";
 
 function AIInsightsCard() {
   const { t, i18n: i18nInstance } = useTranslation();
+  const { current } = useCompany();
   const analyze = useServerFn(analyzeResellers);
   const [status, setStatus] = useState<AIStatus>("idle");
   const [markdown, setMarkdown] = useState<string>("");
@@ -133,6 +144,7 @@ function AIInsightsCard() {
         data: {
           language: safeLang,
           force,
+          organizationId: current.id === "all" ? null : current.id,
         },
       });
       setMarkdown(result.markdown);
@@ -149,7 +161,7 @@ function AIInsightsCard() {
   useEffect(() => {
     void run(false);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [current.id]);
 
   return (
     <div className="k-card p-6 mb-6 border-l-4 border-l-secondary">
