@@ -2,6 +2,7 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { Check, Sparkles, ArrowLeft, BadgeCheck, Loader2 } from "lucide-react";
 import { toast } from "sonner";
+import { useTranslation } from "react-i18next";
 import { PRICING_PLANS, type BillingInterval, type PricingPlan, getPlanByPriceId } from "@/lib/pricing-plans";
 import { StripeEmbeddedCheckout } from "@/components/StripeEmbeddedCheckout";
 import { supabase } from "@/integrations/supabase/client";
@@ -23,6 +24,7 @@ export const Route = createFileRoute("/pricing")({
 });
 
 function PricingPage() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [interval, setInterval] = useState<BillingInterval>("monthly");
   const [checkoutPlan, setCheckoutPlan] = useState<PricingPlan | null>(null);
@@ -76,7 +78,7 @@ function PricingPage() {
             onClick={() => setCheckoutPlan(null)}
             className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground mb-6"
           >
-            <ArrowLeft className="h-4 w-4" /> Retour aux tarifs
+            <ArrowLeft className="h-4 w-4" /> {t("pricing.backToPricing")}
           </button>
           <div className="k-card p-2">
             <StripeEmbeddedCheckout
@@ -95,13 +97,13 @@ function PricingPage() {
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-12">
           <Link to="/" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground mb-6">
-            <ArrowLeft className="h-4 w-4" /> Accueil
+            <ArrowLeft className="h-4 w-4" /> {t("pricing.backToHome")}
           </Link>
           <h1 className="text-4xl font-bold tracking-tight">
-            Choisissez votre plan
+            {t("pricing.heading")}
           </h1>
           <p className="mt-4 text-muted-foreground text-base max-w-xl mx-auto">
-            Essai gratuit 14 jours sur tous les plans. Sans engagement, annulez à tout moment.
+            {t("pricing.subheading")}
           </p>
 
           <div className="mt-8 inline-flex items-center rounded-full border border-border bg-card p-1">
@@ -114,7 +116,7 @@ function PricingPage() {
                   : "text-muted-foreground",
               )}
             >
-              Mensuel
+              {t("pricing.monthly")}
             </button>
             <button
               onClick={() => setInterval("yearly")}
@@ -125,7 +127,7 @@ function PricingPage() {
                   : "text-muted-foreground",
               )}
             >
-              Annuel
+              {t("pricing.yearly")}
               <span className={cn(
                 "text-sm font-bold px-2 py-0.5 rounded",
                 interval === "yearly"
@@ -155,7 +157,7 @@ function PricingPage() {
                 {plan.highlighted && (
                   <div className="absolute -top-3 left-1/2 -translate-x-1/2 inline-flex items-center gap-1.5 rounded-full bg-secondary text-secondary-foreground px-3 py-1 text-[11px] font-bold tracking-wider uppercase">
                     <Sparkles className="h-3 w-3" />
-                    Le plus populaire
+                    {t("pricing.mostPopular")}
                   </div>
                 )}
                 <div>
@@ -164,14 +166,14 @@ function PricingPage() {
                 </div>
                 <div className="mt-6 flex items-baseline gap-1">
                   <span className="text-4xl font-bold tracking-tight">€{amount}</span>
-                  <span className="text-sm text-muted-foreground">/ mois</span>
+                  <span className="text-sm text-muted-foreground">{t("pricing.perMonth")}</span>
                 </div>
                 {interval === "yearly" && (
-                  <p className="text-xs text-muted-foreground">Facturé annuellement</p>
+                  <p className="text-xs text-muted-foreground">{t("pricing.billedYearly")}</p>
                 )}
                 {plan.trialDays && (
                   <p className="mt-2 text-xs font-semibold text-tertiary">
-                    Essai gratuit {plan.trialDays} jours
+                    {t("pricing.trialDaysBadge", { days: plan.trialDays })}
                   </p>
                 )}
 
@@ -187,7 +189,7 @@ function PricingPage() {
                 {currentPlanId === plan.id ? (
                   <div className="mt-7 h-11 rounded-lg text-sm font-semibold inline-flex items-center justify-center gap-2 bg-tertiary/10 text-tertiary border border-tertiary/30">
                     <BadgeCheck className="h-4 w-4" />
-                    Votre plan actuel
+                    {t("pricing.currentPlan")}
                   </div>
                 ) : (
                   <button
@@ -202,10 +204,10 @@ function PricingPage() {
                   >
                     {portalLoading && currentPlanId && <Loader2 className="h-4 w-4 animate-spin" />}
                     {currentPlanId
-                      ? "Changer pour ce plan"
+                      ? t("pricing.switchPlan")
                       : plan.trialDays
-                        ? "Démarrer l'essai gratuit"
-                        : "Choisir ce plan"}
+                        ? t("pricing.startTrial")
+                        : t("pricing.choosePlan")}
                   </button>
                 )}
 
@@ -215,7 +217,7 @@ function PricingPage() {
         </div>
 
         <p className="text-center text-xs text-muted-foreground mt-10">
-          Paiements sécurisés.{"\u00a0"}
+          {t("pricing.securePayments")}
         </p>
       </div>
     </main>

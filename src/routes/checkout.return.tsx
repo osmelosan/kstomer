@@ -1,6 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { CheckCircle2, Loader2 } from "lucide-react";
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { reconcileCheckoutSession } from "@/lib/payments.functions";
 import { getStripeEnvironment } from "@/lib/stripe";
 
@@ -12,6 +13,7 @@ export const Route = createFileRoute("/checkout/return")({
 });
 
 function CheckoutReturn() {
+  const { t } = useTranslation();
   const { session_id } = Route.useSearch();
   const navigate = useNavigate();
   const [reconciling, setReconciling] = useState(!!session_id);
@@ -31,7 +33,7 @@ function CheckoutReturn() {
         }
       })
       .catch(e => {
-        setReconcileError(e instanceof Error ? e.message : "Une erreur est survenue.");
+        setReconcileError(e instanceof Error ? e.message : t("pricing.checkoutReturn.genericError"));
         setReconciling(false);
       });
   }, [session_id]);
@@ -41,7 +43,7 @@ function CheckoutReturn() {
       <main className="min-h-screen bg-background flex items-center justify-center px-6 py-16">
         <div className="max-w-md w-full text-center k-card p-10 flex flex-col items-center gap-4">
           <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-          <p className="text-sm text-muted-foreground">Activation de votre abonnement…</p>
+          <p className="text-sm text-muted-foreground">{t("pricing.checkoutReturn.activating")}</p>
         </div>
       </main>
     );
@@ -54,20 +56,20 @@ function CheckoutReturn() {
           <CheckCircle2 className="h-8 w-8 text-tertiary" />
         </div>
         <h1 className="mt-6 text-2xl font-bold tracking-tight">
-          {session_id ? "Paiement confirmé" : "Aucune session trouvée"}
+          {session_id ? t("pricing.checkoutReturn.confirmed") : t("pricing.checkoutReturn.noSession")}
         </h1>
         <p className="mt-2 text-sm text-muted-foreground">
           {reconcileError
-            ? `Erreur d'activation : ${reconcileError}`
+            ? t("pricing.checkoutReturn.activationError", { error: reconcileError })
             : session_id
-              ? "Votre abonnement est actif. Vous pouvez accéder à votre espace."
-              : "Aucune information de session reçue."}
+              ? t("pricing.checkoutReturn.active")
+              : t("pricing.checkoutReturn.noSessionInfo")}
         </p>
         <Link
           to="/dashboard"
           className="mt-8 inline-flex items-center justify-center h-11 px-6 rounded-lg bg-primary text-primary-foreground text-sm font-semibold hover:bg-primary/90"
         >
-          Aller au tableau de bord
+          {t("pricing.checkoutReturn.goToDashboard")}
         </Link>
       </div>
     </main>

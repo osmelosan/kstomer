@@ -25,7 +25,6 @@ import {
   Download,
   Monitor,
   Plus,
-  Smartphone,
   Trash2,
   Calendar,
   Mail,
@@ -35,7 +34,7 @@ import {
   Check,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { useRevenueGoal } from "@/hooks/use-revenue-goal";
+import { useRevenueGoal, DEFAULT_REVENUE_GOAL } from "@/hooks/use-revenue-goal";
 import { useCurrentUser } from "@/hooks/use-current-user";
 import { supabase } from "@/integrations/supabase/client";
 import { useCompany } from "@/lib/company-context";
@@ -374,12 +373,12 @@ function CompanySection() {
 
 function PreferencesSection() {
   const { t } = useTranslation();
-  const { goal, setGoal } = useRevenueGoal();
-  const [value, setValue] = useState<string>(String(goal));
+  const { goal, hasCustomGoal, setGoal } = useRevenueGoal();
+  const [value, setValue] = useState<string>(hasCustomGoal ? String(goal) : "");
 
   useEffect(() => {
-    setValue(String(goal));
-  }, [goal]);
+    setValue(hasCustomGoal ? String(goal) : "");
+  }, [goal, hasCustomGoal]);
 
   const onSave = () => {
     const n = Number(value);
@@ -406,6 +405,7 @@ function PreferencesSection() {
             min={1}
             step={100}
             value={value}
+            placeholder={String(DEFAULT_REVENUE_GOAL)}
             onChange={(e) => setValue(e.target.value)}
             className="flex-1 h-10 px-3 rounded-md border border-border bg-card text-sm focus:outline-none focus:ring-2 focus:ring-ring/50"
           />
@@ -510,7 +510,7 @@ function BillingSection() {
         window.open(result.url, "_blank");
       }
     } catch (e: any) {
-      toast.error(e?.message ?? "Erreur");
+      toast.error(e?.message ?? t("common.error"));
     } finally {
       setOpening(false);
     }
@@ -537,7 +537,7 @@ function BillingSection() {
           {subscription.current_period_end && (
             <p className="mt-3 text-sm text-muted-foreground">
               {subscription.cancel_at_period_end
-                ? "Accès jusqu'au "
+                ? `${t("settings.billing.accessUntil")} `
                 : `${t("settings.billing.nextCharge")} : `}
               <span className="font-semibold text-foreground">
                 {new Date(subscription.current_period_end).toLocaleDateString()}
@@ -550,7 +550,7 @@ function BillingSection() {
               disabled={opening}
               className="h-9 px-4 rounded-md bg-primary text-primary-foreground text-sm font-semibold disabled:opacity-60"
             >
-              {opening ? "…" : "Gérer la facturation"}
+              {opening ? "…" : t("settings.billing.manageBilling")}
             </button>
             <Link
               to="/pricing"
@@ -563,13 +563,13 @@ function BillingSection() {
       ) : (
         <>
           <p className="mt-3 text-sm text-muted-foreground">
-            Aucun abonnement actif. Choisissez un plan pour débloquer toutes les fonctionnalités.
+            {t("settings.billing.noSubscription")}
           </p>
           <Link
             to="/pricing"
             className="mt-5 inline-flex items-center h-10 px-5 rounded-md bg-secondary text-secondary-foreground text-sm font-semibold hover:bg-secondary/90"
           >
-            Voir les tarifs
+            {t("settings.billing.viewPricing")}
           </Link>
         </>
       )}
@@ -580,8 +580,7 @@ function BillingSection() {
 function SecuritySection({ twoFA, setTwoFA }: { twoFA: boolean; setTwoFA: (v: boolean) => void }) {
   const { t } = useTranslation();
   const sessions = [
-    { id: "1", device: "MacBook Pro — Paris", icon: Monitor, current: true, lastSeen: t("settings.security.activeNow") },
-    { id: "2", device: "iPhone 15 — Paris", icon: Smartphone, current: false, lastSeen: "2h" },
+    { id: "1", device: t("settings.security.thisBrowser"), icon: Monitor, current: true, lastSeen: t("settings.security.activeNow") },
   ];
 
   return (
@@ -671,8 +670,8 @@ function SecuritySection({ twoFA, setTwoFA }: { twoFA: boolean; setTwoFA: (v: bo
 function IntegrationsSection() {
   const { t } = useTranslation();
   const integrations = [
-    { id: "gcal", name: t("settings.integrations.googleCalendar"), desc: t("settings.integrations.googleCalendarDesc"), icon: Calendar, connected: true },
-    { id: "gmail", name: t("settings.integrations.gmail"), desc: t("settings.integrations.gmailDesc"), icon: Mail, connected: true },
+    { id: "gcal", name: t("settings.integrations.googleCalendar"), desc: t("settings.integrations.googleCalendarDesc"), icon: Calendar, connected: false },
+    { id: "gmail", name: t("settings.integrations.gmail"), desc: t("settings.integrations.gmailDesc"), icon: Mail, connected: false },
     { id: "slack", name: t("settings.integrations.slack"), desc: t("settings.integrations.slackDesc"), icon: MessageSquare, connected: false },
     { id: "zapier", name: t("settings.integrations.zapier"), desc: t("settings.integrations.zapierDesc"), icon: Zap, connected: false },
     { id: "webhooks", name: t("settings.integrations.webhooks"), desc: t("settings.integrations.webhooksDesc"), icon: Webhook, connected: false },

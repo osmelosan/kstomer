@@ -1,11 +1,12 @@
 import { pageHead } from "@/lib/route-seo";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { ArrowRight, HelpCircle } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Switch } from "@/components/ui/switch";
 import { Logo } from "@/components/Logo";
 import i18n from "@/lib/i18n";
+import { useCurrentUser } from "@/hooks/use-current-user";
 
 export const Route = createFileRoute("/_authenticated/onboarding")({
   head: () =>
@@ -21,10 +22,19 @@ export const Route = createFileRoute("/_authenticated/onboarding")({
 function Onboarding() {
   const nav = useNavigate();
   const { t } = useTranslation();
+  const { user, profile } = useCurrentUser();
   const [name, setName] = useState("");
   const [role, setRole] = useState("");
   const [taskReminders, setTaskReminders] = useState(true);
   const [prospect, setProspect] = useState(false);
+
+  useEffect(() => {
+    const fullName =
+      profile?.full_name ||
+      (user?.user_metadata?.full_name as string | undefined) ||
+      "";
+    if (fullName) setName(fullName);
+  }, [user, profile]);
 
   return (
     <main className="min-h-screen bg-background px-6 py-10">
@@ -40,10 +50,10 @@ function Onboarding() {
       <div className="max-w-2xl mx-auto mt-16">
         <div className="flex items-center justify-between text-xs font-semibold tracking-wider mb-3">
           <span className="text-secondary">{t("onboarding.configuration")}</span>
-          <span className="text-muted-foreground">{t("onboarding.step", { current: 2, total: 3 })}</span>
+          <span className="text-muted-foreground">{t("onboarding.step", { current: 1, total: 1 })}</span>
         </div>
         <div className="h-1.5 w-full rounded-full bg-secondary/15 overflow-hidden">
-          <div className="h-full bg-secondary" style={{ width: "66%" }} />
+          <div className="h-full bg-secondary" style={{ width: "100%" }} />
         </div>
 
         <div className="mt-10 rounded-2xl bg-card border border-border shadow-[0_1px_3px_rgba(15,27,61,0.05)] p-10">

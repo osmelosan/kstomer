@@ -11,6 +11,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { CONTACTS, type ContactTone } from "@/lib/mock-contacts";
 
 export const Route = createFileRoute("/_authenticated/contacts/")({
   head: () =>
@@ -23,47 +24,10 @@ export const Route = createFileRoute("/_authenticated/contacts/")({
   component: Contacts,
 });
 
-type Tone = "success" | "warning" | "muted";
 type StatusFilter = "all" | "activeClient" | "hotProspect" | "inactive";
 type SourceFilter = "all" | "web" | "referral" | "email";
 
-const CONTACTS = [
-  {
-    id: "jean-dupont",
-    initials: "JD",
-    name: "Jean Dupont",
-    email: "jean.dupont@techcorp.fr",
-    company: "TechCorp Solutions",
-    statusKey: "contacts.statuses.activeClient",
-    tone: "success" as Tone,
-    activityKey: "contacts.activities.twoDays",
-    source: "referral" as SourceFilter,
-  },
-  {
-    id: "marie-lefebvre",
-    initials: "ML",
-    name: "Marie Lefebvre",
-    email: "marie.l@innovate.co",
-    company: "Innovate & Co",
-    statusKey: "contacts.statuses.hotProspect",
-    tone: "warning" as Tone,
-    activityKey: "contacts.activities.today",
-    source: "web" as SourceFilter,
-  },
-  {
-    id: "pierre-durand",
-    initials: "PD",
-    name: "Pierre Durand",
-    email: "pdurand@logistics.net",
-    company: "Global Logistics",
-    statusKey: "contacts.statuses.inactive",
-    tone: "muted" as Tone,
-    activityKey: "contacts.activities.twoMonths",
-    source: "email" as SourceFilter,
-  },
-];
-
-function statusCls(t: Tone) {
+function statusCls(t: ContactTone) {
   return t === "success"
     ? "bg-success-soft text-success border-success/20"
     : t === "warning"

@@ -14,7 +14,7 @@ import { SpeedInsights } from "@vercel/speed-insights/react";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
-import "../lib/i18n";
+import { detectPreferredLanguage } from "../lib/i18n";
 import { Toaster } from "@/components/ui/sonner";
 import { CompanyProvider } from "@/lib/company-context";
 
@@ -162,6 +162,23 @@ function RootComponent() {
   const { queryClient } = Route.useRouteContext();
   const router = useRouter();
   const { i18n } = useTranslation();
+
+  // Apply the user's actual language preference once the router has
+  // finished rendering the initial route. Route components are code-split
+  // and hydrate asynchronously (independently of this root component), so
+  // switching language from a plain mount effect here can race ahead of a
+  // still-hydrating lazy route and trip a hydration mismatch; onRendered
+  // fires only once that hydration has actually settled.
+  useEffect(() => {
+    const unsubscribe = router.subscribe("onRendered", () => {
+      const lang = detectPreferredLanguage();
+      if (lang && lang !== i18n.language) {
+        i18n.changeLanguage(lang);
+      }
+    });
+    return unsubscribe;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     if (typeof document !== "undefined") {
