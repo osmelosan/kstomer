@@ -140,5 +140,18 @@ export function useContact(id: string) {
     [saveNote],
   );
 
-  return { contact, note, noteHistory, loading, updateContact, saveNote, restoreVersion };
+  const archiveContact = useCallback(async () => {
+    await supabase.from("contacts").update({ archived_at: new Date().toISOString() }).eq("id", id);
+  }, [id]);
+
+  return {
+    contact,
+    note,
+    noteHistory,
+    loading,
+    updateContact,
+    saveNote,
+    restoreVersion,
+    archiveContact,
+  };
 }

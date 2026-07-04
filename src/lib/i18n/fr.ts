@@ -385,6 +385,9 @@ export const fr = {
     callPhone: "Appeler",
     scheduleFollowup: "Programmer une relance",
     archive: "Archiver le contact",
+    archiveTitle: "Archiver « {{name}} » ?",
+    archiveBody:
+      "Il sera retiré de vos contacts actifs et du pipeline. Vous pourrez le restaurer depuis Archives.",
     deleteContact: "Supprimer le contact",
     activity: {
       title: "Historique d'activité",
@@ -573,6 +576,10 @@ export const fr = {
     newReseller: "Nouveau revendeur",
     noCompany: "Sélectionnez une société précise pour voir et gérer ses revendeurs.",
     empty: "Aucun revendeur pour l'instant. Ajoutez le premier pour commencer.",
+    archive: "Archiver le revendeur",
+    archiveTitle: "Archiver « {{name}} » ?",
+    archiveBody:
+      "Il sera retiré de votre liste de revendeurs actifs. Vous pourrez le restaurer depuis Archives.",
     tiers: { bronze: "Bronze", silver: "Silver", gold: "Gold" },
     new: {
       metaTitle: "Nouveau revendeur — Kstomer",
@@ -653,12 +660,16 @@ export const fr = {
     subtitle: "Gérez et restaurez vos enregistrements inactifs et vos données historiques.",
     searchPlaceholder: "Rechercher dans les archives…",
     storageEfficiency: "Efficacité de stockage : <0>94%</0>",
+    noCompany: "Sélectionnez une société précise pour voir et gérer ses archives.",
     totalItems: "Total d'éléments",
     contacts: "Contacts",
     opportunities: "Opportunités",
     partners: "Partenaires",
+    thisMonth: "Archivés ce mois-ci",
     categoryAll: "Catégorie : toutes",
+    allTime: "Toute la période",
     archivedLast30: "Archivés : 30 derniers jours",
+    archivedLast90: "Archivés : 90 derniers jours",
     applyFilters: "Appliquer les filtres",
     reset: "Réinitialiser",
     th: {

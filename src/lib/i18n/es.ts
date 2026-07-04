@@ -380,6 +380,9 @@ export const es = {
     callPhone: "Llamar",
     scheduleFollowup: "Programar seguimiento",
     archive: "Archivar contacto",
+    archiveTitle: "¿Archivar «{{name}}»?",
+    archiveBody:
+      "Se quitará de tus contactos activos y del pipeline. Podrás restaurarlo desde Archivo.",
     deleteContact: "Eliminar contacto",
     activity: {
       title: "Historial de actividad",
@@ -568,6 +571,10 @@ export const es = {
     newReseller: "Nuevo distribuidor",
     noCompany: "Selecciona una empresa concreta para ver y gestionar sus distribuidores.",
     empty: "Todavía no hay distribuidores. Añade el primero para empezar.",
+    archive: "Archivar distribuidor",
+    archiveTitle: "¿Archivar «{{name}}»?",
+    archiveBody:
+      "Se quitará de tu lista de distribuidores activos. Podrás restaurarlo desde Archivo.",
     tiers: { bronze: "Bronze", silver: "Silver", gold: "Gold" },
     new: {
       metaTitle: "Nuevo distribuidor — Kstomer",
@@ -648,12 +655,16 @@ export const es = {
     subtitle: "Gestiona y restaura tus registros inactivos y datos históricos.",
     searchPlaceholder: "Buscar en el archivo…",
     storageEfficiency: "Eficiencia de almacenamiento: <0>94%</0>",
+    noCompany: "Selecciona una empresa concreta para ver y gestionar su archivo.",
     totalItems: "Total de elementos",
     contacts: "Contactos",
     opportunities: "Oportunidades",
     partners: "Socios",
+    thisMonth: "Archivados este mes",
     categoryAll: "Categoría: todas",
+    allTime: "Todo el periodo",
     archivedLast30: "Archivados: últimos 30 días",
+    archivedLast90: "Archivados: últimos 90 días",
     applyFilters: "Aplicar filtros",
     reset: "Restablecer",
     th: {

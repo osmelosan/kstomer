@@ -176,6 +176,10 @@ export function useReseller(id: string) {
     [reseller, load],
   );
 
+  const archiveReseller = useCallback(async () => {
+    await supabase.from("resellers").update({ archived_at: new Date().toISOString() }).eq("id", id);
+  }, [id]);
+
   const unlinkContact = useCallback(
     async (contactId: string) => {
       if (!reseller) return;
@@ -205,6 +209,7 @@ export function useReseller(id: string) {
     restoreVersion,
     linkContact,
     unlinkContact,
+    archiveReseller,
     currentUserId: user?.id ?? null,
   };
 }

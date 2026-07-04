@@ -368,6 +368,9 @@ export const en = {
     callPhone: "Call",
     scheduleFollowup: "Schedule a follow-up",
     archive: "Archive contact",
+    archiveTitle: "Archive “{{name}}”?",
+    archiveBody:
+      "This removes it from your active contacts and pipeline views. You can restore it later from Archives.",
     deleteContact: "Delete contact",
     activity: {
       title: "Activity history",
@@ -556,6 +559,10 @@ export const en = {
     newReseller: "New reseller",
     noCompany: "Select a specific company to see and manage its resellers.",
     empty: "No resellers yet. Add your first one to get started.",
+    archive: "Archive reseller",
+    archiveTitle: "Archive “{{name}}”?",
+    archiveBody:
+      "This removes it from your active resellers list. You can restore it later from Archives.",
     tiers: { bronze: "Bronze", silver: "Silver", gold: "Gold" },
     new: {
       metaTitle: "New reseller — Kstomer",
@@ -636,12 +643,16 @@ export const en = {
     subtitle: "Manage and restore your inactive business records and historical data.",
     searchPlaceholder: "Search archives…",
     storageEfficiency: "Storage efficiency: <0>94%</0>",
+    noCompany: "Select a specific company to see and manage its archives.",
     totalItems: "Total items",
     contacts: "Contacts",
     opportunities: "Opportunities",
     partners: "Partners",
+    thisMonth: "Archived this month",
     categoryAll: "Category: all",
+    allTime: "All time",
     archivedLast30: "Archived: last 30 days",
+    archivedLast90: "Archived: last 90 days",
     applyFilters: "Apply filters",
     reset: "Reset",
     th: {

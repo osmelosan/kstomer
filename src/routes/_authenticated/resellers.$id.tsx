@@ -1,5 +1,5 @@
 import { pageHead } from "@/lib/route-seo";
-import { createFileRoute, useParams, Link } from "@tanstack/react-router";
+import { createFileRoute, useParams, Link, useNavigate } from "@tanstack/react-router";
 import { AppShell } from "@/components/AppShell";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -23,6 +23,7 @@ import {
   X,
   Loader2,
   CloudUpload,
+  Trash2,
 } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Input } from "@/components/ui/input";
@@ -34,6 +35,16 @@ import {
   SheetTitle,
   SheetDescription,
 } from "@/components/ui/sheet";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import {
   Select,
   SelectContent,
@@ -67,6 +78,7 @@ function fmtMoney(n: number) {
 
 function ResellerDetail() {
   const { id } = useParams({ from: "/_authenticated/resellers/$id" });
+  const nav = useNavigate();
   const { t, i18n: i18nInstance } = useTranslation();
   const {
     reseller,
@@ -78,9 +90,11 @@ function ResellerDetail() {
     restoreVersion,
     linkContact,
     unlinkContact,
+    archiveReseller,
   } = useReseller(id);
   const { contacts } = useContacts();
 
+  const [archiveOpen, setArchiveOpen] = useState(false);
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState<{
     name: string;
@@ -143,7 +157,7 @@ function ResellerDetail() {
 
   return (
     <AppShell title={view.name}>
-      <div className="mb-4">
+      <div className="mb-4 flex items-center justify-between">
         <Link
           to="/resellers"
           className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
@@ -151,6 +165,13 @@ function ResellerDetail() {
           <ArrowLeft className="h-4 w-4" />
           {t("resellers.detail.back")}
         </Link>
+        <button
+          onClick={() => setArchiveOpen(true)}
+          className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-destructive transition-colors"
+        >
+          <Trash2 className="h-3.5 w-3.5" />
+          {t("resellers.archive")}
+        </button>
       </div>
 
       {/* KPIs */}
@@ -510,6 +531,29 @@ function ResellerDetail() {
           </div>
         </SheetContent>
       </Sheet>
+
+      <AlertDialog open={archiveOpen} onOpenChange={setArchiveOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              {t("resellers.archiveTitle", { name: reseller.name })}
+            </AlertDialogTitle>
+            <AlertDialogDescription>{t("resellers.archiveBody")}</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>{t("common.cancel")}</AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              onClick={async () => {
+                await archiveReseller();
+                nav({ to: "/resellers" });
+              }}
+            >
+              {t("resellers.archive")}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </AppShell>
   );
 }

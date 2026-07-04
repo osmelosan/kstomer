@@ -1,5 +1,5 @@
 import { pageHead } from "@/lib/route-seo";
-import { createFileRoute, useParams, Link } from "@tanstack/react-router";
+import { createFileRoute, useParams, Link, useNavigate } from "@tanstack/react-router";
 import { AppShell } from "@/components/AppShell";
 import {
   BadgeCheck,
@@ -43,6 +43,16 @@ import {
   SheetTitle,
   SheetDescription,
 } from "@/components/ui/sheet";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { useAutosave, type AutosaveStatus } from "@/hooks/use-autosave";
 import { useContact } from "@/hooks/use-contact";
 import type { Contact, ContactStage } from "@/hooks/use-contacts";
@@ -62,15 +72,25 @@ const STAGES: ContactStage[] = ["new_lead", "contacted", "proposal", "active", "
 
 function ContactDetails() {
   const { id } = useParams({ from: "/_authenticated/contacts/$id" });
+  const nav = useNavigate();
   const { t, i18n: i18nInst } = useTranslation();
-  const { contact, note, noteHistory, loading, updateContact, saveNote, restoreVersion } =
-    useContact(id);
+  const {
+    contact,
+    note,
+    noteHistory,
+    loading,
+    updateContact,
+    saveNote,
+    restoreVersion,
+    archiveContact,
+  } = useContact(id);
 
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState<Contact | null>(null);
   const [noteDraft, setNoteDraft] = useState("");
   const [noteTouched, setNoteTouched] = useState(false);
   const [versionsOpen, setVersionsOpen] = useState(false);
+  const [archiveOpen, setArchiveOpen] = useState(false);
 
   const profileAutosave = useAutosave(draft, async (value) => {
     if (!value) return;
@@ -198,12 +218,8 @@ function ContactDetails() {
                       </a>
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
-                    {/* TODO: wire to contacts.archived_at / a real delete once designed with confirmation UX */}
-                    <DropdownMenuItem disabled>
+                    <DropdownMenuItem onClick={() => setArchiveOpen(true)}>
                       <FileText className="h-4 w-4" /> {t("contactDetail.archive")}
-                    </DropdownMenuItem>
-                    <DropdownMenuItem disabled className="text-destructive focus:text-destructive">
-                      {t("contactDetail.deleteContact")}
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
@@ -385,6 +401,29 @@ function ContactDetails() {
           </div>
         </SheetContent>
       </Sheet>
+
+      <AlertDialog open={archiveOpen} onOpenChange={setArchiveOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              {t("contactDetail.archiveTitle", { name: contact.contact_name })}
+            </AlertDialogTitle>
+            <AlertDialogDescription>{t("contactDetail.archiveBody")}</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>{t("common.cancel")}</AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              onClick={async () => {
+                await archiveContact();
+                nav({ to: "/contacts" });
+              }}
+            >
+              {t("contactDetail.archive")}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </AppShell>
   );
 }
