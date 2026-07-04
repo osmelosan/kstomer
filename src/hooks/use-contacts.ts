@@ -103,6 +103,45 @@ export function useContacts() {
     [user, current.id],
   );
 
+  const importContacts = useCallback(
+    async (
+      rows: {
+        contact_name: string;
+        company_name: string | null;
+        email: string | null;
+        phone: string | null;
+        stage: ContactStage;
+        renewal_date: string | null;
+        last_contact_date: string | null;
+      }[],
+    ): Promise<{ imported: number; skipped: number }> => {
+      if (!user || current.id === "all" || rows.length === 0) {
+        return { imported: 0, skipped: rows.length };
+      }
+      const payload = rows.map((r) => ({
+        organization_id: current.id,
+        created_by_user_id: user.id,
+        owner_user_id: user.id,
+        contact_name: r.contact_name,
+        company_name: r.company_name,
+        email: r.email,
+        phone: r.phone,
+        stage: r.stage,
+        renewal_date: r.renewal_date,
+        last_contact_date: r.last_contact_date,
+      }));
+      const { data, error } = await supabase
+        .from("contacts")
+        .upsert(payload, { onConflict: "organization_id,email", ignoreDuplicates: true })
+        .select(SELECT);
+      if (error) throw error;
+      const inserted = (data ?? []) as unknown as Contact[];
+      setContacts((prev) => [...inserted, ...prev]);
+      return { imported: inserted.length, skipped: rows.length - inserted.length };
+    },
+    [user, current.id],
+  );
+
   const updateContact = useCallback(
     async (
       id: string,
@@ -186,6 +225,7 @@ export function useContacts() {
     contacts,
     loading,
     createContact,
+    importContacts,
     updateContact,
     changeStage,
     upsertDealValue,

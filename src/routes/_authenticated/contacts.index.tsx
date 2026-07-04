@@ -1,11 +1,20 @@
 import { pageHead } from "@/lib/route-seo";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { AppShell } from "@/components/AppShell";
-import { Filter, ChevronDown, Plus } from "lucide-react";
+import { Filter, ChevronDown, Plus, Upload } from "lucide-react";
 import { useTranslation, Trans } from "react-i18next";
 import i18n from "@/lib/i18n";
 import { useState } from "react";
 import { useContacts, type ContactStage } from "@/hooks/use-contacts";
+import { useCompany } from "@/lib/company-context";
+import { CsvContactImport } from "@/components/CsvContactImport";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -54,8 +63,10 @@ function initialsOf(name: string) {
 
 function Contacts() {
   const { t, i18n: i18nInst } = useTranslation();
-  const { contacts, loading } = useContacts();
+  const { contacts, loading, importContacts } = useContacts();
+  const { current } = useCompany();
   const [stageFilter, setStageFilter] = useState<StageFilter>("all");
+  const [importOpen, setImportOpen] = useState(false);
   const dateFmt = new Intl.DateTimeFormat(i18nInst.language, {
     year: "numeric",
     month: "short",
@@ -74,12 +85,22 @@ function Contacts() {
       title={t("contacts.title")}
       subtitle={t("contacts.subtitle")}
       actions={
-        <Link
-          to="/contacts/new"
-          className="ml-2 inline-flex items-center gap-2 h-10 px-4 rounded-md bg-secondary text-secondary-foreground text-sm font-semibold shadow-sm hover:bg-secondary/90 active:scale-[0.98] transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50"
-        >
-          <Plus className="h-4 w-4" /> {t("contacts.newContact")}
-        </Link>
+        <>
+          {current.id !== "all" && (
+            <button
+              onClick={() => setImportOpen(true)}
+              className="ml-2 inline-flex items-center gap-2 h-10 px-4 rounded-md border border-input bg-card text-sm font-semibold hover:bg-muted/40 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50"
+            >
+              <Upload className="h-4 w-4" /> {t("contacts.importCsv")}
+            </button>
+          )}
+          <Link
+            to="/contacts/new"
+            className="ml-2 inline-flex items-center gap-2 h-10 px-4 rounded-md bg-secondary text-secondary-foreground text-sm font-semibold shadow-sm hover:bg-secondary/90 active:scale-[0.98] transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50"
+          >
+            <Plus className="h-4 w-4" /> {t("contacts.newContact")}
+          </Link>
+        </>
       }
     >
       <div className="flex items-center justify-between mb-4 flex-wrap gap-3">
@@ -178,6 +199,16 @@ function Contacts() {
           </div>
         </div>
       </div>
+
+      <Dialog open={importOpen} onOpenChange={setImportOpen}>
+        <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>{t("contacts.csvImport.title")}</DialogTitle>
+            <DialogDescription>{t("contacts.csvImport.subtitle")}</DialogDescription>
+          </DialogHeader>
+          <CsvContactImport onImport={importContacts} onImported={() => setImportOpen(false)} />
+        </DialogContent>
+      </Dialog>
     </AppShell>
   );
 }

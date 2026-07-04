@@ -233,6 +233,11 @@ export const en = {
       nameRequired: "Please enter your full name.",
       roleRequired: "Please select your role.",
     },
+    csvImport: {
+      title: "Import your contacts",
+      subtitle: "Optionally bring in your existing contacts from a CSV file to get started faster.",
+      skip: "Skip, I'll add contacts later",
+    },
   },
   dashboard: {
     metaTitle: "Dashboard — Kstomer",
@@ -325,6 +330,45 @@ export const en = {
     },
     empty: "No contacts yet.",
     showing: "Showing <0>{{from}}</0> of <1>{{total}}</1> contacts",
+    importCsv: "Import CSV",
+    csvImport: {
+      title: "Import contacts from CSV",
+      subtitle: "Upload a CSV file to add multiple contacts at once.",
+      instructionsHeading: "Expected CSV format",
+      instructionsIntro:
+        "Your file's first row must contain these column headers exactly as shown (in English):",
+      fields: {
+        name: "— required. The contact's full name.",
+        company: "— optional. Company or organization name.",
+        email:
+          "— optional but must be a valid address if provided; used to detect duplicates within your organization.",
+        phone: "— optional. Any phone number format.",
+        stage:
+          "— optional, one of: new_lead, contacted, proposal, active, at_risk. Defaults to new_lead if left blank.",
+        renewal_date: "— optional. Format: YYYY-MM-DD.",
+        last_contact_date: "— optional. Format: YYYY-MM-DD.",
+      },
+      downloadTemplate: "Download CSV template",
+      emailColumn: "Email",
+      filePickerLabel: "Choose a CSV file",
+      filePickerHint: "Only .csv files are supported.",
+      previewHeading: "Preview",
+      previewSummary: "{{valid}} row(s) ready to import, {{invalid}} row(s) with errors.",
+      unknownColumnsWarning: "Unrecognized column(s) will be ignored: {{columns}}.",
+      errors: {
+        missing_name: "Name is required.",
+        invalid_email: "Email address is not valid.",
+        invalid_stage: "Stage must be one of: new_lead, contacted, proposal, active, at_risk.",
+        invalid_renewal_date: "Renewal date must be in YYYY-MM-DD format.",
+        invalid_last_contact_date: "Last contact date must be in YYYY-MM-DD format.",
+      },
+      importButton: "Import {{count}} contact(s)",
+      importing: "Importing…",
+      importError: "Something went wrong while importing. Please try again.",
+      summary: "Imported {{imported}} contact(s). Skipped {{skipped}} duplicate or invalid row(s).",
+      done: "Done",
+      close: "Close",
+    },
   },
   contactDetail: {
     metaTitle: "Contact details — Kstomer",

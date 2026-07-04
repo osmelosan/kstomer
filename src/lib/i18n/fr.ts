@@ -250,6 +250,12 @@ export const fr = {
       nameRequired: "Merci de renseigner votre nom complet.",
       roleRequired: "Merci de sélectionner votre rôle.",
     },
+    csvImport: {
+      title: "Importez vos contacts",
+      subtitle:
+        "Importez éventuellement vos contacts existants depuis un fichier CSV pour démarrer plus vite.",
+      skip: "Passer, j'ajouterai mes contacts plus tard",
+    },
   },
   dashboard: {
     metaTitle: "Tableau de bord — Kstomer",
@@ -342,6 +348,47 @@ export const fr = {
     },
     empty: "Aucun contact pour l'instant.",
     showing: "Affichage de <0>{{from}}</0> sur <1>{{total}}</1> contacts",
+    importCsv: "Importer un CSV",
+    csvImport: {
+      title: "Importer des contacts depuis un CSV",
+      subtitle: "Téléversez un fichier CSV pour ajouter plusieurs contacts à la fois.",
+      instructionsHeading: "Format CSV attendu",
+      instructionsIntro:
+        "La première ligne de votre fichier doit contenir exactement ces en-têtes de colonne (en anglais) :",
+      fields: {
+        name: "— obligatoire. Le nom complet du contact.",
+        company: "— optionnel. Nom de l'entreprise ou de l'organisation.",
+        email:
+          "— optionnel mais doit être une adresse valide si renseignée ; utilisé pour détecter les doublons au sein de votre organisation.",
+        phone: "— optionnel. N'importe quel format de numéro de téléphone.",
+        stage:
+          "— optionnel, l'une des valeurs : new_lead, contacted, proposal, active, at_risk. Par défaut new_lead si laissé vide.",
+        renewal_date: "— optionnel. Format : AAAA-MM-JJ.",
+        last_contact_date: "— optionnel. Format : AAAA-MM-JJ.",
+      },
+      downloadTemplate: "Télécharger le modèle CSV",
+      emailColumn: "E-mail",
+      filePickerLabel: "Choisir un fichier CSV",
+      filePickerHint: "Seuls les fichiers .csv sont pris en charge.",
+      previewHeading: "Aperçu",
+      previewSummary: "{{valid}} ligne(s) prête(s) à importer, {{invalid}} ligne(s) en erreur.",
+      unknownColumnsWarning: "Les colonnes non reconnues seront ignorées : {{columns}}.",
+      errors: {
+        missing_name: "Le nom est obligatoire.",
+        invalid_email: "L'adresse e-mail n'est pas valide.",
+        invalid_stage:
+          "Le stage doit être l'une des valeurs : new_lead, contacted, proposal, active, at_risk.",
+        invalid_renewal_date: "La date de renouvellement doit être au format AAAA-MM-JJ.",
+        invalid_last_contact_date: "La date de dernier contact doit être au format AAAA-MM-JJ.",
+      },
+      importButton: "Importer {{count}} contact(s)",
+      importing: "Importation…",
+      importError: "Une erreur est survenue lors de l'import. Merci de réessayer.",
+      summary:
+        "{{imported}} contact(s) importé(s). {{skipped}} ligne(s) ignorée(s) (doublons ou erreurs).",
+      done: "Terminé",
+      close: "Fermer",
+    },
   },
   contactDetail: {
     metaTitle: "Détails du contact — Kstomer",
