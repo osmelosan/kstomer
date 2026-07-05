@@ -10,7 +10,7 @@ const InputSchema = z.object({
   force: z.boolean().default(false),
 });
 
-const MODEL = "claude-opus-4-8";
+const MODEL = "claude-sonnet-5";
 const MAX_STEPS = 3;
 
 export type Prospect = {

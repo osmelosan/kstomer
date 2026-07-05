@@ -1,7 +1,7 @@
 import Anthropic from "@anthropic-ai/sdk";
 import type { CrmTool } from "@/lib/crm-ai-tools.server";
 
-const MODEL = "claude-opus-4-8";
+const MODEL = "claude-haiku-4-5";
 const MAX_STEPS = 5;
 
 export async function runCrmAgent({
