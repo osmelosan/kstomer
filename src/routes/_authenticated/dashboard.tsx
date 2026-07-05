@@ -4,6 +4,8 @@ import { AppShell } from "@/components/AppShell";
 import {
   Plus,
   Mail,
+  Phone,
+  Linkedin,
   FileText,
   TrendingUp,
   Sparkles,
@@ -259,9 +261,10 @@ function ActionRow({
   return <div className={className}>{content}</div>;
 }
 
-function ProspectRow({ company, sector, fit, reason, match }: Prospect) {
+function ProspectRow({ company, sector, fit, reason, match, contactName, email, phone, linkedin }: Prospect) {
   const { t } = useTranslation();
   const tone: Tone = fit >= 90 ? "success" : fit >= 80 ? "info" : "warning";
+  const hasContact = contactName || email || phone || linkedin;
   return (
     <div className="p-4 hover:bg-muted/50 transition-colors flex items-start gap-4 group">
       <div className="h-10 w-10 rounded-xl bg-muted flex items-center justify-center shrink-0">
@@ -284,6 +287,32 @@ function ProspectRow({ company, sector, fit, reason, match }: Prospect) {
         <p className="text-[10px] text-muted-foreground mt-1 uppercase tracking-wider">
           {t("dashboard.match")} : <span className="text-secondary font-semibold">{match}</span>
         </p>
+        {hasContact && (
+          <div className="mt-2 pt-2 border-t border-border/60 space-y-1">
+            {contactName && (
+              <p className="text-[11px] text-muted-foreground uppercase tracking-wider">
+                {t("dashboard.bestContact")} : <span className="text-foreground font-medium normal-case">{contactName}</span>
+              </p>
+            )}
+            <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+              {email && (
+                <a href={`mailto:${email}`} className="inline-flex items-center gap-1 text-[11px] text-muted-foreground hover:text-secondary">
+                  <Mail className="h-3 w-3" /> {email}
+                </a>
+              )}
+              {phone && (
+                <a href={`tel:${phone}`} className="inline-flex items-center gap-1 text-[11px] text-muted-foreground hover:text-secondary">
+                  <Phone className="h-3 w-3" /> {phone}
+                </a>
+              )}
+              {linkedin && (
+                <a href={linkedin} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 text-[11px] text-muted-foreground hover:text-secondary">
+                  <Linkedin className="h-3 w-3" /> LinkedIn
+                </a>
+              )}
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

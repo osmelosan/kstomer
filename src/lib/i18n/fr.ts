@@ -290,6 +290,7 @@ export const fr = {
     refresh: "Actualiser",
     fit: "FIT",
     match: "Match",
+    bestContact: "Meilleur contact",
     prospectsAi: {
       loading: "Recherche en cours…",
       empty: "Aucun prospect trouvé à proximité pour le moment.",

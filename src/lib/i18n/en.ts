@@ -272,6 +272,7 @@ export const en = {
     refresh: "Refresh",
     fit: "FIT",
     match: "Match",
+    bestContact: "Best contact",
     prospectsAi: {
       loading: "Searching…",
       empty: "No prospects found nearby right now.",
