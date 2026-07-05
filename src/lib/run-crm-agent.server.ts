@@ -26,7 +26,7 @@ export async function runCrmAgent({
       model: MODEL,
       max_tokens: maxTokens,
       thinking: { type: "adaptive" },
-      system,
+      system: [{ type: "text", text: system, cache_control: { type: "ephemeral" } }],
       tools: tools.map((t) => t.definition),
       messages,
     });

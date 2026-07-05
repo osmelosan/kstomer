@@ -123,7 +123,13 @@ export const analyzeProspects = createServerFn({ method: "POST" })
               model: MODEL,
               max_tokens: 2048,
               thinking: { type: "adaptive" },
-              system: SYSTEM_PROMPTS[data.language],
+              system: [
+                {
+                  type: "text",
+                  text: SYSTEM_PROMPTS[data.language],
+                  cache_control: { type: "ephemeral" },
+                },
+              ],
               tools: [{ type: "web_search_20260209", name: "web_search" }, RETURN_PROSPECTS_TOOL],
               messages,
             });
