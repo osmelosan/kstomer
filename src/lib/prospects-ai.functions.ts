@@ -19,6 +19,10 @@ export type Prospect = {
   fit: number;
   reason: string;
   match: string;
+  contactName?: string;
+  email?: string;
+  phone?: string;
+  linkedin?: string;
 };
 
 const RETURN_PROSPECTS_TOOL: Anthropic.Tool = {

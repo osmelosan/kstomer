@@ -285,6 +285,7 @@ export const es = {
     refresh: "Actualizar",
     fit: "FIT",
     match: "Coincidencia",
+    bestContact: "Mejor contacto",
     prospectsAi: {
       loading: "Buscando…",
       empty: "No se encontraron prospectos cercanos por ahora.",
