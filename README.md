@@ -29,10 +29,11 @@ Kstomer helps solo founders and consultants take control of their sales in minut
 - 🗂️ **Kanban pipeline** — drag-and-drop deal tracking (`@dnd-kit`)
 - 📇 **Unified contact book** — one place for every prospect and client
 - ✅ **Tasks & follow-up reminders** — never drop a deal
-- 📊 **AI-assisted insights** — Claude tool-calling agent diagnoses and next steps on the Dashboard, Tasks, Analytics, and Resellers pages
+- 📊 **AI-assisted insights** — Claude tool-calling agent diagnoses and next steps on the Dashboard (including an AI-suggested prospects card), Tasks, Analytics, and Resellers pages
 - 🤝 **Reseller / portfolio management** — track partners and their pipelines
 - 🏢 **Multi-organization support** — switch between companies, with a guided onboarding flow
-- 💳 **Built-in billing** — Stripe Checkout, embedded checkout, and subscription management
+- 📥 **CSV contact import** — bulk-import contacts from onboarding or the Contacts page, with duplicate-email detection
+- 💳 **Built-in billing** — Stripe Checkout, embedded checkout, billing portal, and subscription management
 - 🌍 **Multi-language** — English, Spanish and French, with IP-based auto-detection
 
 ## Tech stack
@@ -58,6 +59,7 @@ src/
 │   ├── auth*.tsx            # Sign in / reset password / OAuth callback
 │   ├── checkout.return.tsx  # Post-Stripe-checkout return
 │   ├── api/public/payments/webhook.ts  # Stripe webhook handler
+│   ├── api/cron/warm-ai-cache.ts       # Vercel Cron: pre-warm Tasks AI insight cache
 │   └── _authenticated/      # Dashboard, kanban, contacts, tasks,
 │                             # analytics, resellers, archives, settings
 ├── components/               # App shell, command palette, checkout UI, ...
@@ -68,11 +70,13 @@ src/
 │   ├── dashboard-ai.functions.ts    # AI insights server fn for the Dashboard
 │   ├── tasks-ai.functions.ts        # AI insights server fn for Tasks
 │   ├── analytics-ai.functions.ts    # AI insights server fn for Analytics
-│   └── resellers-ai.functions.ts    # AI insights server fn for Resellers
+│   ├── resellers-ai.functions.ts    # AI insights server fn for Resellers
+│   ├── prospects-ai.functions.ts    # AI-suggested prospects card (Dashboard)
+│   └── csv-contacts.ts              # CSV parsing/validation for bulk contact import
 ├── integrations/supabase/    # Browser + server Supabase clients, auth, DB types
 └── assets/
 supabase/
-└── migrations/                # SQL migrations (profiles, organizations, tasks, subscriptions, user_roles)
+└── migrations/                # SQL migrations
 public/                        # Brand assets, favicon, llms.txt
 ```
 
@@ -118,15 +122,30 @@ Non-secret config and empty placeholders live in the committed `.env`; secrets a
 | `STRIPE_SECRET_KEY` | Vercel + local `.env.development` | Test key: `sk_test_…` |
 | `STRIPE_LIVE_SECRET_KEY` | Vercel only | Live key: `sk_live_…` (when going live) |
 | `VITE_PAYMENTS_CLIENT_TOKEN` | `.env.development` / Vercel | Stripe publishable key (`pk_test_…` or `pk_live_…`) — sandbox vs. live is inferred from this prefix |
-| `ANTHROPIC_API_KEY` | Vercel only | Server-only secret — Claude API key used by the Dashboard, Tasks, Analytics, and Reseller AI insights functions |
+| `PAYMENTS_SANDBOX_WEBHOOK_SECRET` | Vercel only | Stripe webhook signing secret (test mode) — verifies `/api/public/payments/webhook` requests |
+| `PAYMENTS_LIVE_WEBHOOK_SECRET` | Vercel only | Stripe webhook signing secret (live mode) |
+| `ANTHROPIC_API_KEY` | Vercel only | Server-only secret — Claude API key used by the Dashboard, Tasks, Analytics, Resellers, and Prospects AI insights functions |
+| `CRON_SECRET` | Vercel only | Authenticates the Vercel Cron request that hits `/api/cron/warm-ai-cache` |
+| `SUPABASE_PROJECT_ID` / `VITE_SUPABASE_PROJECT_ID` | `.env` (committed) | Supabase CLI project ref (server / client) |
 
 ## Database
 
-Backed by Supabase Postgres. Every table (`profiles`, `user_roles`, `organizations`, `subscriptions`, `tasks`) has Row Level Security enabled with per-user/per-owner policies. Schema changes live as SQL migrations in `supabase/migrations/`.
+Backed by Supabase Postgres. All tables have Row Level Security enabled, scoped per-organization (or per-user for account-level tables). Schema changes live as SQL migrations in `supabase/migrations/`.
 
 `profiles` (`id`, `email`, `full_name`, `avatar_url`, `phone`) is populated automatically on signup via an `on_auth_user_created` trigger on `auth.users`.
 
-> **Note:** the live Supabase project also has a second, unused set of tables (`accounts`, `contacts`, `resellers`, `notes`, `reminders`, `stage_history`, `ai_insights`, …) from an accounts-based CRM schema that predates the current app. They're empty and nothing in `src/` queries them yet — the Kanban, Contacts, Dashboard, Resellers, Archives and Analytics pages currently render static/mock data, not live records. Only `/tasks`, Settings → Company, and the billing/paywall are wired to real tables. Building those pages against the real schema (or removing the unused tables) is still open work.
+Kanban, Contacts, Dashboard, Analytics, Resellers, Archives, Tasks, and billing all read and write real Supabase data — none of the CRM pages render static/mock data anymore:
+
+| Area | Tables |
+|---|---|
+| **Core CRM** | `contacts` (pipeline card / stage), `subscription_details`, `notes`, `note_edit_history`, `stage_history` |
+| **Resellers** | `resellers`, `reseller_contacts`, `reseller_contact_history` |
+| **Org & ops** | `organizations`, `profiles`, `user_roles`, `tasks`, `reminders` |
+| **Billing** | `subscriptions` |
+| **AI** | `ai_insight_cache`, `ai_insights`, `ai_prompt_cache`, `agent_logs` |
+| **Other** | `projets` |
+
+`ai_insights`, `ai_prompt_cache`, `projets`, `user_roles`, and `agent_logs` are currently empty — reserved for planned (V2) features rather than dead schema.
 
 ## Pricing
 
@@ -139,6 +158,14 @@ Plans are defined in [`src/lib/pricing-plans.ts`](src/lib/pricing-plans.ts) and 
 | **Empire** | €67 | €31 | Unlimited | Up to 5 users, manager views & team KPIs, permissions and audit log |
 
 All plans include a 14-day free trial.
+
+## Billing & background jobs
+
+- **Checkout & portal** — `createCheckoutSession` creates a Stripe embedded checkout session (price resolved by lookup key); `createPortalSession` opens the Stripe Billing Portal for existing subscribers.
+- **Webhook** — `src/routes/api/public/payments/webhook.ts` handles `customer.subscription.created/updated/deleted`, verifies the signature (HMAC via `PAYMENTS_SANDBOX_WEBHOOK_SECRET` / `PAYMENTS_LIVE_WEBHOOK_SECRET`), and upserts into the `subscriptions` table. Sandbox vs. live is selected via a `?env=` query param on the endpoint.
+- **AI insight caching** — Dashboard/Tasks/Analytics/Resellers/Prospects insight cards are cached in `ai_insight_cache` and only regenerated once per day (or on manual refresh), to avoid calling Claude on every page load.
+- **Vercel Cron** (`vercel.json`) — a daily job hits `/api/cron/warm-ai-cache` (guarded by `CRON_SECRET`) to pre-warm the Tasks AI cache; other cards stay lazy-cached to avoid mixing data across tenants under RLS.
+- **AI model routing** — Dashboard/Tasks/Analytics/Resellers use Claude Haiku 4.5 (summarizing already-fetched data); Prospects uses Sonnet 5 (web-search-grounded reasoning). System prompts use prompt caching (`cache_control: ephemeral`) to reduce token cost.
 
 ## Deployment
 
