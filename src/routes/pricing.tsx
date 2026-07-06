@@ -42,9 +42,7 @@ function PricingPage() {
 
   const maxYearlyDiscountPercent = Math.floor(
     Math.max(
-      ...PRICING_PLANS.map(
-        (plan) => (1 - plan.yearlyMonthlyAmount / plan.monthlyAmount) * 100,
-      ),
+      ...PRICING_PLANS.map((plan) => (1 - plan.yearlyMonthlyAmount / plan.monthlyAmount) * 100),
     ),
   );
 
