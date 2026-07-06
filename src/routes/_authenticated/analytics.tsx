@@ -207,6 +207,8 @@ function Analytics() {
         </TooltipProvider>
       )}
 
+      <AIInsightsCard />
+
       {current.id !== "all" && (
         <div className="k-card p-6 mb-8">
           <div className="flex items-center justify-between mb-4">
@@ -268,8 +270,6 @@ function Analytics() {
           )}
         </div>
       )}
-
-      <AIInsightsCard />
 
       {current.id !== "all" && !loading && data.renewalsNext30.count > 0 && (
         <div className="rounded-2xl bg-warning-soft border border-warning/30 p-7">
