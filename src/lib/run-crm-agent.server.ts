@@ -25,7 +25,6 @@ export async function runCrmAgent({
     const response = await client.messages.create({
       model: MODEL,
       max_tokens: maxTokens,
-      thinking: { type: "adaptive" },
       system: [{ type: "text", text: system, cache_control: { type: "ephemeral" } }],
       tools: tools.map((t) => t.definition),
       messages,
