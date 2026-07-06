@@ -431,6 +431,10 @@ export const es = {
     archiveBody:
       "Se quitará de tus contactos activos y del pipeline. Podrás restaurarlo desde Archivo.",
     deleteContact: "Eliminar contacto",
+    deleteTitle: "¿Eliminar «{{name}}» de forma permanente?",
+    deleteBody:
+      "Esto elimina el contacto de forma permanente junto con sus notas, historial de actividad y recordatorios. Esta acción no se puede deshacer.",
+    deleteConfirmPlaceholder: 'Escribe "delete" para confirmar',
     activity: {
       title: "Historial de actividad",
       addActivity: "Añadir actividad",

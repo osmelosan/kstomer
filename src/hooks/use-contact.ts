@@ -144,6 +144,10 @@ export function useContact(id: string) {
     await supabase.from("contacts").update({ archived_at: new Date().toISOString() }).eq("id", id);
   }, [id]);
 
+  const deleteContact = useCallback(async () => {
+    await supabase.from("contacts").delete().eq("id", id);
+  }, [id]);
+
   return {
     contact,
     note,
@@ -153,5 +157,6 @@ export function useContact(id: string) {
     saveNote,
     restoreVersion,
     archiveContact,
+    deleteContact,
   };
 }

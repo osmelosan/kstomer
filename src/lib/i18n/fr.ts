@@ -437,6 +437,10 @@ export const fr = {
     archiveBody:
       "Il sera retiré de vos contacts actifs et du pipeline. Vous pourrez le restaurer depuis Archives.",
     deleteContact: "Supprimer le contact",
+    deleteTitle: "Supprimer définitivement « {{name}} » ?",
+    deleteBody:
+      "Cela supprime définitivement le contact ainsi que ses notes, son historique d'activité et ses rappels. Cette action est irréversible.",
+    deleteConfirmPlaceholder: 'Tapez "delete" pour confirmer',
     activity: {
       title: "Historique d'activité",
       addActivity: "Ajouter une activité",

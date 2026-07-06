@@ -417,6 +417,10 @@ export const en = {
     archiveBody:
       "This removes it from your active contacts and pipeline views. You can restore it later from Archives.",
     deleteContact: "Delete contact",
+    deleteTitle: "Permanently delete “{{name}}”?",
+    deleteBody:
+      "This permanently deletes the contact along with its notes, activity history, and reminders. This cannot be undone.",
+    deleteConfirmPlaceholder: 'Type "delete" to confirm',
     activity: {
       title: "Activity history",
       addActivity: "Add an activity",

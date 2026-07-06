@@ -16,6 +16,7 @@ import {
   Check,
   Loader2,
   CloudUpload,
+  Trash2,
 } from "lucide-react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -83,6 +84,7 @@ function ContactDetails() {
     saveNote,
     restoreVersion,
     archiveContact,
+    deleteContact,
   } = useContact(id);
 
   const [editing, setEditing] = useState(false);
@@ -91,6 +93,8 @@ function ContactDetails() {
   const [noteTouched, setNoteTouched] = useState(false);
   const [versionsOpen, setVersionsOpen] = useState(false);
   const [archiveOpen, setArchiveOpen] = useState(false);
+  const [deleteOpen, setDeleteOpen] = useState(false);
+  const [deleteConfirmText, setDeleteConfirmText] = useState("");
 
   const profileAutosave = useAutosave(draft, async (value) => {
     if (!value) return;
@@ -220,6 +224,12 @@ function ContactDetails() {
                     <DropdownMenuSeparator />
                     <DropdownMenuItem onClick={() => setArchiveOpen(true)}>
                       <FileText className="h-4 w-4" /> {t("contactDetail.archive")}
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() => setDeleteOpen(true)}
+                      className="text-destructive focus:text-destructive"
+                    >
+                      <Trash2 className="h-4 w-4" /> {t("contactDetail.deleteContact")}
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
@@ -420,6 +430,42 @@ function ContactDetails() {
               }}
             >
               {t("contactDetail.archive")}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <AlertDialog
+        open={deleteOpen}
+        onOpenChange={(open) => {
+          setDeleteOpen(open);
+          if (!open) setDeleteConfirmText("");
+        }}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              {t("contactDetail.deleteTitle", { name: contact.contact_name })}
+            </AlertDialogTitle>
+            <AlertDialogDescription>{t("contactDetail.deleteBody")}</AlertDialogDescription>
+          </AlertDialogHeader>
+          <Input
+            autoFocus
+            value={deleteConfirmText}
+            onChange={(e) => setDeleteConfirmText(e.target.value)}
+            placeholder={t("contactDetail.deleteConfirmPlaceholder")}
+          />
+          <AlertDialogFooter>
+            <AlertDialogCancel>{t("common.cancel")}</AlertDialogCancel>
+            <AlertDialogAction
+              disabled={deleteConfirmText.trim().toLowerCase() !== "delete"}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90 disabled:opacity-50 disabled:pointer-events-none"
+              onClick={async () => {
+                await deleteContact();
+                nav({ to: "/contacts" });
+              }}
+            >
+              {t("contactDetail.deleteContact")}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
