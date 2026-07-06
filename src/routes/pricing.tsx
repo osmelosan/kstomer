@@ -40,6 +40,14 @@ function PricingPage() {
     ? getPlanByPriceId(subscription.price_id)?.id
     : undefined;
 
+  const maxYearlyDiscountPercent = Math.floor(
+    Math.max(
+      ...PRICING_PLANS.map(
+        (plan) => (1 - plan.yearlyMonthlyAmount / plan.monthlyAmount) * 100,
+      ),
+    ),
+  );
+
   const openPortal = async () => {
     setPortalLoading(true);
     try {
@@ -134,7 +142,7 @@ function PricingPage() {
                   ? "bg-white/20 text-white"
                   : "bg-success/20 text-success",
               )}>
-                -25%
+                Jusqu'à -{maxYearlyDiscountPercent}%
               </span>
             </button>
           </div>
