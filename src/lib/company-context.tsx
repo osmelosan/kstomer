@@ -3,6 +3,7 @@ import {
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
   type ReactNode,
 } from "react";
@@ -45,12 +46,25 @@ export function CompanyProvider({ children }: { children: ReactNode }) {
     return plan?.maxCompanies ?? PRICING_PLANS[0].maxCompanies;
   }, [subscription]);
 
+  const hadSavedPreference = useRef(
+    typeof localStorage !== "undefined" &&
+      localStorage.getItem(STORAGE_KEY) !== null,
+  );
+
   const [current, setCurrent] = useState<Company>(() => {
     const saved = typeof localStorage !== "undefined"
       ? localStorage.getItem(STORAGE_KEY)
       : null;
     return saved ? (JSON.parse(saved) as Company) : ALL_COMPANIES;
   });
+
+  // No saved preference yet (new user, or cleared storage): default to the
+  // admin's first company instead of "all companies", once companies load.
+  useEffect(() => {
+    if (loading || companies.length === 0 || hadSavedPreference.current) return;
+    hadSavedPreference.current = true;
+    setCurrent(companies[0]);
+  }, [companies, loading]);
 
   // Keep current in sync: if the saved company no longer exists, reset to first or ALL
   useEffect(() => {
