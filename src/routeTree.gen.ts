@@ -28,6 +28,7 @@ import { Route as AuthenticatedAnalyticsRouteImport } from './routes/_authentica
 import { Route as AuthenticatedResellersIndexRouteImport } from './routes/_authenticated/resellers.index'
 import { Route as AuthenticatedContactsIndexRouteImport } from './routes/_authenticated/contacts.index'
 import { Route as ApiCronWarmAiCacheRouteImport } from './routes/api/cron/warm-ai-cache'
+import { Route as ApiCronRenewalRemindersRouteImport } from './routes/api/cron/renewal-reminders'
 import { Route as AuthenticatedResellersNewRouteImport } from './routes/_authenticated/resellers.new'
 import { Route as AuthenticatedResellersIdRouteImport } from './routes/_authenticated/resellers.$id'
 import { Route as AuthenticatedContactsNewRouteImport } from './routes/_authenticated/contacts.new'
@@ -130,6 +131,11 @@ const ApiCronWarmAiCacheRoute = ApiCronWarmAiCacheRouteImport.update({
   path: '/api/cron/warm-ai-cache',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiCronRenewalRemindersRoute = ApiCronRenewalRemindersRouteImport.update({
+  id: '/api/cron/renewal-reminders',
+  path: '/api/cron/renewal-reminders',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedResellersNewRoute =
   AuthenticatedResellersNewRouteImport.update({
     id: '/new',
@@ -180,6 +186,7 @@ export interface FileRoutesByFullPath {
   '/contacts/new': typeof AuthenticatedContactsNewRoute
   '/resellers/$id': typeof AuthenticatedResellersIdRoute
   '/resellers/new': typeof AuthenticatedResellersNewRoute
+  '/api/cron/renewal-reminders': typeof ApiCronRenewalRemindersRoute
   '/api/cron/warm-ai-cache': typeof ApiCronWarmAiCacheRoute
   '/contacts/': typeof AuthenticatedContactsIndexRoute
   '/resellers/': typeof AuthenticatedResellersIndexRoute
@@ -204,6 +211,7 @@ export interface FileRoutesByTo {
   '/contacts/new': typeof AuthenticatedContactsNewRoute
   '/resellers/$id': typeof AuthenticatedResellersIdRoute
   '/resellers/new': typeof AuthenticatedResellersNewRoute
+  '/api/cron/renewal-reminders': typeof ApiCronRenewalRemindersRoute
   '/api/cron/warm-ai-cache': typeof ApiCronWarmAiCacheRoute
   '/contacts': typeof AuthenticatedContactsIndexRoute
   '/resellers': typeof AuthenticatedResellersIndexRoute
@@ -231,6 +239,7 @@ export interface FileRoutesById {
   '/_authenticated/contacts/new': typeof AuthenticatedContactsNewRoute
   '/_authenticated/resellers/$id': typeof AuthenticatedResellersIdRoute
   '/_authenticated/resellers/new': typeof AuthenticatedResellersNewRoute
+  '/api/cron/renewal-reminders': typeof ApiCronRenewalRemindersRoute
   '/api/cron/warm-ai-cache': typeof ApiCronWarmAiCacheRoute
   '/_authenticated/contacts/': typeof AuthenticatedContactsIndexRoute
   '/_authenticated/resellers/': typeof AuthenticatedResellersIndexRoute
@@ -258,6 +267,7 @@ export interface FileRouteTypes {
     | '/contacts/new'
     | '/resellers/$id'
     | '/resellers/new'
+    | '/api/cron/renewal-reminders'
     | '/api/cron/warm-ai-cache'
     | '/contacts/'
     | '/resellers/'
@@ -282,6 +292,7 @@ export interface FileRouteTypes {
     | '/contacts/new'
     | '/resellers/$id'
     | '/resellers/new'
+    | '/api/cron/renewal-reminders'
     | '/api/cron/warm-ai-cache'
     | '/contacts'
     | '/resellers'
@@ -308,6 +319,7 @@ export interface FileRouteTypes {
     | '/_authenticated/contacts/new'
     | '/_authenticated/resellers/$id'
     | '/_authenticated/resellers/new'
+    | '/api/cron/renewal-reminders'
     | '/api/cron/warm-ai-cache'
     | '/_authenticated/contacts/'
     | '/_authenticated/resellers/'
@@ -322,6 +334,7 @@ export interface RootRouteChildren {
   ResetPasswordRoute: typeof ResetPasswordRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   CheckoutReturnRoute: typeof CheckoutReturnRoute
+  ApiCronRenewalRemindersRoute: typeof ApiCronRenewalRemindersRoute
   ApiCronWarmAiCacheRoute: typeof ApiCronWarmAiCacheRoute
   ApiPublicPaymentsWebhookRoute: typeof ApiPublicPaymentsWebhookRoute
 }
@@ -461,6 +474,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiCronWarmAiCacheRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/cron/renewal-reminders': {
+      id: '/api/cron/renewal-reminders'
+      path: '/api/cron/renewal-reminders'
+      fullPath: '/api/cron/renewal-reminders'
+      preLoaderRoute: typeof ApiCronRenewalRemindersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated/resellers/new': {
       id: '/_authenticated/resellers/new'
       path: '/new'
@@ -566,6 +586,7 @@ const rootRouteChildren: RootRouteChildren = {
   ResetPasswordRoute: ResetPasswordRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   CheckoutReturnRoute: CheckoutReturnRoute,
+  ApiCronRenewalRemindersRoute: ApiCronRenewalRemindersRoute,
   ApiCronWarmAiCacheRoute: ApiCronWarmAiCacheRoute,
   ApiPublicPaymentsWebhookRoute: ApiPublicPaymentsWebhookRoute,
 }

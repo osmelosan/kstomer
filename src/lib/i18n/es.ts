@@ -102,6 +102,13 @@ export const es = {
     title: "Notificaciones",
     markAllRead: "Marcar todo como leído",
     seeAll: "Ver todas las notificaciones",
+    empty: "Aún no hay notificaciones.",
+    time: {
+      now: "ahora mismo",
+      minutes: "{{count}} min",
+      hours: "{{count}} h",
+      days: "{{count}} d",
+    },
     items: {
       dealWon: {
         title: "Negocio ganado: StartUp Vision",
@@ -120,6 +127,9 @@ export const es = {
         body: "Marc Lemaire ha sido añadido a tus contactos.",
       },
       renewal: { title: "Renovación próxima", body: "3 suscripciones vencen este mes." },
+      renewalJ30: { title: "Renovación en 30 días", body: "{{contact}} se renueva en 30 días." },
+      renewalJ7: { title: "Renovación en 7 días", body: "{{contact}} se renueva en 7 días." },
+      renewalJ0: { title: "Renovación hoy", body: "{{contact}} se renueva hoy." },
     },
   },
   help: {
@@ -396,6 +406,10 @@ export const es = {
     editProfile: "Editar perfil",
     workEmail: "Email profesional",
     phone: "Teléfono",
+    renewalDate: "Fecha de renovación",
+    renewalIn: "Se renueva en {{days}} días",
+    renewalToday: "Se renueva hoy",
+    renewalOverdue: "Renovación atrasada",
     confidenceLevel: "Nivel de confianza",
     confidenceLabel: "4 / 5 — Muy confiado",
     noConfidence: "Sin definir",

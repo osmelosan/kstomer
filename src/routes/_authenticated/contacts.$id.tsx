@@ -57,6 +57,7 @@ import {
 import { useAutosave, type AutosaveStatus } from "@/hooks/use-autosave";
 import { useContact } from "@/hooks/use-contact";
 import type { Contact, ContactStage } from "@/hooks/use-contacts";
+import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/contacts/$id")({
   head: ({ params }) =>
@@ -105,6 +106,7 @@ function ContactDetails() {
       phone: value.phone,
       stage: value.stage,
       confidence_level: value.confidence_level,
+      renewal_date: value.renewal_date,
     });
   });
 
@@ -137,6 +139,17 @@ function ContactDetails() {
     month: "long",
     day: "numeric",
   });
+
+  const renewalBadge = (() => {
+    if (!view.renewal_date) return null;
+    const days = Math.ceil(
+      (new Date(view.renewal_date).getTime() - Date.now()) / (24 * 60 * 60 * 1000),
+    );
+    if (days > 30) return null;
+    if (days < 0) return { label: t("contactDetail.renewalOverdue"), overdue: true };
+    if (days === 0) return { label: t("contactDetail.renewalToday"), overdue: false };
+    return { label: t("contactDetail.renewalIn", { days }), overdue: false };
+  })();
 
   function startEditing() {
     setDraft(contact);
@@ -263,6 +276,29 @@ function ContactDetails() {
               onChange={(v) => setDraft({ ...view, company_name: v || null })}
               draftValue={view.company_name ?? ""}
             />
+            <div>
+              <InfoField
+                icon={<Calendar className="h-4 w-4" />}
+                label={t("contactDetail.renewalDate")}
+                value={view.renewal_date ? dateFmt.format(new Date(view.renewal_date)) : "—"}
+                editing={editing}
+                onChange={(v) => setDraft({ ...view, renewal_date: v || null })}
+                draftValue={view.renewal_date ? view.renewal_date.slice(0, 10) : ""}
+                type="date"
+              />
+              {!editing && renewalBadge && (
+                <div
+                  className={cn(
+                    "mt-2 inline-flex items-center text-[10px] font-bold uppercase tracking-wider rounded-full px-2.5 py-1",
+                    renewalBadge.overdue
+                      ? "bg-destructive/10 text-destructive"
+                      : "bg-warning-soft text-warning-foreground",
+                  )}
+                >
+                  {renewalBadge.label}
+                </div>
+              )}
+            </div>
             <div>
               <div className="k-label mb-2 flex items-center gap-2">
                 <TagIcon className="h-3.5 w-3.5" /> {t("contactDetail.status")}
@@ -481,6 +517,7 @@ function InfoField({
   editing,
   onChange,
   draftValue,
+  type = "text",
 }: {
   icon: React.ReactNode;
   label: string;
@@ -488,6 +525,7 @@ function InfoField({
   editing: boolean;
   onChange: (v: string) => void;
   draftValue: string;
+  type?: "text" | "date";
 }) {
   return (
     <div>
@@ -496,7 +534,12 @@ function InfoField({
         {label}
       </div>
       {editing ? (
-        <Input value={draftValue} onChange={(e) => onChange(e.target.value)} className="h-9" />
+        <Input
+          type={type}
+          value={draftValue}
+          onChange={(e) => onChange(e.target.value)}
+          className="h-9"
+        />
       ) : (
         <div className="font-medium text-sm">{value}</div>
       )}

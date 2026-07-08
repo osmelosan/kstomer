@@ -3,6 +3,10 @@
     {
       "path": "/api/cron/warm-ai-cache",
       "schedule": "0 4 * * *"
+    },
+    {
+      "path": "/api/cron/renewal-reminders",
+      "schedule": "0 6 * * *"
     }
   ]
 }

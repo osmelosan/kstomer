@@ -73,7 +73,13 @@ export function useContact(id: string) {
       patch: Partial<
         Pick<
           Contact,
-          "contact_name" | "company_name" | "email" | "phone" | "stage" | "confidence_level"
+          | "contact_name"
+          | "company_name"
+          | "email"
+          | "phone"
+          | "stage"
+          | "confidence_level"
+          | "renewal_date"
         >
       >,
     ) => {

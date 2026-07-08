@@ -100,6 +100,13 @@ export const en = {
     title: "Notifications",
     markAllRead: "Mark all as read",
     seeAll: "See all notifications",
+    empty: "No notifications yet.",
+    time: {
+      now: "just now",
+      minutes: "{{count}}m",
+      hours: "{{count}}h",
+      days: "{{count}}d",
+    },
     items: {
       dealWon: {
         title: "Deal won: StartUp Vision",
@@ -109,6 +116,9 @@ export const en = {
       overdue: { title: "Overdue follow-up", body: "Jean Dupont — last interaction 8 days ago." },
       newContact: { title: "New contact added", body: "Marc Lemaire was added to your contacts." },
       renewal: { title: "Upcoming renewal", body: "3 subscriptions are due this month." },
+      renewalJ30: { title: "Renewal in 30 days", body: "{{contact}} renews in 30 days." },
+      renewalJ7: { title: "Renewal in 7 days", body: "{{contact}} renews in 7 days." },
+      renewalJ0: { title: "Renewal today", body: "{{contact}} renews today." },
     },
   },
   help: {
@@ -382,6 +392,10 @@ export const en = {
     editProfile: "Edit profile",
     workEmail: "Work email",
     phone: "Phone",
+    renewalDate: "Renewal date",
+    renewalIn: "Renews in {{days}} days",
+    renewalToday: "Renews today",
+    renewalOverdue: "Renewal overdue",
     confidenceLevel: "Confidence level",
     confidenceLabel: "4 / 5 — Very confident",
     noConfidence: "Not set",

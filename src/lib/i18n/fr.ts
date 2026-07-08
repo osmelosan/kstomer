@@ -103,6 +103,13 @@ export const fr = {
     title: "Notifications",
     markAllRead: "Tout marquer comme lu",
     seeAll: "Voir toutes les notifications",
+    empty: "Aucune notification pour le moment.",
+    time: {
+      now: "à l'instant",
+      minutes: "{{count}} min",
+      hours: "{{count}} h",
+      days: "{{count}} j",
+    },
     items: {
       dealWon: {
         title: "Affaire gagnée : StartUp Vision",
@@ -124,6 +131,9 @@ export const fr = {
         title: "Renouvellement à venir",
         body: "3 abonnements arrivent à échéance ce mois.",
       },
+      renewalJ30: { title: "Renouvellement dans 30 jours", body: "{{contact}} renouvelle dans 30 jours." },
+      renewalJ7: { title: "Renouvellement dans 7 jours", body: "{{contact}} renouvelle dans 7 jours." },
+      renewalJ0: { title: "Renouvellement aujourd'hui", body: "{{contact}} renouvelle aujourd'hui." },
     },
   },
   help: {
@@ -402,6 +412,10 @@ export const fr = {
     editProfile: "Modifier le profil",
     workEmail: "Email professionnel",
     phone: "Téléphone",
+    renewalDate: "Date de renouvellement",
+    renewalIn: "Renouvelle dans {{days}} jours",
+    renewalToday: "Renouvelle aujourd'hui",
+    renewalOverdue: "Renouvellement en retard",
     confidenceLevel: "Niveau de confiance",
     confidenceLabel: "4 / 5 — Très confiant",
     noConfidence: "Non défini",

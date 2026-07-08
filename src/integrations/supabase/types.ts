@@ -322,6 +322,64 @@ export type Database = {
           },
         ];
       };
+      notifications: {
+        Row: {
+          contact_id: string | null;
+          created_at: string;
+          id: string;
+          organization_id: string;
+          read_at: string | null;
+          reminder_id: string | null;
+          trigger_offset_days: number | null;
+          type: string;
+          user_id: string;
+        };
+        Insert: {
+          contact_id?: string | null;
+          created_at?: string;
+          id?: string;
+          organization_id: string;
+          read_at?: string | null;
+          reminder_id?: string | null;
+          trigger_offset_days?: number | null;
+          type?: string;
+          user_id: string;
+        };
+        Update: {
+          contact_id?: string | null;
+          created_at?: string;
+          id?: string;
+          organization_id?: string;
+          read_at?: string | null;
+          reminder_id?: string | null;
+          trigger_offset_days?: number | null;
+          type?: string;
+          user_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "notifications_contact_id_fkey";
+            columns: ["contact_id"];
+            isOneToOne: false;
+            referencedRelation: "contacts";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "notifications_organization_id_fkey";
+            columns: ["organization_id"];
+            isOneToOne: false;
+            referencedRelation: "organizations";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "notifications_reminder_id_fkey";
+            columns: ["reminder_id"];
+            isOneToOne: false;
+            referencedRelation: "reminders";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       organizations: {
         Row: {
           address: string | null;
