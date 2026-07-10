@@ -143,9 +143,8 @@ Kanban, Contacts, Dashboard, Analytics, Resellers, Archives, Tasks, and billing 
 | **Org & ops** | `organizations`, `profiles`, `user_roles`, `tasks`, `reminders` |
 | **Billing** | `subscriptions` |
 | **AI** | `ai_insight_cache`, `ai_insights`, `ai_prompt_cache`, `agent_logs` |
-| **Other** | `projets` |
 
-`ai_insights`, `ai_prompt_cache`, `projets`, `user_roles`, and `agent_logs` are currently empty — reserved for planned (V2) features rather than dead schema.
+`ai_insights`, `ai_prompt_cache`, `user_roles`, and `agent_logs` are currently empty — reserved for planned (V2) features rather than dead schema.
 
 ## Pricing
 

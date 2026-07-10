@@ -449,30 +449,6 @@ export type Database = {
         };
         Relationships: [];
       };
-      projets: {
-        Row: {
-          created_at: string | null;
-          id: string;
-          statut: string | null;
-          titre: string;
-          user_id: string | null;
-        };
-        Insert: {
-          created_at?: string | null;
-          id?: string;
-          statut?: string | null;
-          titre: string;
-          user_id?: string | null;
-        };
-        Update: {
-          created_at?: string | null;
-          id?: string;
-          statut?: string | null;
-          titre?: string;
-          user_id?: string | null;
-        };
-        Relationships: [];
-      };
       reminders: {
         Row: {
           contact_id: string;
