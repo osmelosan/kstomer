@@ -61,7 +61,7 @@ export const PRICING_PLANS: PricingPlan[] = [
     monthlyPriceId: "empire_monthly",
     yearlyPriceId: "empire_yearly",
     monthlyAmount: 67,
-    yearlyMonthlyAmount: 31,
+    yearlyMonthlyAmount: 51,
     maxCompanies: Infinity,
     features: [
       "Tout Expansion, sans limites",
