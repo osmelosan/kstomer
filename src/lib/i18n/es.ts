@@ -250,6 +250,7 @@ export const es = {
     prospectHint: "Alertas ante nuevas interacciones de clientes.",
     continue: "Continuar la configuración",
     skip: "Omitir este paso",
+    back: "Atrás",
     privacy: "Tus datos están seguros y nunca serán compartidos.",
     errors: {
       nameRequired: "Introduce tu nombre completo.",
