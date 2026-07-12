@@ -154,7 +154,7 @@ Plans are defined in [`src/lib/pricing-plans.ts`](src/lib/pricing-plans.ts) and 
 |---|---|---|---|---|
 | **Starter** | €17 | €13 | 1 | Solo use, smart pipeline & reminders, personalized AI dashboard |
 | **Expansion** ⭐ | €37 | €28 | Unlimited | Multi-company, unlimited pipelines, advanced AI portfolio analysis |
-| **Empire** | €67 | €31 | Unlimited | Up to 5 users, manager views & team KPIs, permissions and audit log |
+| **Empire** | €67 | €51 | Unlimited | Up to 5 users, manager views & team KPIs, permissions and audit log |
 
 All plans include a 14-day free trial.
 
