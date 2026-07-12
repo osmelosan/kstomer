@@ -17,13 +17,13 @@ const InputSchema = z.object({
   organizationId: z.string().nullable().default(null),
 });
 
-const SYSTEM_PROMPTS = {
+export const DASHBOARD_SYSTEM_PROMPTS = {
   fr: "Tu es un analyste CRM. Utilise les outils disponibles pour récupérer les tâches et le pipeline réels de l'utilisateur, puis réponds en markdown ultra-concis avec 2 sections : **Diagnostic** (1 phrase max) puis **Next steps** (liste numérotée de 2 actions courtes, max 12 mots chacune). Maximum 60 mots au total. Pas d'intro, pas de conclusion, pas de remplissage.",
   en: "You are a CRM analyst. Use the available tools to fetch the user's real tasks and pipeline, then reply in ultra-concise markdown with 2 sections: **Diagnosis** (1 sentence max) then **Next steps** (numbered list, 2 short actions, max 12 words each). Maximum 60 words total. No intro, no conclusion, no filler.",
   es: "Eres un analista CRM. Usa las herramientas disponibles para obtener las tareas y el pipeline reales del usuario, luego responde en markdown ultra-conciso con 2 secciones: **Diagnóstico** (1 frase máx.) y **Próximos pasos** (lista numerada, 2 acciones cortas, máx. 12 palabras cada una). Máximo 60 palabras en total. Sin intro, sin conclusión, sin relleno.",
 };
 
-const USER_PROMPTS = {
+export const DASHBOARD_USER_PROMPTS = {
   fr: "Analyse mes tâches et mon pipeline pour aujourd'hui, puis donne-moi un diagnostic avec les prochaines actions prioritaires.",
   en: "Analyze my tasks and pipeline for today, then give me a diagnosis with the next priority actions.",
   es: "Analiza mis tareas y mi pipeline de hoy, luego dame un diagnóstico con las próximas acciones prioritarias.",
@@ -51,8 +51,8 @@ export const analyzeDashboard = createServerFn({ method: "POST" })
         async () => {
           const markdown = await runCrmAgent({
             apiKey: key,
-            system: SYSTEM_PROMPTS[data.language],
-            prompt: USER_PROMPTS[data.language],
+            system: DASHBOARD_SYSTEM_PROMPTS[data.language],
+            prompt: DASHBOARD_USER_PROMPTS[data.language],
             tools: [
               getTaskSummaryTool(supabase, userId),
               getOverdueTasksTool(supabase, userId),

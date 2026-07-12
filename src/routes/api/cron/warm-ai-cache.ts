@@ -1,19 +1,25 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import {
+  getAtRiskContactsTool,
   getOverdueTasksTool,
+  getPipelineSummaryTool,
   getTaskSummaryTool,
   getUpcomingTasksTool,
 } from "@/lib/crm-ai-tools.server";
 import { runCrmAgent } from "@/lib/run-crm-agent.server";
 import { getCachedOrGenerate } from "@/lib/ai-insight-cache.server";
+import { DASHBOARD_SYSTEM_PROMPTS, DASHBOARD_USER_PROMPTS } from "@/lib/dashboard-ai.functions";
 
-// Only "tasks" is prewarmed here: its tools filter explicitly by user_id, so
-// running them under the service-role client for every user is safe. The
-// other AI cards (dashboard's pipeline/at-risk tools, analytics, resellers,
-// prospects) rely on RLS account-scoping with no explicit account filter,
-// so batch-running them with the service role would mix data across
-// tenants — they stay on lazy cache-on-read only.
+// Only scopes that resolve to an explicit, filtered account are prewarmed
+// here. "tasks" tools always filter by user_id, so they're safe for any
+// user under the service-role client. The dashboard's pipeline/at-risk
+// tools only filter by organization_id when one is passed explicitly — with
+// no organizationId they rely on RLS account-scoping, which the
+// service-role client bypasses. So "dashboard" is only prewarmed per real
+// organization (never the "all companies" null scope), keyed to that
+// organization's owner. Other AI cards (analytics, resellers, prospects)
+// stay on lazy cache-on-read only.
 const SYSTEM_PROMPTS = {
   fr: "Tu es un analyste CRM. Utilise les outils disponibles pour récupérer les tâches réelles de l'utilisateur, puis réponds en markdown ultra-concis avec 2 sections : **Diagnostic** (1 phrase max) puis **Next steps** (liste numérotée de 2 actions courtes, max 12 mots chacune). Maximum 60 mots au total. Pas d'intro, pas de conclusion, pas de remplissage.",
 };
@@ -31,6 +37,24 @@ async function warmTasksForUser(userId: string, apiKey: string): Promise<void> {
         getTaskSummaryTool(supabaseAdmin, userId),
         getOverdueTasksTool(supabaseAdmin, userId),
         getUpcomingTasksTool(supabaseAdmin, userId),
+      ],
+      maxTokens: 1024,
+    });
+    return { markdown };
+  });
+}
+
+async function warmDashboardForOrg(ownerId: string, orgId: string, apiKey: string): Promise<void> {
+  await getCachedOrGenerate(supabaseAdmin, ownerId, "dashboard", `${orgId}:fr`, true, async () => {
+    const markdown = await runCrmAgent({
+      apiKey,
+      system: DASHBOARD_SYSTEM_PROMPTS.fr,
+      prompt: DASHBOARD_USER_PROMPTS.fr,
+      tools: [
+        getTaskSummaryTool(supabaseAdmin, ownerId),
+        getOverdueTasksTool(supabaseAdmin, ownerId),
+        getPipelineSummaryTool(supabaseAdmin, orgId),
+        getAtRiskContactsTool(supabaseAdmin, orgId),
       ],
       maxTokens: 1024,
     });
@@ -84,7 +108,25 @@ export const Route = createFileRoute("/api/cron/warm-ai-cache")({
           page += 1;
         }
 
-        return Response.json({ warmed, errors });
+        let dashboardWarmed = 0;
+        let dashboardErrors = 0;
+        const { data: orgs, error: orgsError } = await supabaseAdmin
+          .from("organizations")
+          .select("id, owner_id");
+        if (orgsError) {
+          console.error("[cron/warm-ai-cache] list organizations failed:", orgsError);
+        }
+        for (const org of orgs ?? []) {
+          try {
+            await warmDashboardForOrg(org.owner_id, org.id, apiKey);
+            dashboardWarmed += 1;
+          } catch (err) {
+            dashboardErrors += 1;
+            console.error(`[cron/warm-ai-cache] failed for org ${org.id}:`, err);
+          }
+        }
+
+        return Response.json({ warmed, errors, dashboardWarmed, dashboardErrors });
       },
     },
   },
