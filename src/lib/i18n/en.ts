@@ -266,12 +266,11 @@ export const en = {
     priorityActions: "Priority actions",
     seeAll: "See all",
     actions: {
-      followUp: "Follow up with Thomas Durand",
-      followUpSub: "Quote sent 3 days ago",
-      finalize: "Finalize the SaaS contract",
-      finalizeSub: "Client: StartUp Vision",
-      late: "Overdue follow-up: Jean Dupont",
-      lateSub: "Last interaction 8 days ago",
+      empty: "No pending tasks. You're all caught up!",
+      overdueBy_one: "Overdue by {{count}} day",
+      overdueBy_other: "Overdue by {{count}} days",
+      dueToday: "Due today",
+      dueOn: "Due: {{date}}",
     },
     tags: {
       urgent: "URGENT",
