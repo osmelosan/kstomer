@@ -279,12 +279,11 @@ export const es = {
     priorityActions: "Acciones prioritarias",
     seeAll: "Ver todo",
     actions: {
-      followUp: "Hacer seguimiento a Thomas Durand",
-      followUpSub: "Presupuesto enviado hace 3 días",
-      finalize: "Finalizar el contrato SaaS",
-      finalizeSub: "Cliente: StartUp Vision",
-      late: "Seguimiento atrasado: Jean Dupont",
-      lateSub: "Última interacción hace 8 días",
+      empty: "No hay tareas pendientes. ¡Estás al día!",
+      overdueBy_one: "Con {{count}} día de retraso",
+      overdueBy_other: "Con {{count}} días de retraso",
+      dueToday: "Vence hoy",
+      dueOn: "Vencimiento: {{date}}",
     },
     tags: {
       urgent: "URGENTE",

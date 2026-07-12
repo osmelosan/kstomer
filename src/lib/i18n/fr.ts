@@ -284,12 +284,11 @@ export const fr = {
     priorityActions: "Actions prioritaires",
     seeAll: "Voir tout",
     actions: {
-      followUp: "Relancer Thomas Durand",
-      followUpSub: "Devis envoyé il y a 3 jours",
-      finalize: "Finaliser le contrat SaaS",
-      finalizeSub: "Client : StartUp Vision",
-      late: "Relance en retard : Jean Dupont",
-      lateSub: "Dernière interaction il y a 8 jours",
+      empty: "Aucune tâche en attente. Vous êtes à jour !",
+      overdueBy_one: "En retard depuis {{count}} jour",
+      overdueBy_other: "En retard depuis {{count}} jours",
+      dueToday: "À faire aujourd'hui",
+      dueOn: "Échéance : {{date}}",
     },
     tags: {
       urgent: "URGENT",

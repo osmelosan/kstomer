@@ -6,7 +6,6 @@ import {
   Mail,
   Phone,
   Linkedin,
-  FileText,
   TrendingUp,
   Sparkles,
   Building2,
@@ -22,6 +21,7 @@ import { useCompany } from "@/lib/company-context";
 import { useServerFn } from "@tanstack/react-start";
 import { analyzeDashboard } from "@/lib/dashboard-ai.functions";
 import { analyzeProspects, type Prospect } from "@/lib/prospects-ai.functions";
+import { getPriorityActions, type PriorityAction } from "@/lib/priority-actions.functions";
 import ReactMarkdown from "react-markdown";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
@@ -96,36 +96,7 @@ function Dashboard() {
       <AIInsightsCard />
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8">
-        <section className="space-y-4">
-          <SectionHeader
-            title={t("dashboard.priorityActions")}
-            cta={t("dashboard.seeAll")}
-            ctaTo="/tasks"
-          />
-          <div className="bg-card rounded-2xl border border-border divide-y divide-border overflow-hidden shadow-card">
-            <ActionRow
-              taskId="t1"
-              icon={<Mail className="h-5 w-5 text-muted-foreground" />}
-              title={t("dashboard.actions.followUp")}
-              subtitle={t("dashboard.actions.followUpSub")}
-              tag={{ label: t("dashboard.tags.urgent"), tone: "warning" }}
-            />
-            <ActionRow
-              taskId="t2"
-              icon={<FileText className="h-5 w-5 text-muted-foreground" />}
-              title={t("dashboard.actions.finalize")}
-              subtitle={t("dashboard.actions.finalizeSub")}
-              tag={{ label: t("dashboard.tags.todo"), tone: "info" }}
-            />
-            <ActionRow
-              taskId="t3"
-              icon={<Mail className="h-5 w-5 text-muted-foreground" />}
-              title={t("dashboard.actions.late")}
-              subtitle={t("dashboard.actions.lateSub")}
-              tag={{ label: t("dashboard.tags.late"), tone: "danger" }}
-            />
-          </div>
-        </section>
+        <PriorityActionsCard />
 
         <AIProspectsCard />
       </div>
@@ -259,6 +230,109 @@ function ActionRow({
     );
   }
   return <div className={className}>{content}</div>;
+}
+
+type PriorityStatus = "idle" | "loading" | "ready" | "error";
+
+function PriorityActionsCard() {
+  const { t, i18n: i18nInstance } = useTranslation();
+  const getActions = useServerFn(getPriorityActions);
+  const [status, setStatus] = useState<PriorityStatus>("idle");
+  const [actions, setActions] = useState<PriorityAction[]>([]);
+  const locale = i18nInstance.language || "fr";
+
+  useEffect(() => {
+    let cancelled = false;
+    setStatus("loading");
+    getActions()
+      .then((result) => {
+        if (cancelled) return;
+        setActions(result.actions);
+        setStatus("ready");
+      })
+      .catch(() => {
+        if (!cancelled) setStatus("error");
+      });
+    return () => {
+      cancelled = true;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const subtitleFor = (action: PriorityAction) => {
+    if (action.overdue) {
+      const days = Math.max(
+        1,
+        Math.ceil((Date.now() - new Date(action.dueDate).getTime()) / 86_400_000),
+      );
+      const label = t("dashboard.actions.overdueBy", { count: days });
+      return action.contact ? `${action.contact} · ${label}` : label;
+    }
+    const isToday = new Date(action.dueDate).toDateString() === new Date().toDateString();
+    const label = isToday
+      ? t("dashboard.actions.dueToday")
+      : t("dashboard.actions.dueOn", {
+          date: new Date(action.dueDate).toLocaleDateString(locale, {
+            day: "numeric",
+            month: "short",
+          }),
+        });
+    return action.contact ? `${action.contact} · ${label}` : label;
+  };
+
+  const tagFor = (action: PriorityAction): { label: string; tone: Tone } => {
+    if (action.overdue) return { label: t("dashboard.tags.late"), tone: "danger" };
+    if (action.priority === "high") return { label: t("dashboard.tags.urgent"), tone: "warning" };
+    return { label: t("dashboard.tags.todo"), tone: "info" };
+  };
+
+  return (
+    <section className="space-y-4">
+      <SectionHeader
+        title={t("dashboard.priorityActions")}
+        cta={t("dashboard.seeAll")}
+        ctaTo="/tasks"
+      />
+      <div className="bg-card rounded-2xl border border-border divide-y divide-border overflow-hidden shadow-card">
+        {status === "loading" && (
+          <div className="p-4 space-y-2 animate-pulse">
+            <div className="h-3 bg-muted rounded w-3/4" />
+            <div className="h-3 bg-muted rounded w-full" />
+            <div className="h-3 bg-muted rounded w-5/6" />
+          </div>
+        )}
+
+        {status === "error" && (
+          <div className="p-4 flex items-start gap-2 text-sm text-error">
+            <AlertCircle className="h-4 w-4 mt-0.5 shrink-0" />
+            <span>{t("dashboard.ai.errorGeneric")}</span>
+          </div>
+        )}
+
+        {status === "ready" && actions.length === 0 && (
+          <p className="p-4 text-sm text-muted-foreground">{t("dashboard.actions.empty")}</p>
+        )}
+
+        {status === "ready" &&
+          actions.map((action) => (
+            <ActionRow
+              key={action.id}
+              taskId={action.id}
+              icon={
+                action.overdue ? (
+                  <AlertCircle className="h-5 w-5 text-muted-foreground" />
+                ) : (
+                  <Mail className="h-5 w-5 text-muted-foreground" />
+                )
+              }
+              title={action.title}
+              subtitle={subtitleFor(action)}
+              tag={tagFor(action)}
+            />
+          ))}
+      </div>
+    </section>
+  );
 }
 
 function ProspectRow({ company, sector, fit, reason, match, contactName, email, phone, linkedin }: Prospect) {
