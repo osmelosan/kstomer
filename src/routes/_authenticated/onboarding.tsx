@@ -1,20 +1,28 @@
 import { pageHead } from "@/lib/route-seo";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { ArrowRight, HelpCircle } from "lucide-react";
+import { ArrowLeft, ArrowRight, HelpCircle } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Switch } from "@/components/ui/switch";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Logo } from "@/components/Logo";
-import i18n from "@/lib/i18n";
+import i18nGlobal, { SUPPORTED_LANGUAGES, type LanguageCode } from "@/lib/i18n";
 import { useCurrentUser } from "@/hooks/use-current-user";
 import { useContacts } from "@/hooks/use-contacts";
 import { CsvContactImport } from "@/components/CsvContactImport";
+import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/_authenticated/onboarding")({
   head: () =>
     pageHead({
       routeKey: "onboarding",
-      title: i18n.t("onboarding.metaTitle"),
+      title: i18nGlobal.t("onboarding.metaTitle"),
       path: "/onboarding",
       noindex: true,
     }),
@@ -23,7 +31,7 @@ export const Route = createFileRoute("/_authenticated/onboarding")({
 
 function Onboarding() {
   const nav = useNavigate();
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { user, profile } = useCurrentUser();
   const { importContacts } = useContacts();
   const [step, setStep] = useState<1 | 2>(1);
@@ -41,6 +49,12 @@ function Onboarding() {
     if (Object.keys(next).length === 0) setStep(2);
   }
 
+  async function completeOnboarding() {
+    if (!user) return;
+    await supabase.from("profiles").update({ onboarding_completed: true }).eq("id", user.id);
+    nav({ to: "/dashboard" });
+  }
+
   useEffect(() => {
     const fullName =
       profile?.full_name || (user?.user_metadata?.full_name as string | undefined) || "";
@@ -49,13 +63,33 @@ function Onboarding() {
 
   return (
     <main className="min-h-screen bg-background px-6 py-10">
-      <header className="flex items-center justify-between max-w-5xl mx-auto">
+      <header className="flex items-center justify-between max-w-5xl mx-auto gap-4">
         <Link to="/" className="block" aria-label={t("onboarding.homeAria")}>
           <Logo variant="horizontal" theme="on-light" className="h-24" />
         </Link>
-        <button className="flex items-center gap-2 text-sm font-semibold uppercase tracking-wider text-muted-foreground">
-          {t("onboarding.help")} <HelpCircle className="h-5 w-5" />
-        </button>
+        <div className="flex items-center gap-4">
+          <Select
+            value={i18n.language.split("-")[0]}
+            onValueChange={(v) => {
+              i18n.changeLanguage(v as LanguageCode);
+              if (typeof document !== "undefined") document.documentElement.lang = v;
+            }}
+          >
+            <SelectTrigger className="w-[140px]" aria-label={t("settings.language")}>
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {SUPPORTED_LANGUAGES.map((l) => (
+                <SelectItem key={l.code} value={l.code}>
+                  {l.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <button className="flex items-center gap-2 text-sm font-semibold uppercase tracking-wider text-muted-foreground">
+            {t("onboarding.help")} <HelpCircle className="h-5 w-5" />
+          </button>
+        </div>
       </header>
 
       <div className="max-w-2xl mx-auto mt-16">
@@ -135,7 +169,7 @@ function Onboarding() {
                   {t("onboarding.continue")} <ArrowRight className="h-5 w-5" />
                 </button>
                 <button
-                  onClick={() => nav({ to: "/dashboard" })}
+                  onClick={completeOnboarding}
                   className="w-full text-center text-sm text-muted-foreground hover:text-foreground"
                 >
                   {t("onboarding.skip")}
@@ -144,7 +178,13 @@ function Onboarding() {
             </>
           ) : (
             <>
-              <h1 className="text-[28px] font-bold tracking-tight">
+              <button
+                onClick={() => setStep(1)}
+                className="flex items-center gap-2 text-sm font-semibold text-muted-foreground hover:text-foreground"
+              >
+                <ArrowLeft className="h-4 w-4" /> {t("onboarding.back")}
+              </button>
+              <h1 className="mt-4 text-[28px] font-bold tracking-tight">
                 {t("onboarding.csvImport.title")}
               </h1>
               <p className="mt-2 text-muted-foreground">{t("onboarding.csvImport.subtitle")}</p>
@@ -152,9 +192,9 @@ function Onboarding() {
               <div className="mt-8">
                 <CsvContactImport
                   onImport={importContacts}
-                  onSkip={() => nav({ to: "/dashboard" })}
+                  onSkip={completeOnboarding}
                   skipLabel={t("onboarding.csvImport.skip")}
-                  onImported={() => nav({ to: "/dashboard" })}
+                  onImported={completeOnboarding}
                 />
               </div>
             </>

@@ -238,6 +238,7 @@ export const en = {
     prospectHint: "Alerts when there's new client activity.",
     continue: "Continue setup",
     skip: "Skip this step",
+    back: "Back",
     privacy: "Your data is secure and will never be shared.",
     errors: {
       nameRequired: "Please enter your full name.",

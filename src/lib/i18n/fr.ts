@@ -255,6 +255,7 @@ export const fr = {
     prospectHint: "Alertes lors de nouvelles interactions clients.",
     continue: "Continuer la configuration",
     skip: "Passer cette étape",
+    back: "Retour",
     privacy: "Vos données sont sécurisées et ne seront jamais partagées.",
     errors: {
       nameRequired: "Merci de renseigner votre nom complet.",
