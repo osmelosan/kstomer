@@ -130,6 +130,12 @@ Non-secret config and empty placeholders live in the committed `.env`; secrets a
 
 ## Database
 
+> ⚠️ **Terminologie** : le modèle multi-utilisateurs repose sur l'entité `organizations`
+> (propriétaire unique `owner_id`), et non `accounts`/`account_members` comme décrit
+> dans certains documents historiques (PRD v1.1–v1.4, DBML v1.3). La bascule a eu lieu
+> le 03/07/2026 (migrations `migrate_crm_tables_to_organizations` et
+> `drop_orphaned_accounts_schema`).
+
 Backed by Supabase Postgres. All tables have Row Level Security enabled, scoped per-organization (or per-user for account-level tables). Schema changes live as SQL migrations in `supabase/migrations/`.
 
 `profiles` (`id`, `email`, `full_name`, `avatar_url`, `phone`) is populated automatically on signup via an `on_auth_user_created` trigger on `auth.users`.
