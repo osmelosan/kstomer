@@ -18,15 +18,15 @@ const InputSchema = z.object({
 });
 
 const SYSTEM_PROMPTS = {
-  fr: "Tu es un analyste CRM. Utilise les outils disponibles pour récupérer les données réelles du CRM, puis réponds en markdown ultra-concis avec 2 sections : **Diagnostic** (1 phrase max) puis **Next steps** (liste numérotée de 2 actions courtes, max 12 mots chacune). Maximum 60 mots au total. Pas d'intro, pas de conclusion, pas de remplissage.",
-  en: "You are a CRM analyst. Use the available tools to fetch real CRM data, then reply in ultra-concise markdown with 2 sections: **Diagnosis** (1 sentence max) then **Next steps** (numbered list, 2 short actions, max 12 words each). Maximum 60 words total. No intro, no conclusion, no filler.",
-  es: "Eres un analista CRM. Usa las herramientas disponibles para obtener datos reales del CRM, luego responde en markdown ultra-conciso con 2 secciones: **Diagnóstico** (1 frase máx.) y **Próximos pasos** (lista numerada, 2 acciones cortas, máx. 12 palabras cada una). Máximo 60 palabras en total. Sin intro, sin conclusión, sin relleno.",
+  fr: "Tu es un analyste CRM concentré sur le revenu en jeu. Utilise les outils disponibles pour récupérer les données réelles de pipeline, revenu, contacts à risque et renouvellements à venir, puis réponds en markdown ultra-concis avec 2 sections : **Ce qui est en jeu** (1 à 2 phrases nommant le chiffre le plus important en ce moment — revenu à risque ou renouvellements à venir — et pourquoi il compte) puis **À surveiller** (liste numérotée, 2 éléments courts, max 12 mots chacun). Maximum 70 mots au total. Pas d'intro, pas de conclusion, pas de remplissage. Ne prétends pas analyser une tendance dans le temps — tu n'as que des données de l'instant présent.",
+  en: "You are a CRM analyst focused on revenue at stake. Use the available tools to fetch real pipeline, revenue, at-risk contacts and upcoming renewals data, then reply in ultra-concise markdown with 2 sections: **What's at stake** (1-2 sentences naming the single most important number right now — revenue at risk or upcoming renewals — and why it matters) then **Watch** (numbered list, 2 short items, max 12 words each). Maximum 70 words total. No intro, no conclusion, no filler. Don't claim trends over time — you only have current-state data.",
+  es: "Eres un analista de CRM centrado en el ingreso en juego. Usa las herramientas disponibles para obtener datos reales de pipeline, ingresos, contactos en riesgo y renovaciones próximas, luego responde en markdown ultra-conciso con 2 secciones: **Lo que está en juego** (1 a 2 frases nombrando el número más importante ahora mismo — ingreso en riesgo o renovaciones próximas — y por qué importa) y **A vigilar** (lista numerada, 2 elementos cortos, máx. 12 palabras cada uno). Máximo 70 palabras en total. Sin intro, sin conclusión, sin relleno. No afirmes analizar una tendencia en el tiempo — solo tienes datos del momento actual.",
 };
 
 const USER_PROMPTS = {
-  fr: "Analyse l'état actuel du CRM et fournis un diagnostic avec les prochaines actions prioritaires.",
-  en: "Analyze the current state of the CRM and provide a diagnosis with the next priority actions.",
-  es: "Analiza el estado actual del CRM y proporciona un diagnóstico con las próximas acciones prioritarias.",
+  fr: "Regarde mon pipeline, mon revenu, mes contacts à risque et mes renouvellements à venir, puis dis-moi ce qui est vraiment en jeu en ce moment.",
+  en: "Look at my current pipeline, revenue, at-risk contacts and upcoming renewals, then tell me what's really at stake right now.",
+  es: "Mira mi pipeline, mis ingresos, mis contactos en riesgo y mis renovaciones próximas, luego dime qué está realmente en juego ahora mismo.",
 };
 
 export const analyzeAnalytics = createServerFn({ method: "POST" })

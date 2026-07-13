@@ -16,15 +16,15 @@ const InputSchema = z.object({
 });
 
 const SYSTEM_PROMPTS = {
-  fr: "Tu es un analyste CRM. Utilise les outils disponibles pour récupérer les tâches réelles de l'utilisateur, puis réponds en markdown ultra-concis avec 2 sections : **Diagnostic** (1 phrase max) puis **Next steps** (liste numérotée de 2 actions courtes, max 12 mots chacune). Maximum 60 mots au total. Pas d'intro, pas de conclusion, pas de remplissage.",
-  en: "You are a CRM analyst. Use the available tools to fetch the user's real tasks, then reply in ultra-concise markdown with 2 sections: **Diagnosis** (1 sentence max) then **Next steps** (numbered list, 2 short actions, max 12 words each). Maximum 60 words total. No intro, no conclusion, no filler.",
-  es: "Eres un analista CRM. Usa las herramientas disponibles para obtener las tareas reales del usuario, luego responde en markdown ultra-conciso con 2 secciones: **Diagnóstico** (1 frase máx.) y **Próximos pasos** (lista numerada, 2 acciones cortas, máx. 12 palabras cada una). Máximo 60 palabras en total. Sin intro, sin conclusión, sin relleno.",
+  fr: "Tu es un assistant de triage de charge de travail CRM. Utilise les outils disponibles pour récupérer les tâches réelles de l'utilisateur, puis réponds en markdown ultra-concis : une section **Priorité du jour** avec une liste numérotée des 2 à 3 tâches à faire en premier, classées par urgence (en retard d'abord, puis échéance la plus proche), en regroupant les tâches similaires quand c'est pertinent (ex. « Lot : 3 appels de suivi »). Maximum 60 mots au total. Pas d'intro, pas de conclusion, pas de remplissage.",
+  en: "You are a CRM workload triage assistant. Use the available tools to fetch the user's real tasks, then reply in ultra-concise markdown: a **Priority today** section with a numbered list of the top 2-3 tasks to tackle first, ranked by urgency (overdue first, then soonest due), grouping similar tasks together when relevant (e.g. 'Batch: 3 follow-up calls'). Maximum 60 words total. No intro, no conclusion, no filler.",
+  es: "Eres un asistente de clasificación de carga de tareas del CRM. Usa las herramientas disponibles para obtener las tareas reales del usuario, luego responde en markdown ultra-conciso: una sección **Prioridad de hoy** con una lista numerada de las 2 a 3 tareas a hacer primero, ordenadas por urgencia (vencidas primero, luego la fecha más próxima), agrupando tareas similares cuando sea relevante (ej. «Lote: 3 llamadas de seguimiento»). Máximo 60 palabras en total. Sin intro, sin conclusión, sin relleno.",
 };
 
 const USER_PROMPTS = {
-  fr: "Analyse ma charge de tâches actuelle et fournis un diagnostic avec les prochaines actions prioritaires.",
-  en: "Analyze my current task workload and provide a diagnosis with the next priority actions.",
-  es: "Analiza mi carga de tareas actual y proporciona un diagnóstico con las próximas acciones prioritarias.",
+  fr: "Regarde ma charge de tâches actuelle et dis-moi exactement par quoi commencer aujourd'hui.",
+  en: "Look at my current task workload and tell me exactly what to tackle first today.",
+  es: "Mira mi carga de tareas actual y dime exactamente por dónde empezar hoy.",
 };
 
 export const analyzeTasks = createServerFn({ method: "POST" })

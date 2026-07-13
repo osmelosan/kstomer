@@ -206,6 +206,53 @@ export function getRevenueMetricsTool(supabase: Supa, organizationId: string | n
   };
 }
 
+export function getContactProfileTool(supabase: Supa, contactId: string): CrmTool {
+  return {
+    definition: {
+      name: "getContactProfile",
+      description:
+        "Get a single contact's stage, confidence level, renewal date, last contact date, company, latest note text, and note edit activity",
+      input_schema: { type: "object", properties: {} },
+    },
+    execute: async () => {
+      const { data: contact } = await supabase
+        .from("contacts")
+        .select(
+          "contact_name, company_name, stage, confidence_level, last_contact_date, renewal_date",
+        )
+        .eq("id", contactId)
+        .maybeSingle();
+
+      const { data: note } = await supabase
+        .from("notes")
+        .select("id, note_text")
+        .eq("contact_id", contactId)
+        .order("created_at", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+
+      let noteEditCount = 0;
+      let noteLastEditedAt: string | null = null;
+      if (note) {
+        const { data: history } = await supabase
+          .from("note_edit_history")
+          .select("edited_at")
+          .eq("note_id", note.id)
+          .order("edited_at", { ascending: false });
+        noteEditCount = history?.length ?? 0;
+        noteLastEditedAt = history?.[0]?.edited_at ?? null;
+      }
+
+      return {
+        contact: contact ?? null,
+        note: note?.note_text ?? null,
+        noteEditCount,
+        noteLastEditedAt,
+      };
+    },
+  };
+}
+
 export function getUpcomingRenewalsTool(supabase: Supa, organizationId: string | null): CrmTool {
   return {
     definition: {

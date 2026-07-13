@@ -15,9 +15,6 @@ import {
   Wallet,
   MousePointerClick,
   Users,
-  Sparkles,
-  RefreshCw,
-  AlertCircle,
   AlertTriangle,
   CalendarIcon,
   Info,
@@ -37,7 +34,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { analyzeAnalytics } from "@/lib/analytics-ai.functions";
 import { useCompany } from "@/lib/company-context";
 import { useAnalytics, type AnalyticsPeriod } from "@/hooks/use-analytics";
-import ReactMarkdown from "react-markdown";
+import { AiInsightCard, type AiInsightStatus } from "@/components/AiInsightCard";
 
 export const Route = createFileRoute("/_authenticated/analytics")({
   head: () =>
@@ -344,13 +341,11 @@ function Legend({ dot, children }: { dot: string; children: React.ReactNode }) {
   );
 }
 
-type AIStatus = "idle" | "loading" | "ready" | "error";
-
 function AIInsightsCard() {
   const { t, i18n: i18nInstance } = useTranslation();
   const { current } = useCompany();
   const analyze = useServerFn(analyzeAnalytics);
-  const [status, setStatus] = useState<AIStatus>("idle");
+  const [status, setStatus] = useState<AiInsightStatus>("idle");
   const [markdown, setMarkdown] = useState<string>("");
   const [errorKey, setErrorKey] = useState<string>("analytics.ai.errorGeneric");
 
@@ -383,49 +378,15 @@ function AIInsightsCard() {
   }, [current.id]);
 
   return (
-    <div className="k-card p-6 mb-5 border-l-4 border-l-secondary">
-      <div className="flex items-start justify-between mb-4 gap-4">
-        <div className="flex items-center gap-2.5">
-          <div className="h-9 w-9 rounded-md bg-secondary/10 text-secondary grid place-items-center">
-            <Sparkles className="h-4 w-4" />
-          </div>
-          <div>
-            <h3 className="font-semibold text-[15px] tracking-tight">{t("analytics.ai.title")}</h3>
-            <p className="text-xs text-muted-foreground mt-0.5">{t("analytics.ai.disclaimer")}</p>
-          </div>
-        </div>
-        <button
-          type="button"
-          onClick={() => run(true)}
-          disabled={status === "loading"}
-          className="inline-flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-md border border-border hover:bg-muted/60 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-        >
-          <RefreshCw className={`h-3.5 w-3.5 ${status === "loading" ? "animate-spin" : ""}`} />
-          {status === "loading" ? t("analytics.ai.loading") : t("analytics.ai.regenerate")}
-        </button>
-      </div>
-
-      {status === "loading" && (
-        <div className="space-y-2 animate-pulse">
-          <div className="h-3 bg-muted rounded w-3/4" />
-          <div className="h-3 bg-muted rounded w-full" />
-          <div className="h-3 bg-muted rounded w-5/6" />
-          <div className="h-3 bg-muted rounded w-2/3" />
-        </div>
-      )}
-
-      {status === "error" && (
-        <div className="flex items-start gap-2 text-sm text-error">
-          <AlertCircle className="h-4 w-4 mt-0.5 shrink-0" />
-          <span>{t(errorKey)}</span>
-        </div>
-      )}
-
-      {status === "ready" && (
-        <div className="prose prose-sm max-w-none text-foreground prose-headings:text-foreground prose-strong:text-foreground prose-p:my-2 prose-ul:my-2 prose-ol:my-2 prose-li:my-0.5">
-          <ReactMarkdown>{markdown}</ReactMarkdown>
-        </div>
-      )}
-    </div>
+    <AiInsightCard
+      title={t("analytics.ai.title")}
+      disclaimer={t("analytics.ai.disclaimer")}
+      status={status}
+      markdown={markdown}
+      errorMessage={t(errorKey)}
+      loadingLabel={t("analytics.ai.loading")}
+      regenerateLabel={t("analytics.ai.regenerate")}
+      onRegenerate={() => run(true)}
+    />
   );
 }

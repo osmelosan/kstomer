@@ -131,9 +131,18 @@ export const fr = {
         title: "Renouvellement à venir",
         body: "3 abonnements arrivent à échéance ce mois.",
       },
-      renewalJ30: { title: "Renouvellement dans 30 jours", body: "{{contact}} renouvelle dans 30 jours." },
-      renewalJ7: { title: "Renouvellement dans 7 jours", body: "{{contact}} renouvelle dans 7 jours." },
-      renewalJ0: { title: "Renouvellement aujourd'hui", body: "{{contact}} renouvelle aujourd'hui." },
+      renewalJ30: {
+        title: "Renouvellement dans 30 jours",
+        body: "{{contact}} renouvelle dans 30 jours.",
+      },
+      renewalJ7: {
+        title: "Renouvellement dans 7 jours",
+        body: "{{contact}} renouvelle dans 7 jours.",
+      },
+      renewalJ0: {
+        title: "Renouvellement aujourd'hui",
+        body: "{{contact}} renouvelle aujourd'hui.",
+      },
     },
   },
   help: {
@@ -520,6 +529,21 @@ export const fr = {
       saving: "Enregistrement…",
       saved: "Enregistré",
       savedAt: "Enregistré à {{time}}",
+    },
+    ai: {
+      title: "Santé de la relation",
+      disclaimer: "Généré par IA — à vérifier avant d'agir.",
+      regenerate: "Régénérer",
+      loading: "Analyse en cours…",
+      errorGeneric: "Impossible de générer l'analyse. Réessaie.",
+      errorRate: "Trop de requêtes. Merci de patienter un instant.",
+      errorCredits: "Crédits IA épuisés. Rechargez votre espace de travail.",
+      draftButton: "Rédiger un suivi",
+      drafting: "Rédaction en cours…",
+      draftDialogTitle: "Message de suivi",
+      draftDialogDescription: "Généré par IA — à relire avant l'envoi.",
+      copy: "Copier",
+      copied: "Copié !",
     },
   },
   newContact: {

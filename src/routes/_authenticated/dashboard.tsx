@@ -22,7 +22,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { analyzeDashboard } from "@/lib/dashboard-ai.functions";
 import { analyzeProspects, type Prospect } from "@/lib/prospects-ai.functions";
 import { getPriorityActions, type PriorityAction } from "@/lib/priority-actions.functions";
-import ReactMarkdown from "react-markdown";
+import { AiInsightCard, type AiInsightStatus } from "@/components/AiInsightCard";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
   head: () =>
@@ -335,7 +335,17 @@ function PriorityActionsCard() {
   );
 }
 
-function ProspectRow({ company, sector, fit, reason, match, contactName, email, phone, linkedin }: Prospect) {
+function ProspectRow({
+  company,
+  sector,
+  fit,
+  reason,
+  match,
+  contactName,
+  email,
+  phone,
+  linkedin,
+}: Prospect) {
   const { t } = useTranslation();
   const tone: Tone = fit >= 90 ? "success" : fit >= 80 ? "info" : "warning";
   const hasContact = contactName || email || phone || linkedin;
@@ -365,22 +375,34 @@ function ProspectRow({ company, sector, fit, reason, match, contactName, email, 
           <div className="mt-2 pt-2 border-t border-border/60 space-y-1">
             {contactName && (
               <p className="text-[11px] text-muted-foreground uppercase tracking-wider">
-                {t("dashboard.bestContact")} : <span className="text-foreground font-medium normal-case">{contactName}</span>
+                {t("dashboard.bestContact")} :{" "}
+                <span className="text-foreground font-medium normal-case">{contactName}</span>
               </p>
             )}
             <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
               {email && (
-                <a href={`mailto:${email}`} className="inline-flex items-center gap-1 text-[11px] text-muted-foreground hover:text-secondary">
+                <a
+                  href={`mailto:${email}`}
+                  className="inline-flex items-center gap-1 text-[11px] text-muted-foreground hover:text-secondary"
+                >
                   <Mail className="h-3 w-3" /> {email}
                 </a>
               )}
               {phone && (
-                <a href={`tel:${phone}`} className="inline-flex items-center gap-1 text-[11px] text-muted-foreground hover:text-secondary">
+                <a
+                  href={`tel:${phone}`}
+                  className="inline-flex items-center gap-1 text-[11px] text-muted-foreground hover:text-secondary"
+                >
                   <Phone className="h-3 w-3" /> {phone}
                 </a>
               )}
               {linkedin && (
-                <a href={linkedin} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 text-[11px] text-muted-foreground hover:text-secondary">
+                <a
+                  href={linkedin}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex items-center gap-1 text-[11px] text-muted-foreground hover:text-secondary"
+                >
                   <Linkedin className="h-3 w-3" /> LinkedIn
                 </a>
               )}
@@ -507,13 +529,11 @@ function AIProspectsCard() {
   );
 }
 
-type AIStatus = "idle" | "loading" | "ready" | "error";
-
 function AIInsightsCard() {
   const { t, i18n: i18nInstance } = useTranslation();
   const { current } = useCompany();
   const analyze = useServerFn(analyzeDashboard);
-  const [status, setStatus] = useState<AIStatus>("idle");
+  const [status, setStatus] = useState<AiInsightStatus>("idle");
   const [markdown, setMarkdown] = useState<string>("");
   const [errorKey, setErrorKey] = useState<string>("dashboard.ai.errorGeneric");
 
@@ -546,49 +566,16 @@ function AIInsightsCard() {
   }, [current.id]);
 
   return (
-    <div className="k-card p-6 mb-8 border-l-4 border-l-secondary">
-      <div className="flex items-start justify-between mb-4 gap-4">
-        <div className="flex items-center gap-2.5">
-          <div className="h-9 w-9 rounded-md bg-secondary/10 text-secondary grid place-items-center">
-            <Sparkles className="h-4 w-4" />
-          </div>
-          <div>
-            <h3 className="font-semibold text-[15px] tracking-tight">{t("dashboard.ai.title")}</h3>
-            <p className="text-xs text-muted-foreground mt-0.5">{t("dashboard.ai.disclaimer")}</p>
-          </div>
-        </div>
-        <button
-          type="button"
-          onClick={() => run(true)}
-          disabled={status === "loading"}
-          className="inline-flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-md border border-border hover:bg-muted/60 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-        >
-          <RefreshCw className={`h-3.5 w-3.5 ${status === "loading" ? "animate-spin" : ""}`} />
-          {status === "loading" ? t("dashboard.ai.loading") : t("dashboard.ai.regenerate")}
-        </button>
-      </div>
-
-      {status === "loading" && (
-        <div className="space-y-2 animate-pulse">
-          <div className="h-3 bg-muted rounded w-3/4" />
-          <div className="h-3 bg-muted rounded w-full" />
-          <div className="h-3 bg-muted rounded w-5/6" />
-          <div className="h-3 bg-muted rounded w-2/3" />
-        </div>
-      )}
-
-      {status === "error" && (
-        <div className="flex items-start gap-2 text-sm text-error">
-          <AlertCircle className="h-4 w-4 mt-0.5 shrink-0" />
-          <span>{t(errorKey)}</span>
-        </div>
-      )}
-
-      {status === "ready" && (
-        <div className="prose prose-sm max-w-none text-foreground prose-headings:text-foreground prose-strong:text-foreground prose-p:my-2 prose-ul:my-2 prose-ol:my-2 prose-li:my-0.5">
-          <ReactMarkdown>{markdown}</ReactMarkdown>
-        </div>
-      )}
-    </div>
+    <AiInsightCard
+      title={t("dashboard.ai.title")}
+      disclaimer={t("dashboard.ai.disclaimer")}
+      status={status}
+      markdown={markdown}
+      errorMessage={t(errorKey)}
+      loadingLabel={t("dashboard.ai.loading")}
+      regenerateLabel={t("dashboard.ai.regenerate")}
+      onRegenerate={() => run(true)}
+      className="mb-8"
+    />
   );
 }

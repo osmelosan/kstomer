@@ -17,8 +17,10 @@ import {
   Loader2,
   CloudUpload,
   Trash2,
+  PenLine,
+  Copy,
 } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import i18n from "@/lib/i18n";
 import { Input } from "@/components/ui/input";
@@ -54,10 +56,21 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
 import { useAutosave, type AutosaveStatus } from "@/hooks/use-autosave";
 import { useContact } from "@/hooks/use-contact";
 import type { Contact, ContactStage } from "@/hooks/use-contacts";
 import { cn } from "@/lib/utils";
+import { useServerFn } from "@tanstack/react-start";
+import { analyzeContactHealth, draftFollowUp } from "@/lib/contact-ai.functions";
+import { AiInsightCard, type AiInsightStatus } from "@/components/AiInsightCard";
 
 export const Route = createFileRoute("/_authenticated/contacts/$id")({
   head: ({ params }) =>
@@ -96,6 +109,7 @@ function ContactDetails() {
   const [archiveOpen, setArchiveOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [deleteConfirmText, setDeleteConfirmText] = useState("");
+  const [draftOpen, setDraftOpen] = useState(false);
 
   const profileAutosave = useAutosave(draft, async (value) => {
     if (!value) return;
@@ -370,6 +384,9 @@ function ContactDetails() {
           </div>
         </div>
 
+        {/* AI relationship health */}
+        <ContactHealthCard contactId={contact.id} onDraftClick={() => setDraftOpen(true)} />
+
         {/* Notes */}
         <div className="k-card p-8">
           <div className="flex items-center justify-between mb-4 gap-3 flex-wrap">
@@ -506,7 +523,148 @@ function ContactDetails() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      <DraftFollowUpDialog open={draftOpen} onOpenChange={setDraftOpen} contactId={contact.id} />
     </AppShell>
+  );
+}
+
+function ContactHealthCard({
+  contactId,
+  onDraftClick,
+}: {
+  contactId: string;
+  onDraftClick: () => void;
+}) {
+  const { t, i18n: i18nInstance } = useTranslation();
+  const analyze = useServerFn(analyzeContactHealth);
+  const [status, setStatus] = useState<AiInsightStatus>("idle");
+  const [markdown, setMarkdown] = useState<string>("");
+  const [errorKey, setErrorKey] = useState<string>("contactDetail.ai.errorGeneric");
+
+  const run = async (force: boolean) => {
+    setStatus("loading");
+    try {
+      const lang = (i18nInstance.language?.slice(0, 2) ?? "fr") as "fr" | "en" | "es";
+      const safeLang = (["fr", "en", "es"] as const).includes(lang) ? lang : "fr";
+      const result = await analyze({ data: { language: safeLang, contactId, force } });
+      setMarkdown(result.markdown);
+      setStatus("ready");
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "";
+      if (msg.includes("RATE_LIMIT")) setErrorKey("contactDetail.ai.errorRate");
+      else if (msg.includes("CREDITS_EXHAUSTED")) setErrorKey("contactDetail.ai.errorCredits");
+      else setErrorKey("contactDetail.ai.errorGeneric");
+      setStatus("error");
+    }
+  };
+
+  useEffect(() => {
+    void run(false);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [contactId]);
+
+  return (
+    <div className="relative">
+      <AiInsightCard
+        title={t("contactDetail.ai.title")}
+        disclaimer={t("contactDetail.ai.disclaimer")}
+        status={status}
+        markdown={markdown}
+        errorMessage={t(errorKey)}
+        loadingLabel={t("contactDetail.ai.loading")}
+        regenerateLabel={t("contactDetail.ai.regenerate")}
+        onRegenerate={() => run(true)}
+        className="pb-14"
+      />
+      <button
+        type="button"
+        onClick={onDraftClick}
+        className="absolute right-4 bottom-4 inline-flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-md bg-secondary text-secondary-foreground hover:bg-secondary/90 transition-colors"
+      >
+        <PenLine className="h-3.5 w-3.5" />
+        {t("contactDetail.ai.draftButton")}
+      </button>
+    </div>
+  );
+}
+
+function DraftFollowUpDialog({
+  open,
+  onOpenChange,
+  contactId,
+}: {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  contactId: string;
+}) {
+  const { t, i18n: i18nInstance } = useTranslation();
+  const draft = useServerFn(draftFollowUp);
+  const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState("");
+  const [errorKey, setErrorKey] = useState<string | null>(null);
+  const [copied, setCopied] = useState(false);
+
+  useEffect(() => {
+    if (!open) return;
+    setLoading(true);
+    setErrorKey(null);
+    setCopied(false);
+    const lang = (i18nInstance.language?.slice(0, 2) ?? "fr") as "fr" | "en" | "es";
+    const safeLang = (["fr", "en", "es"] as const).includes(lang) ? lang : "fr";
+    draft({ data: { language: safeLang, contactId } })
+      .then((result) => setMessage(result.message))
+      .catch((err: unknown) => {
+        const msg = err instanceof Error ? err.message : "";
+        if (msg.includes("RATE_LIMIT")) setErrorKey("contactDetail.ai.errorRate");
+        else if (msg.includes("CREDITS_EXHAUSTED")) setErrorKey("contactDetail.ai.errorCredits");
+        else setErrorKey("contactDetail.ai.errorGeneric");
+      })
+      .finally(() => setLoading(false));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open, contactId]);
+
+  const copy = async () => {
+    await navigator.clipboard.writeText(message);
+    setCopied(true);
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>{t("contactDetail.ai.draftDialogTitle")}</DialogTitle>
+          <DialogDescription>{t("contactDetail.ai.draftDialogDescription")}</DialogDescription>
+        </DialogHeader>
+
+        {loading && (
+          <div className="space-y-2 animate-pulse py-2">
+            <div className="h-3 bg-muted rounded w-full" />
+            <div className="h-3 bg-muted rounded w-5/6" />
+            <div className="h-3 bg-muted rounded w-full" />
+            <div className="h-3 bg-muted rounded w-2/3" />
+          </div>
+        )}
+
+        {!loading && errorKey && <p className="text-sm text-error">{t(errorKey)}</p>}
+
+        {!loading && !errorKey && (
+          <Textarea value={message} readOnly rows={8} className="text-sm" />
+        )}
+
+        <DialogFooter>
+          <button
+            type="button"
+            onClick={copy}
+            disabled={loading || !!errorKey}
+            className="inline-flex items-center gap-2 h-10 px-4 rounded-md bg-secondary text-secondary-foreground text-sm font-semibold hover:bg-secondary/90 disabled:opacity-50"
+          >
+            {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+            {copied ? t("contactDetail.ai.copied") : t("contactDetail.ai.copy")}
+          </button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 }
 
