@@ -10,6 +10,7 @@ import {
 import { runCrmAgent } from "@/lib/run-crm-agent.server";
 import { getCachedOrGenerate } from "@/lib/ai-insight-cache.server";
 import { DASHBOARD_SYSTEM_PROMPTS, DASHBOARD_USER_PROMPTS } from "@/lib/dashboard-ai.functions";
+import { generateProspects, type OrgProfile } from "@/lib/prospects-ai.server";
 
 // Only scopes that resolve to an explicit, filtered account are prewarmed
 // here. "tasks" tools always filter by user_id, so they're safe for any
@@ -18,8 +19,10 @@ import { DASHBOARD_SYSTEM_PROMPTS, DASHBOARD_USER_PROMPTS } from "@/lib/dashboar
 // no organizationId they rely on RLS account-scoping, which the
 // service-role client bypasses. So "dashboard" is only prewarmed per real
 // organization (never the "all companies" null scope), keyed to that
-// organization's owner. Other AI cards (analytics, resellers, prospects)
-// stay on lazy cache-on-read only.
+// organization's owner. "prospects" is prewarmed the same way, skipping
+// organizations without a description/city (mirrors analyzeProspects'
+// MISSING_PROFILE guard). Other AI cards (analytics, resellers) stay on
+// lazy cache-on-read only.
 const SYSTEM_PROMPTS = {
   fr: "Tu es un analyste CRM. Utilise les outils disponibles pour récupérer les tâches réelles de l'utilisateur, puis réponds en markdown ultra-concis avec 2 sections : **Diagnostic** (1 phrase max) puis **Next steps** (liste numérotée de 2 actions courtes, max 12 mots chacune). Maximum 60 mots au total. Pas d'intro, pas de conclusion, pas de remplissage.",
 };
@@ -60,6 +63,17 @@ async function warmDashboardForOrg(ownerId: string, orgId: string, apiKey: strin
     });
     return { markdown };
   });
+}
+
+async function warmProspectsForOrg(
+  ownerId: string,
+  orgId: string,
+  org: OrgProfile,
+  apiKey: string,
+): Promise<void> {
+  await getCachedOrGenerate(supabaseAdmin, ownerId, "prospects", `${orgId}:fr`, true, () =>
+    generateProspects(apiKey, "fr", org),
+  );
 }
 
 export const Route = createFileRoute("/api/cron/warm-ai-cache")({
@@ -110,9 +124,11 @@ export const Route = createFileRoute("/api/cron/warm-ai-cache")({
 
         let dashboardWarmed = 0;
         let dashboardErrors = 0;
+        let prospectsWarmed = 0;
+        let prospectsErrors = 0;
         const { data: orgs, error: orgsError } = await supabaseAdmin
           .from("organizations")
-          .select("id, owner_id");
+          .select("id, owner_id, name, description, city, country");
         if (orgsError) {
           console.error("[cron/warm-ai-cache] list organizations failed:", orgsError);
         }
@@ -124,9 +140,25 @@ export const Route = createFileRoute("/api/cron/warm-ai-cache")({
             dashboardErrors += 1;
             console.error(`[cron/warm-ai-cache] failed for org ${org.id}:`, err);
           }
+
+          if (!org.description && !org.city) continue; // matches analyzeProspects' MISSING_PROFILE guard
+          try {
+            await warmProspectsForOrg(org.owner_id, org.id, org, apiKey);
+            prospectsWarmed += 1;
+          } catch (err) {
+            prospectsErrors += 1;
+            console.error(`[cron/warm-ai-cache] failed prospects for org ${org.id}:`, err);
+          }
         }
 
-        return Response.json({ warmed, errors, dashboardWarmed, dashboardErrors });
+        return Response.json({
+          warmed,
+          errors,
+          dashboardWarmed,
+          dashboardErrors,
+          prospectsWarmed,
+          prospectsErrors,
+        });
       },
     },
   },
