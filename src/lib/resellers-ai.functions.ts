@@ -61,6 +61,9 @@ export const analyzeResellers = createServerFn({ method: "POST" })
       console.error("[resellers-ai] agent run failed:", err);
       if (err instanceof Anthropic.RateLimitError) throw new Error("RATE_LIMIT");
       if (err instanceof Anthropic.PermissionDeniedError) throw new Error("CREDITS_EXHAUSTED");
+      if (err instanceof Anthropic.APIError && /credit balance/i.test(err.message)) {
+        throw new Error("CREDITS_EXHAUSTED");
+      }
       throw new Error("AI_ERROR");
     }
   });
