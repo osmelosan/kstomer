@@ -125,7 +125,7 @@ Non-secret config and empty placeholders live in the committed `.env`; secrets a
 | `PAYMENTS_SANDBOX_WEBHOOK_SECRET` | Vercel only | Stripe webhook signing secret (test mode) — verifies `/api/public/payments/webhook` requests |
 | `PAYMENTS_LIVE_WEBHOOK_SECRET` | Vercel only | Stripe webhook signing secret (live mode) |
 | `ANTHROPIC_API_KEY` | Vercel only | Server-only secret — Claude API key used by the Dashboard, Tasks, Analytics, Resellers, and Prospects AI insights functions |
-| `CRON_SECRET` | Vercel only | Authenticates the Vercel Cron request that hits `/api/cron/warm-ai-cache` |
+| `CRON_SECRET` | Vercel only | Authenticates the Vercel Cron requests that hit `/api/cron/warm-ai-cache`, `/api/cron/renewal-reminders`, and `/api/cron/organization-archival` |
 | `SUPABASE_PROJECT_ID` / `VITE_SUPABASE_PROJECT_ID` | `.env` (committed) | Supabase CLI project ref (server / client) |
 
 ## Database
@@ -170,6 +170,7 @@ All plans include a 14-day free trial.
 - **Webhook** — `src/routes/api/public/payments/webhook.ts` handles `customer.subscription.created/updated/deleted`, verifies the signature (HMAC via `PAYMENTS_SANDBOX_WEBHOOK_SECRET` / `PAYMENTS_LIVE_WEBHOOK_SECRET`), and upserts into the `subscriptions` table. Sandbox vs. live is selected via a `?env=` query param on the endpoint.
 - **AI insight caching** — Dashboard/Tasks/Analytics/Resellers/Prospects insight cards are cached in `ai_insight_cache` and only regenerated once per day (or on manual refresh), to avoid calling Claude on every page load.
 - **Vercel Cron** (`vercel.json`) — a daily job hits `/api/cron/warm-ai-cache` (guarded by `CRON_SECRET`) to pre-warm the Tasks AI cache; other cards stay lazy-cached to avoid mixing data across tenants under RLS.
+- **Account-level GDPR purge** — `/api/cron/organization-archival` runs daily and permanently deletes any `organizations` row with `archived_at` older than 12 months (`is_test` accounts are excluded); cascading FKs remove all of that organization's contacts, resellers, notes, reminders, etc. in the same operation.
 - **AI model routing** — Dashboard/Tasks/Analytics/Resellers use Claude Haiku 4.5 (summarizing already-fetched data); Prospects uses Sonnet 5 (web-search-grounded reasoning). System prompts use prompt caching (`cache_control: ephemeral`) to reduce token cost.
 
 ## Deployment
