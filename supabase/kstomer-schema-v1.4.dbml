@@ -1,0 +1,333 @@
+// ============================================
+// KSTOMER — Schéma de données v1.4
+// Généré depuis l'état réel de la base Supabase
+// (projet bwtceabdjhyrbmglyina, eu-central-1) le 14/07/2026.
+// Remplace le DBML v1.3 (obsolète — accounts/account_members,
+// notes/note_edit_history, profiles avec account_id).
+// Prêt pour import dans dbdiagram.io
+// ============================================
+
+Enum contact_stage {
+  new_lead
+  contacted
+  proposal
+  active
+  at_risk
+}
+
+Enum ai_insight_type {
+  score
+  summary
+  suggested_action
+}
+
+Enum app_role {
+  admin
+  tester
+  user
+}
+
+// Compte société : entité multi-utilisateurs, propriétaire unique.
+// Remplace accounts/account_members (abandonnés le 03/07/2026, migration
+// drop_orphaned_accounts_schema). Pas de table de rôles de membres.
+Table organizations {
+  id uuid [pk, default: `gen_random_uuid()`]
+  owner_id uuid [not null, ref: > auth_users.id]
+  name text [not null]
+  address text
+  city text
+  postal_code text
+  country text
+  description text
+  created_at timestamptz [not null, default: `now()`]
+  updated_at timestamptz [not null, default: `now()`]
+
+  Note: 'Propriétaire unique (owner_id). Ni is_test ni archived_at en base (écart signalé vs PRD historique — non implémenté).'
+}
+
+// Profil utilisateur générique, créé automatiquement au signup (trigger on_auth_user_created)
+Table profiles {
+  id uuid [pk, ref: - auth_users.id]
+  email text
+  full_name text
+  avatar_url text
+  phone text
+  onboarding_completed bool [not null, default: false]
+  created_at timestamptz [not null, default: `now()`]
+  updated_at timestamptz [not null, default: `now()`]
+
+  Note: 'Schéma réel simple, sans account_id/imported_at (schéma cible du DBML v1.3 non retenu).'
+}
+
+// Rôle applicatif d'un utilisateur (indépendant des organizations)
+Table user_roles {
+  id uuid [pk, default: `gen_random_uuid()`]
+  user_id uuid [not null, ref: > auth_users.id]
+  role app_role [not null]
+  created_at timestamptz [not null, default: `now()`]
+
+  Note: 'Table vide à ce jour — réservée à un usage futur (admin/tester/user), distincte des rôles account_role abandonnés.'
+}
+
+// Fiche prospect / abonné : entité centrale du pipeline visuel
+Table contacts {
+  id uuid [pk, default: `gen_random_uuid()`]
+  organization_id uuid [not null, ref: > organizations.id]
+  created_by_user_id uuid [not null, ref: > auth_users.id]
+  owner_user_id uuid [not null, ref: > auth_users.id]
+  contact_name text [not null]
+  company_name text
+  email text
+  phone text
+  stage contact_stage [not null, default: 'new_lead']
+  confidence_level int4 // CHECK 1-5
+  notes_count int4 [not null, default: 0]
+  renewal_date timestamptz
+  last_contact_date timestamptz
+  archived_at timestamptz
+  created_at timestamptz [not null, default: `now()`]
+  updated_at timestamptz [not null, default: `now()`]
+
+  Note: 'Carte du pipeline : un prospect ou un abonné. Le stage pilote la colonne du Kanban.'
+}
+
+// Détails financiers liés à un contact : valeur de deal et/ou abonnement actif
+Table subscription_details {
+  id uuid [pk, default: `gen_random_uuid()`]
+  contact_id uuid [not null, unique, ref: - contacts.id]
+  organization_id uuid [not null, ref: > organizations.id]
+  deal_value numeric
+  plan_name text
+  mrr numeric
+  subscription_start_date timestamptz
+  updated_at timestamptz [not null, default: `now()`]
+
+  Note: '1 ligne par contact, créée à la demande. deal_value et infos d\'abonnement peuvent coexister.'
+}
+
+// Notes horodatées sur un contact — remplace `notes`/`note_edit_history` (13/07/2026)
+Table contact_notes {
+  id uuid [pk, default: `gen_random_uuid()`]
+  organization_id uuid [not null, ref: > organizations.id]
+  contact_id uuid [not null, ref: > contacts.id]
+  note_text text [not null]
+  created_at timestamptz [not null, default: `now()`]
+  updated_at timestamptz [not null, default: `now()`]
+
+  Note: 'Liste de notes indépendantes par contact, sans champ "modifiée" ni historique de versions.'
+}
+
+// Notes horodatées sur un revendeur — remplace `notes`/`note_edit_history` (13/07/2026)
+Table reseller_notes {
+  id uuid [pk, default: `gen_random_uuid()`]
+  organization_id uuid [not null, ref: > organizations.id]
+  reseller_id uuid [not null, ref: > resellers.id]
+  note_text text [not null]
+  created_at timestamptz [not null, default: `now()`]
+  updated_at timestamptz [not null, default: `now()`]
+
+  Note: 'Liste de notes indépendantes par revendeur, sans champ "modifiée" ni historique de versions.'
+}
+
+// Fiche revendeur : partenaire qui apporte/gère des abonnés
+Table resellers {
+  id uuid [pk, default: `gen_random_uuid()`]
+  organization_id uuid [not null, ref: > organizations.id]
+  created_by_user_id uuid [not null, ref: > auth_users.id]
+  owner_user_id uuid [not null, ref: > auth_users.id]
+  name text [not null]
+  company text
+  email text
+  phone text
+  confidence_level int4 // CHECK 1-5
+  archived_at timestamptz
+  created_at timestamptz [not null, default: `now()`]
+
+  Note: 'Partenaire revendeur, avec son propre niveau de confiance et historique de notes.'
+}
+
+// Lien actif courant entre un contact et son revendeur
+Table reseller_contacts {
+  id uuid [pk, default: `gen_random_uuid()`]
+  reseller_id uuid [not null, ref: > resellers.id]
+  contact_id uuid [not null, unique, ref: - contacts.id]
+  organization_id uuid [not null, ref: > organizations.id]
+
+  Note: 'Lien actuel (1 contact = au plus 1 revendeur actif à la fois).'
+}
+
+// Historique complet des liaisons contact <-> revendeur dans le temps
+Table reseller_contact_history {
+  id uuid [pk, default: `gen_random_uuid()`]
+  contact_id uuid [not null, ref: > contacts.id]
+  reseller_id uuid [not null, ref: > resellers.id]
+  organization_id uuid [not null, ref: > organizations.id]
+  started_at timestamptz [not null]
+  ended_at timestamptz // null = lien actif
+
+  Note: 'Trace tous les changements de revendeur pour un contact (qui, quand, jusqu\'à quand).'
+}
+
+// Rappels automatiques de renouvellement (J-30, J-7, jour J) — générés par le
+// trigger DB sync_contact_reminders
+Table reminders {
+  id uuid [pk, default: `gen_random_uuid()`]
+  contact_id uuid [not null, ref: > contacts.id]
+  organization_id uuid [not null, ref: > organizations.id]
+  reminder_date timestamptz [not null]
+  trigger_offset_days int4 [not null] // CHECK IN (30, 7, 0)
+  sent_at timestamptz
+  is_active bool [not null, default: true]
+
+  Note: 'Générés/recréés automatiquement quand renewal_date est défini ou modifié.'
+}
+
+// Notifications in-app (cloche), alimentées par le cron quotidien renewal-reminders
+Table notifications {
+  id uuid [pk, default: `gen_random_uuid()`]
+  organization_id uuid [not null, ref: > organizations.id]
+  user_id uuid [not null, ref: > auth_users.id]
+  contact_id uuid [ref: > contacts.id]
+  reminder_id uuid [ref: > reminders.id]
+  type text [not null, default: 'renewal']
+  trigger_offset_days int4
+  read_at timestamptz
+  created_at timestamptz [not null, default: `now()`]
+
+  Note: 'Flux de notifications in-app (icône cloche). Canal email non branché à ce jour.'
+}
+
+// Historique des changements d'étape du pipeline pour un contact
+Table stage_history {
+  id uuid [pk, default: `gen_random_uuid()`]
+  contact_id uuid [not null, ref: > contacts.id]
+  organization_id uuid [not null, ref: > organizations.id]
+  from_stage contact_stage
+  to_stage contact_stage [not null]
+  changed_by_user_id uuid [ref: > auth_users.id]
+  changed_at timestamptz [not null, default: `now()`]
+
+  Note: 'Permet d\'analyser le temps passé par étape et le taux de conversion (V2 analytics).'
+}
+
+// Résultats IA générés pour un contact (scoring, résumés, suggestions), historisés — V2, table vide
+Table ai_insights {
+  id uuid [pk, default: `gen_random_uuid()`]
+  contact_id uuid [not null, ref: > contacts.id]
+  organization_id uuid [not null, ref: > organizations.id]
+  insight_type ai_insight_type [not null]
+  content text [not null]
+  score int4
+  model_used text
+  created_at timestamptz [not null, default: `now()`]
+
+  Note: 'V2 — non utilisée tant que le scoring IA n\'est pas activé.'
+}
+
+// Cache de contexte/résumés réutilisables pour limiter les appels IA — V2, table vide
+Table ai_prompt_cache {
+  id uuid [pk, default: `gen_random_uuid()`]
+  organization_id uuid [not null, ref: > organizations.id]
+  contact_id uuid [ref: > contacts.id]
+  cache_key text [not null]
+  cached_content text [not null]
+  generated_at timestamptz [not null, default: `now()`]
+  expires_at timestamptz
+
+  Note: 'V2 — non utilisée tant que les résumés IA ne sont pas activés.'
+
+  indexes {
+    (organization_id, cache_key) [unique]
+  }
+}
+
+// Cache journalier des insights IA affichés (Dashboard/Tasks/Analytics/Resellers/Prospects)
+Table ai_insight_cache {
+  id uuid [pk, default: `gen_random_uuid()`]
+  user_id uuid [not null, ref: > auth_users.id]
+  feature text [not null]
+  scope_id text [not null, default: 'default']
+  content jsonb [not null]
+  generated_at timestamptz [not null, default: `now()`]
+
+  Note: 'Cache réel (en production), 1 génération/jour ou refresh manuel. Distinct de ai_prompt_cache (V2, non utilisée).'
+}
+
+// Trace toutes les exécutions de l'agent IA (crm-ai-tools.server.ts / run-crm-agent.server.ts)
+Table agent_logs {
+  id uuid [pk, default: `gen_random_uuid()`]
+  created_at timestamptz [not null, default: `now()`]
+  agent_name text [not null]
+  trigger_type text [not null] // CHECK IN ('manual','schedule','webhook','db_trigger')
+  input jsonb
+  output jsonb
+  duration_ms int4
+  cost_usd numeric
+  tokens_input int4
+  tokens_output int4
+  status text [not null] // CHECK IN ('success','error')
+  error_message text
+
+  Note: 'Table vide en pratique à ce jour — prévue pour l\'observabilité des agents IA.'
+}
+
+// Abonnement Stripe (billing), indépendant des organizations
+Table subscriptions {
+  id uuid [pk, default: `gen_random_uuid()`]
+  user_id uuid [not null, ref: > auth_users.id]
+  stripe_subscription_id text [not null, unique]
+  stripe_customer_id text [not null]
+  product_id text [not null]
+  price_id text [not null]
+  status text [not null, default: 'active']
+  current_period_start timestamptz
+  current_period_end timestamptz
+  cancel_at_period_end bool [default: false]
+  environment text [not null, default: 'sandbox'] // sandbox | live
+  created_at timestamptz [not null, default: `now()`]
+  updated_at timestamptz [not null, default: `now()`]
+
+  Note: 'Alimentée par le webhook Stripe (customer.subscription.*). environment distingue sandbox/live via le préfixe de clé publishable.'
+}
+
+// Tâches de suivi (route /tasks), indépendantes des organizations
+Table tasks {
+  id uuid [pk, default: `gen_random_uuid()`]
+  user_id uuid [not null, ref: > auth_users.id]
+  title text [not null]
+  contact text
+  due_date date [not null, default: `CURRENT_DATE`]
+  priority text [not null, default: 'medium'] // CHECK IN ('high','medium','low')
+  status text [not null, default: 'todo'] // CHECK IN ('todo','in_progress','done')
+  created_at timestamptz [not null, default: `now()`]
+  updated_at timestamptz [not null, default: `now()`]
+
+  Note: 'Table réelle connectée (mock abandonné, 01/07/2026). Scoping par user_id, pas organization_id.'
+}
+
+// Référence symbolique à auth.users (Supabase Auth) — non gérée par ce schéma
+Table auth_users {
+  id uuid [pk]
+
+  Note: 'auth.users (Supabase Auth), hors périmètre public.'
+}
+
+// ============================================
+// Notes d'implémentation
+// ============================================
+// - organizations : propriétaire unique (owner_id). Ni is_test ni archived_at
+//   en base — écart vs. discours produit (PRD section 5/16), à corriger ou
+//   retirer avant la soutenance.
+// - contact_notes / reseller_notes remplacent notes/note_edit_history depuis
+//   le 13/07/2026 : pas de champ "modifiée", pas d'historique de versions.
+// - tasks, subscriptions, ai_insight_cache sont scopées par user_id, pas par
+//   organization_id (pas de partage multi-utilisateur sur ces 3 tables).
+// - ai_insights / ai_prompt_cache : tables prêtes mais vides (0 lignes),
+//   réservées à une V2 IA. Distinctes de ai_insight_cache (réelle, utilisée).
+// - agent_logs : vide en pratique malgré l'agent IA actif en production.
+// - Contraintes CHECK notables (non modélisables en DBML pur) :
+//   contacts.confidence_level / resellers.confidence_level BETWEEN 1 AND 5
+//   reminders.trigger_offset_days IN (30, 7, 0)
+//   agent_logs.trigger_type IN ('manual','schedule','webhook','db_trigger')
+//   agent_logs.status IN ('success','error')
+//   tasks.priority IN ('high','medium','low'), tasks.status IN ('todo','in_progress','done')

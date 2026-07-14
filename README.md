@@ -144,13 +144,13 @@ Kanban, Contacts, Dashboard, Analytics, Resellers, Archives, Tasks, and billing 
 
 | Area | Tables |
 |---|---|
-| **Core CRM** | `contacts` (pipeline card / stage), `subscription_details`, `notes`, `note_edit_history`, `stage_history` |
+| **Core CRM** | `contacts` (pipeline card / stage), `subscription_details`, `contact_notes`, `reseller_notes`, `stage_history` |
 | **Resellers** | `resellers`, `reseller_contacts`, `reseller_contact_history` |
-| **Org & ops** | `organizations`, `profiles`, `user_roles`, `tasks`, `reminders` |
+| **Org & ops** | `organizations`, `profiles`, `user_roles`, `tasks`, `reminders`, `notifications` |
 | **Billing** | `subscriptions` |
 | **AI** | `ai_insight_cache`, `ai_insights`, `ai_prompt_cache`, `agent_logs` |
 
-`ai_insights`, `ai_prompt_cache`, `user_roles`, and `agent_logs` are currently empty — reserved for planned (V2) features rather than dead schema.
+19 tables total, all with RLS enabled. `contact_notes` / `reseller_notes` replaced `notes` / `note_edit_history` on 2026-07-13 (multiple timestamped notes per contact/reseller, no edit history). `ai_insights`, `ai_prompt_cache`, `user_roles`, and `agent_logs` are currently empty — reserved for planned (V2) features rather than dead schema. Full field-level schema: [`supabase/kstomer-schema-v1.4.dbml`](supabase/kstomer-schema-v1.4.dbml).
 
 ## Pricing
 
