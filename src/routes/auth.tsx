@@ -243,6 +243,7 @@ function SignInForm({ onSwitchForgot }: { onSwitchForgot: () => void }) {
 
 function SignUpForm() {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [fullName, setFullName] = useState("");
@@ -260,7 +261,7 @@ function SignUpForm() {
       return;
     }
     setLoading(true);
-    const { error } = await supabase.auth.signUp({
+    const { data, error } = await supabase.auth.signUp({
       email,
       password,
       options: {
@@ -277,6 +278,13 @@ function SignUpForm() {
             ? t("auth.emailDomainNotSupported")
             : error.message,
       );
+      return;
+    }
+    // Email confirmation is disabled while we don't send outbound emails —
+    // signUp already returns an active session, so skip the "check inbox" step.
+    if (data.session) {
+      toast.success(t("auth.signedIn"));
+      navigate({ to: "/dashboard", replace: true });
       return;
     }
     setSent(true);
