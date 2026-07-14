@@ -179,8 +179,8 @@ function ContactDetails() {
       <div className="grid grid-cols-1 gap-6 max-w-3xl">
         {/* Header card */}
         <div className="k-card p-8">
-          <div className="flex items-start gap-5">
-            <div className="h-20 w-20 rounded-2xl bg-muted grid place-items-center text-2xl font-bold text-muted-foreground">
+          <div className="flex flex-wrap items-start gap-5">
+            <div className="h-20 w-20 rounded-2xl bg-muted grid place-items-center text-2xl font-bold text-muted-foreground shrink-0">
               {initials}
             </div>
             <div className="flex-1 min-w-0">
@@ -192,13 +192,15 @@ function ContactDetails() {
                 />
               ) : (
                 <div className="flex items-center gap-3 flex-wrap">
-                  <h2 className="text-[24px] font-bold tracking-tight">{view.contact_name}</h2>
+                  <h2 className="text-[24px] font-bold tracking-tight break-words">
+                    {view.contact_name}
+                  </h2>
                   <StageBadge stage={view.stage} />
                 </div>
               )}
             </div>
 
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 flex-wrap ml-auto">
               <AutosaveIndicator
                 status={profileAutosave.status}
                 savedAt={profileAutosave.savedAt}

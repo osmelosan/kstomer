@@ -415,6 +415,7 @@ export const es = {
     noConfidence: "Sin definir",
     projectNotes: "Notas del proyecto",
     saveNote: "Guardar nota",
+    notePlaceholder: "Idea, seguimiento, punto clave…",
     notesEmpty: "Aún no hay notas",
     partnerTier: "Socio Cert. Gold",
     associate: "Comercial asociado",
