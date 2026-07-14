@@ -31,8 +31,8 @@ Kstomer helps solo founders and consultants take control of their sales in minut
 - ✅ **Tasks & follow-up reminders** — never drop a deal
 - 📊 **AI-assisted insights** — Claude tool-calling agent diagnoses and next steps on the Dashboard (including an AI-suggested prospects card), Tasks, Analytics, and Resellers pages
 - 🤝 **Reseller / portfolio management** — track partners and their pipelines
-- 🏢 **Multi-organization support** — switch between companies, with a guided onboarding flow
-- 📥 **CSV contact import** — bulk-import contacts from onboarding or the Contacts page, with duplicate-email detection
+- 🏢 **Multi-organization support** — switch between companies, with a guided 3-step onboarding flow (profile → company info → CSV import) that's fully navigable back and forth
+- 📥 **CSV contact import** — bulk-import contacts (first/last name, company, email, phone, stage, dates) from onboarding or the Contacts page, with duplicate-email detection and rejection of non-CSV files masquerading as `.csv`
 - 💳 **Built-in billing** — Stripe Checkout, embedded checkout, billing portal, and subscription management
 - 🌍 **Multi-language** — English, Spanish and French, with IP-based auto-detection
 
@@ -150,7 +150,13 @@ Kanban, Contacts, Dashboard, Analytics, Resellers, Archives, Tasks, and billing 
 | **Billing** | `subscriptions` |
 | **AI** | `ai_insight_cache`, `ai_insights`, `ai_prompt_cache`, `agent_logs` |
 
-`organizations` gained `is_test` (flags test/demo accounts, exempt from plan limits and business metrics, admin-only via SQL) and `archived_at` (account-level GDPR archival, 12 months before permanent deletion, mirroring `contacts`/`resellers`) on 2026-07-14. 19 tables total, all with RLS enabled. `contact_notes` / `reseller_notes` replaced `notes` / `note_edit_history` on 2026-07-13 (multiple timestamped notes per contact/reseller, no edit history). The frontend (contact/reseller detail pages, the mobile quick-add sheet, and the new-contact form) was updated on 2026-07-14 to match — notes are added one at a time via an explicit **save** button (no autosave) and listed newest first; the old single-note-with-autosave-and-version-history UI is gone. `ai_insights`, `ai_prompt_cache`, `user_roles`, and `agent_logs` are currently empty — reserved for planned (V2) features rather than dead schema. Full field-level schema: [`supabase/kstomer-schema-v1.4.dbml`](supabase/kstomer-schema-v1.4.dbml).
+`organizations` gained `is_test` (flags test/demo accounts, exempt from plan limits and business metrics, admin-only via SQL) and `archived_at` (account-level GDPR archival, 12 months before permanent deletion, mirroring `contacts`/`resellers`) on 2026-07-14. `contacts` gained `first_name` (required) and `last_name` (optional) on 2026-07-14, backfilled from the existing `contact_name`; `contact_name` stays as the single denormalized display string used everywhere else (lists, kanban, notifications, reseller views, AI tools) and is kept in sync from `first_name`/`last_name` wherever a contact is created or edited — the contact detail page and the CSV import/template now capture first and last name as separate fields, other entry points (kanban card editor, mobile quick-add) still take one free-text name and split it automatically. 19 tables total, all with RLS enabled. `contact_notes` / `reseller_notes` replaced `notes` / `note_edit_history` on 2026-07-13 (multiple timestamped notes per contact/reseller, no edit history). The frontend (contact/reseller detail pages, the mobile quick-add sheet, and the new-contact form) was updated on 2026-07-14 to match — notes are added one at a time via an explicit **save** button (no autosave) and listed newest first; the old single-note-with-autosave-and-version-history UI is gone. `ai_insights`, `ai_prompt_cache`, `user_roles`, and `agent_logs` are currently empty — reserved for planned (V2) features rather than dead schema. Full field-level schema: [`supabase/kstomer-schema-v1.4.dbml`](supabase/kstomer-schema-v1.4.dbml).
+
+## Sign up flow
+
+- **No email confirmation step (for now)** — since outbound email isn't configured and test signups use nonexistent addresses, `supabase.auth.signUp` on `/auth` no longer waits on a "check your inbox" screen: once Supabase returns a session, the user goes straight to onboarding. This requires **"Confirm email" to be disabled** in the Supabase dashboard (Authentication → Providers → Email) — while enabled, `signUp` doesn't return a session and outbound mail hits Supabase's default rate limit (`429: email rate limit exceeded`) since no custom SMTP is configured.
+- The sign-up form only collects **email and password** — full name is asked once, in onboarding step 1, not duplicated on `/auth`.
+- Onboarding is a 3-step, fully back-navigable flow: profile (name, role, notification prefs) → company info (name, city, country, description — powers the AI-suggested prospects card, which requires `organizations.description` or `.city` to be set) → CSV contact import. Step 1 has a "back to sign in" action that signs the user out.
 
 ## Pricing
 
