@@ -284,7 +284,7 @@ function SignUpForm() {
     // signUp already returns an active session, so skip the "check inbox" step.
     if (data.session) {
       toast.success(t("auth.signedIn"));
-      navigate({ to: "/dashboard", replace: true });
+      navigate({ to: "/onboarding", replace: true });
       return;
     }
     setSent(true);
