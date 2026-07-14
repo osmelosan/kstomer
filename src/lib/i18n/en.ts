@@ -401,6 +401,7 @@ export const en = {
     noConfidence: "Not set",
     projectNotes: "Project notes",
     saveNote: "Save note",
+    notePlaceholder: "Idea, follow-up, key point…",
     notesEmpty: "No notes yet",
     partnerTier: "Gold Certified Partner",
     associate: "Associate sales rep",

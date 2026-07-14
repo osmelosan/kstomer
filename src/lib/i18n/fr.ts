@@ -430,6 +430,7 @@ export const fr = {
     noConfidence: "Non défini",
     projectNotes: "Notes du projet",
     saveNote: "Sauvegarder la note",
+    notePlaceholder: "Idée, suivi, point à creuser…",
     notesEmpty: "Aucune note pour l'instant",
     partnerTier: "Partenaire Cert. Gold",
     associate: "Commercial associé",
