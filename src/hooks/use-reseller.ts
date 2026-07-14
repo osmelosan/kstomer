@@ -115,6 +115,19 @@ export function useReseller(id: string) {
     [reseller],
   );
 
+  const updateNote = useCallback(async (noteId: string, text: string) => {
+    if (!text.trim()) return;
+    const { data: updated } = await supabase
+      .from("reseller_notes")
+      .update({ note_text: text.trim(), updated_at: new Date().toISOString() })
+      .eq("id", noteId)
+      .select()
+      .single();
+    if (updated) {
+      setNotes((prev) => prev.map((n) => (n.id === noteId ? (updated as ResellerNote) : n)));
+    }
+  }, []);
+
   const linkContact = useCallback(
     async (contactId: string) => {
       if (!reseller) return { error: null as string | null };
@@ -167,6 +180,7 @@ export function useReseller(id: string) {
     loading,
     updateReseller,
     addNote,
+    updateNote,
     linkContact,
     unlinkContact,
     archiveReseller,
