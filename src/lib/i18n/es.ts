@@ -434,6 +434,8 @@ export const es = {
     saveNote: "Guardar nota",
     notePlaceholder: "Idea, seguimiento, punto clave…",
     notesEmpty: "Aún no hay notas",
+    editNote: "Editar nota",
+    noteEdited: "editada",
     partnerTier: "Socio Cert. Gold",
     associate: "Comercial asociado",
     relatedContacts: "Socios y contactos relacionados",

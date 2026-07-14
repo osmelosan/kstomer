@@ -420,6 +420,8 @@ export const en = {
     saveNote: "Save note",
     notePlaceholder: "Idea, follow-up, key point…",
     notesEmpty: "No notes yet",
+    editNote: "Edit note",
+    noteEdited: "edited",
     partnerTier: "Gold Certified Partner",
     associate: "Associate sales rep",
     relatedContacts: "Partners & related contacts",

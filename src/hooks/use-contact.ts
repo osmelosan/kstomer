@@ -95,6 +95,19 @@ export function useContact(id: string) {
     [contact],
   );
 
+  const updateNote = useCallback(async (noteId: string, text: string) => {
+    if (!text.trim()) return;
+    const { data: updated } = await supabase
+      .from("contact_notes")
+      .update({ note_text: text.trim(), updated_at: new Date().toISOString() })
+      .eq("id", noteId)
+      .select()
+      .single();
+    if (updated) {
+      setNotes((prev) => prev.map((n) => (n.id === noteId ? (updated as ContactNote) : n)));
+    }
+  }, []);
+
   const archiveContact = useCallback(async () => {
     await supabase.from("contacts").update({ archived_at: new Date().toISOString() }).eq("id", id);
   }, [id]);
@@ -109,6 +122,7 @@ export function useContact(id: string) {
     loading,
     updateContact,
     addNote,
+    updateNote,
     archiveContact,
     deleteContact,
   };

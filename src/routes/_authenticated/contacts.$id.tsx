@@ -81,8 +81,16 @@ function ContactDetails() {
   const { id } = useParams({ from: "/_authenticated/contacts/$id" });
   const nav = useNavigate();
   const { t, i18n: i18nInst } = useTranslation();
-  const { contact, notes, loading, updateContact, addNote, archiveContact, deleteContact } =
-    useContact(id);
+  const {
+    contact,
+    notes,
+    loading,
+    updateContact,
+    addNote,
+    updateNote,
+    archiveContact,
+    deleteContact,
+  } = useContact(id);
 
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState<Contact | null>(null);
@@ -92,6 +100,9 @@ function ContactDetails() {
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [deleteConfirmText, setDeleteConfirmText] = useState("");
   const [draftOpen, setDraftOpen] = useState(false);
+  const [editingNoteId, setEditingNoteId] = useState<string | null>(null);
+  const [editingNoteText, setEditingNoteText] = useState("");
+  const [savingNoteEdit, setSavingNoteEdit] = useState(false);
 
   const profileAutosave = useAutosave(draft, async (value) => {
     if (!value) return;
@@ -116,6 +127,27 @@ function ContactDetails() {
       setNoteDraft("");
     } finally {
       setSavingNote(false);
+    }
+  }
+
+  function startEditingNote(noteId: string, text: string) {
+    setEditingNoteId(noteId);
+    setEditingNoteText(text);
+  }
+
+  function cancelEditingNote() {
+    setEditingNoteId(null);
+    setEditingNoteText("");
+  }
+
+  async function submitNoteEdit() {
+    if (!editingNoteId || !editingNoteText.trim() || savingNoteEdit) return;
+    setSavingNoteEdit(true);
+    try {
+      await updateNote(editingNoteId, editingNoteText);
+      cancelEditingNote();
+    } finally {
+      setSavingNoteEdit(false);
     }
   }
 
@@ -435,14 +467,54 @@ function ContactDetails() {
                 {t("contactDetail.notesEmpty")}
               </p>
             ) : (
-              notes.map((n) => (
-                <div key={n.id} className="rounded-md border border-border p-4">
-                  <div className="text-xs text-muted-foreground mb-2">
-                    {new Date(n.created_at).toLocaleString(i18nInst.language)}
+              notes.map((n) =>
+                editingNoteId === n.id ? (
+                  <div key={n.id} className="rounded-md border border-border p-4">
+                    <Textarea
+                      value={editingNoteText}
+                      onChange={(e) => setEditingNoteText(e.target.value)}
+                      rows={4}
+                      className="text-sm"
+                      autoFocus
+                    />
+                    <div className="flex justify-end gap-2 mt-3">
+                      <button
+                        onClick={cancelEditingNote}
+                        className="h-9 px-3 rounded-md border border-input bg-card text-sm font-medium hover:bg-muted"
+                      >
+                        {t("common.cancel")}
+                      </button>
+                      <button
+                        onClick={submitNoteEdit}
+                        disabled={!editingNoteText.trim() || savingNoteEdit}
+                        className="inline-flex items-center gap-2 h-9 px-4 rounded-md bg-secondary text-secondary-foreground text-sm font-semibold hover:bg-secondary/90 disabled:opacity-50 disabled:pointer-events-none"
+                      >
+                        {savingNoteEdit ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
+                        {t("contactDetail.saveNote")}
+                      </button>
+                    </div>
                   </div>
-                  <p className="text-sm whitespace-pre-wrap">{n.note_text}</p>
-                </div>
-              ))
+                ) : (
+                  <div key={n.id} className="group rounded-md border border-border p-4">
+                    <div className="flex items-start justify-between gap-3 mb-2">
+                      <div className="text-xs text-muted-foreground">
+                        {new Date(n.created_at).toLocaleString(i18nInst.language)}
+                        {n.updated_at && n.updated_at !== n.created_at && (
+                          <span> · {t("contactDetail.noteEdited")}</span>
+                        )}
+                      </div>
+                      <button
+                        onClick={() => startEditingNote(n.id, n.note_text)}
+                        aria-label={t("contactDetail.editNote")}
+                        className="text-muted-foreground hover:text-foreground opacity-0 group-hover:opacity-100 transition-opacity shrink-0"
+                      >
+                        <PenLine className="h-3.5 w-3.5" />
+                      </button>
+                    </div>
+                    <p className="text-sm whitespace-pre-wrap">{n.note_text}</p>
+                  </div>
+                ),
+              )
             )}
           </div>
         </div>

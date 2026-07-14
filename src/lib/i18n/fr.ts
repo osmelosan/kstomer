@@ -449,6 +449,8 @@ export const fr = {
     saveNote: "Sauvegarder la note",
     notePlaceholder: "Idée, suivi, point à creuser…",
     notesEmpty: "Aucune note pour l'instant",
+    editNote: "Modifier la note",
+    noteEdited: "modifiée",
     partnerTier: "Partenaire Cert. Gold",
     associate: "Commercial associé",
     relatedContacts: "Partenaires & contacts associés",
