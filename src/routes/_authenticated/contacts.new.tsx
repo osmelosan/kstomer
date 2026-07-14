@@ -78,11 +78,15 @@ function NewContact() {
       });
       if (!created) return;
       if (form.notes.trim()) {
-        await supabase.from("notes").insert({
+        await supabase.from("contact_notes").insert({
           organization_id: created.organization_id,
           contact_id: created.id,
           note_text: form.notes.trim(),
         });
+        await supabase
+          .from("contacts")
+          .update({ notes_count: created.notes_count + 1 })
+          .eq("id", created.id);
       }
       nav({ to: "/contacts/$id", params: { id: created.id } });
     } catch (err: unknown) {

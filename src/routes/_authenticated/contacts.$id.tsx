@@ -4,7 +4,6 @@ import { AppShell } from "@/components/AppShell";
 import {
   BadgeCheck,
   FileText,
-  History,
   Mail,
   Phone,
   Calendar,
@@ -12,7 +11,6 @@ import {
   Briefcase,
   MoreHorizontal,
   Pencil,
-  RotateCcw,
   Check,
   Loader2,
   CloudUpload,
@@ -39,13 +37,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-  SheetDescription,
-} from "@/components/ui/sheet";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -89,23 +80,13 @@ function ContactDetails() {
   const { id } = useParams({ from: "/_authenticated/contacts/$id" });
   const nav = useNavigate();
   const { t, i18n: i18nInst } = useTranslation();
-  const {
-    contact,
-    note,
-    noteHistory,
-    loading,
-    updateContact,
-    saveNote,
-    restoreVersion,
-    archiveContact,
-    deleteContact,
-  } = useContact(id);
+  const { contact, notes, loading, updateContact, addNote, archiveContact, deleteContact } =
+    useContact(id);
 
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState<Contact | null>(null);
   const [noteDraft, setNoteDraft] = useState("");
-  const [noteTouched, setNoteTouched] = useState(false);
-  const [versionsOpen, setVersionsOpen] = useState(false);
+  const [savingNote, setSavingNote] = useState(false);
   const [archiveOpen, setArchiveOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [deleteConfirmText, setDeleteConfirmText] = useState("");
@@ -124,10 +105,16 @@ function ContactDetails() {
     });
   });
 
-  const noteAutosave = useAutosave(noteTouched ? noteDraft : null, async (value) => {
-    if (value === null) return;
-    await saveNote(value);
-  });
+  async function submitNote() {
+    if (!noteDraft.trim() || savingNote) return;
+    setSavingNote(true);
+    try {
+      await addNote(noteDraft);
+      setNoteDraft("");
+    } finally {
+      setSavingNote(false);
+    }
+  }
 
   if (loading) {
     return (
@@ -393,77 +380,47 @@ function ContactDetails() {
             <h3 className="flex items-center gap-2 text-[20px] font-semibold">
               <FileText className="h-5 w-5 text-secondary" />
               {t("contactDetail.projectNotes")}
+              {notes.length > 0 && (
+                <span className="text-xs text-muted-foreground font-normal">({notes.length})</span>
+              )}
             </h3>
-            <div className="flex items-center gap-2">
-              <AutosaveIndicator status={noteAutosave.status} savedAt={noteAutosave.savedAt} />
-              <button
-                onClick={() => setVersionsOpen(true)}
-                className="inline-flex items-center gap-2 h-10 px-3 rounded-md border border-input bg-card text-sm hover:bg-muted"
-              >
-                <History className="h-4 w-4" /> {t("contactDetail.versionHistory")}
-                {noteHistory.length > 0 && (
-                  <span className="ml-1 text-xs text-muted-foreground">({noteHistory.length})</span>
-                )}
-              </button>
-            </div>
           </div>
           <Textarea
-            value={noteTouched ? noteDraft : (note?.note_text ?? "")}
-            onChange={(e) => {
-              setNoteTouched(true);
-              setNoteDraft(e.target.value);
-            }}
-            rows={7}
+            value={noteDraft}
+            onChange={(e) => setNoteDraft(e.target.value)}
+            placeholder={t("contactDetail.notePlaceholder")}
+            rows={4}
             className="text-sm"
           />
-        </div>
-      </div>
+          <div className="flex justify-end mt-3">
+            <button
+              onClick={submitNote}
+              disabled={!noteDraft.trim() || savingNote}
+              className="inline-flex items-center gap-2 h-10 px-4 rounded-md bg-secondary text-secondary-foreground text-sm font-semibold hover:bg-secondary/90 disabled:opacity-50 disabled:pointer-events-none"
+            >
+              {savingNote ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
+              {t("contactDetail.saveNote")}
+            </button>
+          </div>
 
-      {/* Versions sheet */}
-      <Sheet open={versionsOpen} onOpenChange={setVersionsOpen}>
-        <SheetContent className="w-full sm:max-w-lg overflow-y-auto">
-          <SheetHeader>
-            <SheetTitle>{t("contactDetail.versions.title")}</SheetTitle>
-            <SheetDescription>{t("contactDetail.versions.current")}</SheetDescription>
-          </SheetHeader>
-          <div className="mt-6 space-y-5">
-            <div className="rounded-md border border-secondary/30 bg-secondary/5 p-4">
-              <div className="text-xs font-semibold text-secondary uppercase tracking-wider mb-2">
-                {t("contactDetail.versions.current")}
-              </div>
-              <p className="text-sm whitespace-pre-wrap">{note?.note_text ?? ""}</p>
-            </div>
-            {noteHistory.length === 0 ? (
+          <div className="mt-6 space-y-4">
+            {notes.length === 0 ? (
               <p className="text-sm text-muted-foreground text-center py-6">
-                {t("contactDetail.versions.empty")}
+                {t("contactDetail.notesEmpty")}
               </p>
             ) : (
-              noteHistory.map((v) => (
-                <div key={v.id} className="rounded-md border border-border p-4">
-                  <div className="flex items-center justify-between mb-2">
-                    <div className="text-xs text-muted-foreground">
-                      {new Date(v.edited_at).toLocaleString(i18nInst.language)}
-                    </div>
-                    <button
-                      onClick={() => {
-                        restoreVersion(v);
-                        setVersionsOpen(false);
-                      }}
-                      className="inline-flex items-center gap-1 text-xs font-semibold text-secondary hover:underline"
-                    >
-                      <RotateCcw className="h-3 w-3" />
-                      {t("contactDetail.versions.restore")}
-                    </button>
+              notes.map((n) => (
+                <div key={n.id} className="rounded-md border border-border p-4">
+                  <div className="text-xs text-muted-foreground mb-2">
+                    {new Date(n.created_at).toLocaleString(i18nInst.language)}
                   </div>
-                  <p className="text-sm whitespace-pre-wrap text-muted-foreground">
-                    {v.previous_text}
-                  </p>
+                  <p className="text-sm whitespace-pre-wrap">{n.note_text}</p>
                 </div>
               ))
             )}
           </div>
-        </SheetContent>
-      </Sheet>
+        </div>
+      </div>
 
       <AlertDialog open={archiveOpen} onOpenChange={setArchiveOpen}>
         <AlertDialogContent>

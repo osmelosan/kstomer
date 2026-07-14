@@ -211,7 +211,7 @@ export function getContactProfileTool(supabase: Supa, contactId: string): CrmToo
     definition: {
       name: "getContactProfile",
       description:
-        "Get a single contact's stage, confidence level, renewal date, last contact date, company, latest note text, and note edit activity",
+        "Get a single contact's stage, confidence level, renewal date, last contact date, company, and its notes (most recent first)",
       input_schema: { type: "object", properties: {} },
     },
     execute: async () => {
@@ -223,31 +223,17 @@ export function getContactProfileTool(supabase: Supa, contactId: string): CrmToo
         .eq("id", contactId)
         .maybeSingle();
 
-      const { data: note } = await supabase
-        .from("notes")
-        .select("id, note_text")
+      const { data: notes } = await supabase
+        .from("contact_notes")
+        .select("note_text, created_at")
         .eq("contact_id", contactId)
-        .order("created_at", { ascending: false })
-        .limit(1)
-        .maybeSingle();
-
-      let noteEditCount = 0;
-      let noteLastEditedAt: string | null = null;
-      if (note) {
-        const { data: history } = await supabase
-          .from("note_edit_history")
-          .select("edited_at")
-          .eq("note_id", note.id)
-          .order("edited_at", { ascending: false });
-        noteEditCount = history?.length ?? 0;
-        noteLastEditedAt = history?.[0]?.edited_at ?? null;
-      }
+        .order("created_at", { ascending: false });
 
       return {
         contact: contact ?? null,
-        note: note?.note_text ?? null,
-        noteEditCount,
-        noteLastEditedAt,
+        note: notes?.[0]?.note_text ?? null,
+        noteCount: notes?.length ?? 0,
+        noteLastCreatedAt: notes?.[0]?.created_at ?? null,
       };
     },
   };

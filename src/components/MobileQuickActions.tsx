@@ -79,11 +79,15 @@ export function MobileQuickActions() {
     if (!contact) return;
     setSubmitting(true);
     try {
-      await supabase.from("notes").insert({
+      await supabase.from("contact_notes").insert({
         organization_id: contact.organization_id,
         contact_id: contact.id,
         note_text: noteContent.trim(),
       });
+      await supabase
+        .from("contacts")
+        .update({ notes_count: contact.notes_count + 1 })
+        .eq("id", contact.id);
       toast.success(t("quickActions.noteAdded", { name: contact.contact_name }), {
         action: {
           label: t("quickActions.viewContact"),

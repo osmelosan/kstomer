@@ -17,8 +17,6 @@ import {
   Info,
   Pencil,
   Check,
-  History,
-  RotateCcw,
   Link2,
   X,
   Loader2,
@@ -28,13 +26,6 @@ import {
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-  SheetDescription,
-} from "@/components/ui/sheet";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -82,12 +73,10 @@ function ResellerDetail() {
   const { t, i18n: i18nInstance } = useTranslation();
   const {
     reseller,
-    note,
-    noteHistory,
+    notes,
     loading,
     updateReseller,
-    saveNote,
-    restoreVersion,
+    addNote,
     linkContact,
     unlinkContact,
     archiveReseller,
@@ -104,8 +93,7 @@ function ResellerDetail() {
     confidence_level: number | null;
   } | null>(null);
   const [noteDraft, setNoteDraft] = useState("");
-  const [noteTouched, setNoteTouched] = useState(false);
-  const [versionsOpen, setVersionsOpen] = useState(false);
+  const [savingNote, setSavingNote] = useState(false);
   const [linkTarget, setLinkTarget] = useState("");
   const [linkError, setLinkError] = useState<string | null>(null);
 
@@ -113,10 +101,17 @@ function ResellerDetail() {
     if (!value) return;
     await updateReseller(value);
   });
-  const noteAutosave = useAutosave(noteTouched ? noteDraft : null, async (value) => {
-    if (value === null) return;
-    await saveNote(value);
-  });
+
+  async function submitNote() {
+    if (!noteDraft.trim() || savingNote) return;
+    setSavingNote(true);
+    try {
+      await addNote(noteDraft);
+      setNoteDraft("");
+    } finally {
+      setSavingNote(false);
+    }
+  }
 
   if (loading) {
     return (
@@ -368,27 +363,47 @@ function ResellerDetail() {
             <div className="flex items-center justify-between mb-3">
               <h2 className="text-[15px] font-semibold tracking-tight">
                 {t("resellers.detail.notes")}
+                {notes.length > 0 && (
+                  <span className="ml-1 text-xs text-muted-foreground font-normal">
+                    ({notes.length})
+                  </span>
+                )}
               </h2>
-              <div className="flex items-center gap-2">
-                <AutosaveIndicator status={noteAutosave.status} savedAt={noteAutosave.savedAt} />
-                <button
-                  onClick={() => setVersionsOpen(true)}
-                  className="inline-flex items-center gap-1.5 h-8 px-2.5 rounded-md border border-input bg-card text-xs hover:bg-muted"
-                >
-                  <History className="h-3.5 w-3.5" />
-                  {noteHistory.length > 0 && <span>({noteHistory.length})</span>}
-                </button>
-              </div>
             </div>
             <Textarea
-              value={noteTouched ? noteDraft : (note?.note_text ?? "")}
-              onChange={(e) => {
-                setNoteTouched(true);
-                setNoteDraft(e.target.value);
-              }}
-              rows={6}
+              value={noteDraft}
+              onChange={(e) => setNoteDraft(e.target.value)}
+              placeholder={t("contactDetail.notePlaceholder")}
+              rows={4}
               className="text-sm"
             />
+            <div className="flex justify-end mt-3">
+              <button
+                onClick={submitNote}
+                disabled={!noteDraft.trim() || savingNote}
+                className="inline-flex items-center gap-1.5 h-9 px-3 rounded-md bg-secondary text-secondary-foreground text-sm font-semibold hover:bg-secondary/90 disabled:opacity-50 disabled:pointer-events-none"
+              >
+                {savingNote ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : null}
+                {t("contactDetail.saveNote")}
+              </button>
+            </div>
+
+            <div className="mt-5 space-y-3">
+              {notes.length === 0 ? (
+                <p className="text-sm text-muted-foreground text-center py-6">
+                  {t("contactDetail.notesEmpty")}
+                </p>
+              ) : (
+                notes.map((n) => (
+                  <div key={n.id} className="rounded-md border border-border p-3">
+                    <div className="text-xs text-muted-foreground mb-1.5">
+                      {new Date(n.created_at).toLocaleString(i18nInstance.language)}
+                    </div>
+                    <p className="text-sm whitespace-pre-wrap">{n.note_text}</p>
+                  </div>
+                ))
+              )}
+            </div>
           </section>
         </aside>
 
@@ -485,52 +500,6 @@ function ResellerDetail() {
           </div>
         </section>
       </div>
-
-      {/* Versions sheet */}
-      <Sheet open={versionsOpen} onOpenChange={setVersionsOpen}>
-        <SheetContent className="w-full sm:max-w-lg overflow-y-auto">
-          <SheetHeader>
-            <SheetTitle>{t("contactDetail.versions.title")}</SheetTitle>
-            <SheetDescription>{t("contactDetail.versions.current")}</SheetDescription>
-          </SheetHeader>
-          <div className="mt-6 space-y-5">
-            <div className="rounded-md border border-secondary/30 bg-secondary/5 p-4">
-              <div className="text-xs font-semibold text-secondary uppercase tracking-wider mb-2">
-                {t("contactDetail.versions.current")}
-              </div>
-              <p className="text-sm whitespace-pre-wrap">{note?.note_text ?? ""}</p>
-            </div>
-            {noteHistory.length === 0 ? (
-              <p className="text-sm text-muted-foreground text-center py-6">
-                {t("contactDetail.versions.empty")}
-              </p>
-            ) : (
-              noteHistory.map((v) => (
-                <div key={v.id} className="rounded-md border border-border p-4">
-                  <div className="flex items-center justify-between mb-2">
-                    <div className="text-xs text-muted-foreground">
-                      {new Date(v.edited_at).toLocaleString(i18nInstance.language)}
-                    </div>
-                    <button
-                      onClick={() => {
-                        restoreVersion(v);
-                        setVersionsOpen(false);
-                      }}
-                      className="inline-flex items-center gap-1 text-xs font-semibold text-secondary hover:underline"
-                    >
-                      <RotateCcw className="h-3 w-3" />
-                      {t("contactDetail.versions.restore")}
-                    </button>
-                  </div>
-                  <p className="text-sm whitespace-pre-wrap text-muted-foreground">
-                    {v.previous_text}
-                  </p>
-                </div>
-              ))
-            )}
-          </div>
-        </SheetContent>
-      </Sheet>
 
       <AlertDialog open={archiveOpen} onOpenChange={setArchiveOpen}>
         <AlertDialogContent>

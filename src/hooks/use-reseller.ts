@@ -42,14 +42,19 @@ function mapRow(row: any): Reseller {
   };
 }
 
-export type NoteVersion = { id: string; previous_text: string; edited_at: string };
-type NoteRow = { id: string; note_text: string; edited: boolean };
+export type ResellerNote = {
+  id: string;
+  organization_id: string;
+  reseller_id: string;
+  note_text: string;
+  created_at: string;
+  updated_at: string | null;
+};
 
 export function useReseller(id: string) {
   const { user } = useCurrentUser();
   const [reseller, setReseller] = useState<Reseller | null>(null);
-  const [note, setNote] = useState<NoteRow | null>(null);
-  const [noteHistory, setNoteHistory] = useState<NoteVersion[]>([]);
+  const [notes, setNotes] = useState<ResellerNote[]>([]);
   const [loading, setLoading] = useState(true);
 
   const load = useCallback(async () => {
@@ -63,24 +68,12 @@ export function useReseller(id: string) {
     setReseller(mapped);
 
     if (mapped) {
-      const { data: noteRow } = await supabase
-        .from("notes")
+      const { data: noteRows } = await supabase
+        .from("reseller_notes")
         .select("*")
         .eq("reseller_id", id)
-        .order("created_at", { ascending: false })
-        .limit(1)
-        .maybeSingle();
-      setNote(noteRow as NoteRow | null);
-      if (noteRow) {
-        const { data: history } = await supabase
-          .from("note_edit_history")
-          .select("*")
-          .eq("note_id", noteRow.id)
-          .order("edited_at", { ascending: false });
-        setNoteHistory((history ?? []) as NoteVersion[]);
-      } else {
-        setNoteHistory([]);
-      }
+        .order("created_at", { ascending: false });
+      setNotes((noteRows ?? []) as ResellerNote[]);
     }
     setLoading(false);
   }, [id]);
@@ -105,52 +98,21 @@ export function useReseller(id: string) {
     [id],
   );
 
-  const saveNote = useCallback(
+  const addNote = useCallback(
     async (text: string) => {
-      if (!reseller) return;
-      if (note) {
-        if (note.note_text === text) return;
-        await supabase
-          .from("note_edit_history")
-          .insert({ note_id: note.id, previous_text: note.note_text });
-        const { data: updated } = await supabase
-          .from("notes")
-          .update({ note_text: text, edited: true, updated_at: new Date().toISOString() })
-          .eq("id", note.id)
-          .select()
-          .single();
-        if (updated) setNote(updated as NoteRow);
-        setNoteHistory((prev) => [
-          {
-            id: crypto.randomUUID(),
-            previous_text: note.note_text,
-            edited_at: new Date().toISOString(),
-          },
-          ...prev,
-        ]);
-      } else {
-        if (!text.trim()) return;
-        const { data: created } = await supabase
-          .from("notes")
-          .insert({
-            organization_id: reseller.organization_id,
-            reseller_id: reseller.id,
-            note_text: text,
-          })
-          .select()
-          .single();
-        if (created) setNote(created as NoteRow);
-      }
+      if (!reseller || !text.trim()) return;
+      const { data: created } = await supabase
+        .from("reseller_notes")
+        .insert({
+          organization_id: reseller.organization_id,
+          reseller_id: reseller.id,
+          note_text: text.trim(),
+        })
+        .select()
+        .single();
+      if (created) setNotes((prev) => [created as ResellerNote, ...prev]);
     },
-    [reseller, note],
-  );
-
-  const restoreVersion = useCallback(
-    async (version: NoteVersion) => {
-      await saveNote(version.previous_text);
-      setNoteHistory((prev) => prev.filter((v) => v.id !== version.id));
-    },
-    [saveNote],
+    [reseller],
   );
 
   const linkContact = useCallback(
@@ -201,12 +163,10 @@ export function useReseller(id: string) {
 
   return {
     reseller,
-    note,
-    noteHistory,
+    notes,
     loading,
     updateReseller,
-    saveNote,
-    restoreVersion,
+    addNote,
     linkContact,
     unlinkContact,
     archiveReseller,
