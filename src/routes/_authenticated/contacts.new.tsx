@@ -71,7 +71,8 @@ function NewContact() {
     setSubmitting(true);
     try {
       const created = await createContact({
-        contact_name: `${form.firstName.trim()} ${form.lastName.trim()}`.trim(),
+        first_name: form.firstName.trim(),
+        last_name: form.lastName.trim() || null,
         company_name: form.company.trim() || null,
         email: form.email.trim(),
         phone: form.phone.trim() || null,

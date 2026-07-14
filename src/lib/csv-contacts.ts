@@ -1,8 +1,10 @@
 import Papa from "papaparse";
 import type { ContactStage } from "@/hooks/use-contacts";
+import { joinContactName } from "@/lib/contact-name";
 
 export const CSV_CONTACT_COLUMNS = [
-  "name",
+  "first_name",
+  "last_name",
   "company",
   "email",
   "phone",
@@ -28,6 +30,8 @@ export type CsvRowErrorCode =
   | "invalid_last_contact_date";
 
 export type ImportContactRow = {
+  first_name: string;
+  last_name: string | null;
   contact_name: string;
   company_name: string | null;
   email: string | null;
@@ -87,13 +91,16 @@ export function parseContactsCsv(fileText: string): CsvParseResult {
 
   const fields = result.meta.fields ?? [];
   const unknownColumns = fields.filter((f) => !CSV_CONTACT_COLUMNS.includes(f as CsvContactColumn));
-  const missingColumns = CSV_CONTACT_COLUMNS.filter((c) => c === "name" && !fields.includes(c));
+  const missingColumns = CSV_CONTACT_COLUMNS.filter(
+    (c) => c === "first_name" && !fields.includes(c),
+  );
 
   const rows: ParsedCsvRow[] = result.data.map((raw, index) => {
     const errors: CsvRowErrorCode[] = [];
 
-    const name = (raw.name ?? "").trim();
-    if (!name) errors.push("missing_name");
+    const firstName = (raw.first_name ?? "").trim();
+    if (!firstName) errors.push("missing_name");
+    const lastName = (raw.last_name ?? "").trim();
 
     const company = (raw.company ?? "").trim();
 
@@ -140,7 +147,9 @@ export function parseContactsCsv(fileText: string): CsvParseResult {
 
     return {
       rowNumber: index + 1,
-      contact_name: name,
+      first_name: firstName,
+      last_name: lastName || null,
+      contact_name: joinContactName(firstName, lastName),
       company_name: company || null,
       email,
       phone: phone || null,
@@ -185,7 +194,8 @@ export function generateContactsCsvTemplate(): string {
   const rows = [
     [...CSV_CONTACT_COLUMNS],
     [
-      "Jane Doe",
+      "Jane",
+      "Doe",
       "Acme Inc",
       "jane@acme.com",
       "+1 555 123 4567",

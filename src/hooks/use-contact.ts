@@ -53,6 +53,8 @@ export function useContact(id: string) {
         Pick<
           Contact,
           | "contact_name"
+          | "first_name"
+          | "last_name"
           | "company_name"
           | "email"
           | "phone"

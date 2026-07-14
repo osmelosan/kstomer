@@ -388,7 +388,8 @@ export const fr = {
       instructionsIntro:
         "La première ligne de votre fichier doit contenir exactement ces en-têtes de colonne (en anglais) :",
       fields: {
-        name: "— obligatoire. Le nom complet du contact.",
+        first_name: "— obligatoire. Le prénom du contact.",
+        last_name: "— optionnel. Le nom de famille du contact.",
         company: "— optionnel. Nom de l'entreprise ou de l'organisation.",
         email:
           "— optionnel mais doit être une adresse valide si renseignée ; utilisé pour détecter les doublons au sein de votre organisation.",
@@ -408,7 +409,7 @@ export const fr = {
       previewSummary: "{{valid}} ligne(s) prête(s) à importer, {{invalid}} ligne(s) en erreur.",
       unknownColumnsWarning: "Les colonnes non reconnues seront ignorées : {{columns}}.",
       errors: {
-        missing_name: "Le nom est obligatoire.",
+        missing_name: "Le prénom est obligatoire.",
         invalid_email: "L'adresse e-mail n'est pas valide.",
         invalid_stage:
           "Le stage doit être l'une des valeurs : new_lead, contacted, proposal, active, at_risk.",
@@ -429,6 +430,8 @@ export const fr = {
     title: "Détails du contact",
     back: "← Retour aux contacts",
     notFound: "Contact introuvable.",
+    firstName: "Prénom",
+    lastName: "Nom",
     sampleNote:
       "Julien est intéressé par le pack Premium CRM. Il souhaite intégrer son équipe de 3 personnes d'ici le mois prochain. Discussion prévue pour les remises sur volume.\n\nDernier point : validation du budget Q4 confirmée.",
     role: "CEO chez Beaumont Digital",

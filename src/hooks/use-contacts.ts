@@ -1,6 +1,7 @@
 import { useEffect, useState, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useCompany } from "@/lib/company-context";
+import { joinContactName } from "@/lib/contact-name";
 import { useCurrentUser } from "./use-current-user";
 
 export type ContactStage = "new_lead" | "contacted" | "proposal" | "active" | "at_risk";
@@ -18,6 +19,8 @@ export type Contact = {
   created_by_user_id: string;
   owner_user_id: string;
   contact_name: string;
+  first_name: string;
+  last_name: string | null;
   company_name: string | null;
   email: string | null;
   phone: string | null;
@@ -72,7 +75,8 @@ export function useContacts() {
 
   const createContact = useCallback(
     async (data: {
-      contact_name: string;
+      first_name: string;
+      last_name?: string | null;
       company_name?: string | null;
       email?: string | null;
       phone?: string | null;
@@ -86,7 +90,9 @@ export function useContacts() {
           organization_id: current.id,
           created_by_user_id: user.id,
           owner_user_id: user.id,
-          contact_name: data.contact_name,
+          first_name: data.first_name,
+          last_name: data.last_name ?? null,
+          contact_name: joinContactName(data.first_name, data.last_name),
           company_name: data.company_name ?? null,
           email: data.email ?? null,
           phone: data.phone ?? null,
@@ -106,7 +112,8 @@ export function useContacts() {
   const importContacts = useCallback(
     async (
       rows: {
-        contact_name: string;
+        first_name: string;
+        last_name: string | null;
         company_name: string | null;
         email: string | null;
         phone: string | null;
@@ -122,7 +129,9 @@ export function useContacts() {
         organization_id: current.id,
         created_by_user_id: user.id,
         owner_user_id: user.id,
-        contact_name: r.contact_name,
+        first_name: r.first_name,
+        last_name: r.last_name,
+        contact_name: joinContactName(r.first_name, r.last_name),
         company_name: r.company_name,
         email: r.email,
         phone: r.phone,
@@ -149,6 +158,8 @@ export function useContacts() {
         Pick<
           Contact,
           | "contact_name"
+          | "first_name"
+          | "last_name"
           | "company_name"
           | "email"
           | "phone"

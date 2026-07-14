@@ -230,8 +230,10 @@ export type Database = {
           created_at: string
           created_by_user_id: string
           email: string | null
+          first_name: string
           id: string
           last_contact_date: string | null
+          last_name: string | null
           notes_count: number
           organization_id: string
           owner_user_id: string
@@ -248,8 +250,10 @@ export type Database = {
           created_at?: string
           created_by_user_id: string
           email?: string | null
+          first_name: string
           id?: string
           last_contact_date?: string | null
+          last_name?: string | null
           notes_count?: number
           organization_id: string
           owner_user_id: string
@@ -266,8 +270,10 @@ export type Database = {
           created_at?: string
           created_by_user_id?: string
           email?: string | null
+          first_name?: string
           id?: string
           last_contact_date?: string | null
+          last_name?: string | null
           notes_count?: number
           organization_id?: string
           owner_user_id?: string

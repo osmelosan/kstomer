@@ -58,6 +58,7 @@ import {
 import { useAutosave, type AutosaveStatus } from "@/hooks/use-autosave";
 import { useContact } from "@/hooks/use-contact";
 import type { Contact, ContactStage } from "@/hooks/use-contacts";
+import { joinContactName } from "@/lib/contact-name";
 import { cn } from "@/lib/utils";
 import { useServerFn } from "@tanstack/react-start";
 import { analyzeContactHealth, draftFollowUp } from "@/lib/contact-ai.functions";
@@ -95,7 +96,9 @@ function ContactDetails() {
   const profileAutosave = useAutosave(draft, async (value) => {
     if (!value) return;
     await updateContact({
-      contact_name: value.contact_name,
+      first_name: value.first_name,
+      last_name: value.last_name,
+      contact_name: joinContactName(value.first_name, value.last_name),
       company_name: value.company_name,
       email: value.email,
       phone: value.phone,
@@ -185,11 +188,32 @@ function ContactDetails() {
             </div>
             <div className="flex-1 min-w-0">
               {editing ? (
-                <Input
-                  value={view.contact_name}
-                  onChange={(e) => setDraft({ ...view, contact_name: e.target.value })}
-                  className="text-xl font-bold h-10"
-                />
+                <div className="flex flex-wrap gap-2">
+                  <Input
+                    value={view.first_name}
+                    placeholder={t("contactDetail.firstName")}
+                    onChange={(e) =>
+                      setDraft({
+                        ...view,
+                        first_name: e.target.value,
+                        contact_name: joinContactName(e.target.value, view.last_name),
+                      })
+                    }
+                    className="text-xl font-bold h-10 flex-1 min-w-[140px]"
+                  />
+                  <Input
+                    value={view.last_name ?? ""}
+                    placeholder={t("contactDetail.lastName")}
+                    onChange={(e) =>
+                      setDraft({
+                        ...view,
+                        last_name: e.target.value || null,
+                        contact_name: joinContactName(view.first_name, e.target.value),
+                      })
+                    }
+                    className="text-xl font-bold h-10 flex-1 min-w-[140px]"
+                  />
+                </div>
               ) : (
                 <div className="flex items-center gap-3 flex-wrap">
                   <h2 className="text-[24px] font-bold tracking-tight break-words">

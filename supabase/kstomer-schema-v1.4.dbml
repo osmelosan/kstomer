@@ -78,6 +78,8 @@ Table contacts {
   created_by_user_id uuid [not null, ref: > auth_users.id]
   owner_user_id uuid [not null, ref: > auth_users.id]
   contact_name text [not null]
+  first_name text [not null]
+  last_name text
   company_name text
   email text
   phone text

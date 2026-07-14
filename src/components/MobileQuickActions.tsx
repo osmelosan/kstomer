@@ -16,6 +16,7 @@ import {
 import { cn } from "@/lib/utils";
 import { useContacts } from "@/hooks/use-contacts";
 import { useCompany } from "@/lib/company-context";
+import { splitContactName } from "@/lib/contact-name";
 import { supabase } from "@/integrations/supabase/client";
 
 type Mode = "menu" | "opportunity" | "note";
@@ -57,7 +58,8 @@ export function MobileQuickActions() {
     setSubmitting(true);
     try {
       const amount = Number(oppAmount.replace(/[^0-9.]/g, "")) || 0;
-      const created = await createContact({ contact_name: oppName.trim(), stage: "new_lead" });
+      const { firstName, lastName } = splitContactName(oppName);
+      const created = await createContact({ first_name: firstName, last_name: lastName, stage: "new_lead" });
       if (created && amount) {
         await upsertDealValue(created.id, created.organization_id, amount);
       }

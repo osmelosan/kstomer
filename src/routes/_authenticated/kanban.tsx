@@ -41,6 +41,7 @@ import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
 import { useContacts, type Contact, type ContactStage } from "@/hooks/use-contacts";
 import { useCompany } from "@/lib/company-context";
+import { splitContactName } from "@/lib/contact-name";
 
 export const Route = createFileRoute("/_authenticated/kanban")({
   head: () =>
@@ -292,6 +293,8 @@ function KanbanPage() {
               contact={editingContact}
               onSave={async (patch) => {
                 await updateContact(editingContact.id, {
+                  first_name: patch.first_name,
+                  last_name: patch.last_name,
                   contact_name: patch.contact_name,
                   confidence_level: patch.confidence_level,
                 });
@@ -318,7 +321,8 @@ function KanbanPage() {
               stage={draft.stage}
               onSave={async (patch) => {
                 const created = await createContact({
-                  contact_name: patch.contact_name,
+                  first_name: patch.first_name,
+                  last_name: patch.last_name,
                   stage: patch.stage,
                   confidence_level: patch.confidence_level,
                 });
@@ -532,6 +536,8 @@ function Confidence({ value }: { value: number }) {
 // ---------- Card editor ----------
 type CardPatch = {
   contact_name: string;
+  first_name: string;
+  last_name: string | null;
   amount: number;
   confidence_level: number | null;
   stage: ContactStage;
@@ -566,8 +572,11 @@ function CardEditor({
     }
     setSaving(true);
     try {
+      const { firstName, lastName } = splitContactName(name);
       await onSave({
         contact_name: name.trim(),
+        first_name: firstName,
+        last_name: lastName,
         amount: Math.max(0, amount),
         confidence_level: confidence,
         stage: cardStage,

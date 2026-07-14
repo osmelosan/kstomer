@@ -374,7 +374,8 @@ export const es = {
       instructionsIntro:
         "La primera fila de tu archivo debe contener exactamente estos encabezados de columna (en inglés):",
       fields: {
-        name: "— obligatorio. El nombre completo del contacto.",
+        first_name: "— obligatorio. El nombre del contacto.",
+        last_name: "— opcional. Los apellidos del contacto.",
         company: "— opcional. Nombre de la empresa u organización.",
         email:
           "— opcional, pero debe ser una dirección válida si se indica; se usa para detectar duplicados dentro de tu organización.",
@@ -414,6 +415,8 @@ export const es = {
     title: "Detalle del contacto",
     back: "← Volver a contactos",
     notFound: "Contacto no encontrado.",
+    firstName: "Nombre",
+    lastName: "Apellidos",
     sampleNote:
       "Julien está interesado en el pack Premium CRM. Quiere incorporar a su equipo de 3 personas el próximo mes. Conversación pendiente sobre descuentos por volumen.\n\nÚltimo punto: validación del presupuesto Q4 confirmada.",
     role: "CEO en Beaumont Digital",

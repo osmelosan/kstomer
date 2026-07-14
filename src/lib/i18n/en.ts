@@ -361,7 +361,8 @@ export const en = {
       instructionsIntro:
         "Your file's first row must contain these column headers exactly as shown (in English):",
       fields: {
-        name: "— required. The contact's full name.",
+        first_name: "— required. The contact's first name.",
+        last_name: "— optional. The contact's last name.",
         company: "— optional. Company or organization name.",
         email:
           "— optional but must be a valid address if provided; used to detect duplicates within your organization.",
@@ -381,7 +382,7 @@ export const en = {
       previewSummary: "{{valid}} row(s) ready to import, {{invalid}} row(s) with errors.",
       unknownColumnsWarning: "Unrecognized column(s) will be ignored: {{columns}}.",
       errors: {
-        missing_name: "Name is required.",
+        missing_name: "First name is required.",
         invalid_email: "Email address is not valid.",
         invalid_stage: "Stage must be one of: new_lead, contacted, proposal, active, at_risk.",
         invalid_renewal_date: "Renewal date must be in YYYY-MM-DD format.",
@@ -400,6 +401,8 @@ export const en = {
     title: "Contact details",
     back: "← Back to contacts",
     notFound: "Contact not found.",
+    firstName: "First name",
+    lastName: "Last name",
     sampleNote:
       "Julien is interested in the Premium CRM pack. He wants to onboard his 3-person team within the next month. Volume discount discussion scheduled.\n\nLatest: Q4 budget validation confirmed.",
     role: "CEO at Beaumont Digital",

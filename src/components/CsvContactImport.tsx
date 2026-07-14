@@ -53,6 +53,8 @@ export function CsvContactImport({
     setState("importing");
     try {
       const rows: ImportContactRow[] = parseResult.validRows.map((r) => ({
+        first_name: r.first_name,
+        last_name: r.last_name,
         contact_name: r.contact_name,
         company_name: r.company_name,
         email: r.email,
