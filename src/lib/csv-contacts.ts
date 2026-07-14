@@ -59,6 +59,25 @@ function normalizeDate(value: string): string | null | "invalid" {
   return value;
 }
 
+// Detects files that aren't plain-text CSV — e.g. a .numbers or .xlsx file
+// renamed/exported with a .csv extension. Those decode as garbage (zip
+// signature "PK", binary control chars) rather than as one bad row, so we
+// want to reject the whole file with a clear message instead of flooding
+// the preview with hundreds of "name is required" errors.
+export function looksLikeBinaryFile(fileText: string): boolean {
+  if (fileText.startsWith("PK") || fileText.startsWith("PK")) return true;
+  const sample = fileText.slice(0, 2000);
+  if (sample.length === 0) return false;
+  let suspicious = 0;
+  for (let i = 0; i < sample.length; i++) {
+    const code = sample.charCodeAt(i);
+    if (code === 0xfffd || (code < 32 && code !== 9 && code !== 10 && code !== 13)) {
+      suspicious++;
+    }
+  }
+  return suspicious / sample.length > 0.02;
+}
+
 export function parseContactsCsv(fileText: string): CsvParseResult {
   const result = Papa.parse<Record<string, string>>(fileText, {
     header: true,

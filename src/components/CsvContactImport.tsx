@@ -6,6 +6,7 @@ import {
   CSV_CONTACT_COLUMNS,
   dedupeByEmail,
   downloadContactsCsvTemplate,
+  looksLikeBinaryFile,
   parseContactsCsv,
   type CsvParseResult,
   type ImportContactRow,
@@ -34,6 +35,12 @@ export function CsvContactImport({
 
   async function handleFile(file: File) {
     const text = await file.text();
+    if (looksLikeBinaryFile(text)) {
+      toast.error(t("contacts.csvImport.notPlainTextError"));
+      setParseResult(null);
+      setState("idle");
+      return;
+    }
     const parsed = parseContactsCsv(text);
     const { deduped, duplicateCount: dupes } = dedupeByEmail(parsed.validRows);
     setParseResult({ ...parsed, validRows: deduped });

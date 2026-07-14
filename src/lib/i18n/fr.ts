@@ -402,6 +402,8 @@ export const fr = {
       emailColumn: "E-mail",
       filePickerLabel: "Choisir un fichier CSV",
       filePickerHint: "Seuls les fichiers .csv sont pris en charge.",
+      notPlainTextError:
+        "Ce fichier ne ressemble pas à un CSV en texte brut (il s'agit peut-être d'un fichier Excel ou Numbers enregistré avec l'extension .csv). Exportez-le en CSV texte brut et réessayez.",
       previewHeading: "Aperçu",
       previewSummary: "{{valid}} ligne(s) prête(s) à importer, {{invalid}} ligne(s) en erreur.",
       unknownColumnsWarning: "Les colonnes non reconnues seront ignorées : {{columns}}.",

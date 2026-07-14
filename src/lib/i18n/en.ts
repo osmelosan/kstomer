@@ -375,6 +375,8 @@ export const en = {
       emailColumn: "Email",
       filePickerLabel: "Choose a CSV file",
       filePickerHint: "Only .csv files are supported.",
+      notPlainTextError:
+        "This file doesn't look like a plain-text CSV (it may be an Excel or Numbers file saved with a .csv extension). Please export it as plain CSV text and try again.",
       previewHeading: "Preview",
       previewSummary: "{{valid}} row(s) ready to import, {{invalid}} row(s) with errors.",
       unknownColumnsWarning: "Unrecognized column(s) will be ignored: {{columns}}.",

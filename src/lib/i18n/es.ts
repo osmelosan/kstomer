@@ -388,6 +388,8 @@ export const es = {
       emailColumn: "Correo electrónico",
       filePickerLabel: "Elige un archivo CSV",
       filePickerHint: "Solo se admiten archivos .csv.",
+      notPlainTextError:
+        "Este archivo no parece un CSV de texto plano (puede ser un Excel o Numbers guardado con extensión .csv). Expórtalo como CSV de texto plano e inténtalo de nuevo.",
       previewHeading: "Vista previa",
       previewSummary: "{{valid}} fila(s) lista(s) para importar, {{invalid}} fila(s) con errores.",
       unknownColumnsWarning: "Las columnas no reconocidas se ignorarán: {{columns}}.",
