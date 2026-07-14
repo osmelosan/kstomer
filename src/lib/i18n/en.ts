@@ -915,8 +915,15 @@ export const en = {
       activeNow: "Active now",
       signOutSession: "Sign out",
       sessionClosed: "Session signed out.",
-      deleteAccount: "Delete account",
-      deleteAccountHint: "This cannot be undone. All your data will be erased.",
+      deleteAccount: "Archive my account",
+      deleteAccountHint:
+        "Your account and all its data (contacts, resellers, notes, reminders) are archived immediately and hidden from the app. They are kept for 12 months for compliance, then permanently and irreversibly deleted.",
+      deleteAccountConfirmTitle: "Archive your account?",
+      deleteAccountConfirmBody:
+        "You'll be signed out immediately and your data will no longer be accessible. It stays archived for 12 months (GDPR right-to-erasure grace period) before being permanently deleted. This cannot be undone once the 12 months have passed.",
+      deleteAccountConfirmAction: "Archive my account",
+      deleteAccountConfirmed: "Your account has been archived.",
+      deleteAccountError: "Something went wrong archiving your account. Please try again.",
     },
     integrations: {
       connected: "Connected",

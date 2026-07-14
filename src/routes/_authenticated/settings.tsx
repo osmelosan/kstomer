@@ -1,6 +1,18 @@
 import { pageHead } from "@/lib/route-seo";
 import i18nGlobal from "@/lib/i18n";
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { useQueryClient } from "@tanstack/react-query";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { useSubscription } from "@/hooks/use-subscription";
 import { useEntitlement } from "@/hooks/use-entitlement";
 import { listUsersWithRoles, setTesterRole } from "@/lib/admin.functions";
@@ -596,6 +608,26 @@ function BillingSection() {
 
 function SecuritySection({ twoFA, setTwoFA }: { twoFA: boolean; setTwoFA: (v: boolean) => void }) {
   const { t } = useTranslation();
+  const { archiveAccount } = useCompany();
+  const navigate = useNavigate();
+  const queryClient = useQueryClient();
+  const [archiving, setArchiving] = useState(false);
+
+  const handleArchiveAccount = async () => {
+    setArchiving(true);
+    try {
+      await archiveAccount();
+      await queryClient.cancelQueries();
+      queryClient.clear();
+      await supabase.auth.signOut();
+      toast.success(t("settings.security.deleteAccountConfirmed"));
+      navigate({ to: "/auth", replace: true });
+    } catch {
+      toast.error(t("settings.security.deleteAccountError"));
+      setArchiving(false);
+    }
+  };
+
   const sessions = [
     { id: "1", device: t("settings.security.thisBrowser"), icon: Monitor, current: true, lastSeen: t("settings.security.activeNow") },
   ];
@@ -674,10 +706,34 @@ function SecuritySection({ twoFA, setTwoFA }: { twoFA: boolean; setTwoFA: (v: bo
             </h3>
             <p className="text-sm text-muted-foreground mt-1">{t("settings.security.deleteAccountHint")}</p>
           </div>
-          <button className="h-9 px-4 rounded-md border border-destructive text-destructive text-sm font-semibold hover:bg-destructive hover:text-destructive-foreground transition-colors inline-flex items-center gap-2">
-            <Trash2 className="h-4 w-4" />
-            {t("common.delete")}
-          </button>
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <button
+                disabled={archiving}
+                className="h-9 px-4 rounded-md border border-destructive text-destructive text-sm font-semibold hover:bg-destructive hover:text-destructive-foreground transition-colors inline-flex items-center gap-2 disabled:opacity-60"
+              >
+                <Trash2 className="h-4 w-4" />
+                {t("settings.security.deleteAccountConfirmAction")}
+              </button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>{t("settings.security.deleteAccountConfirmTitle")}</AlertDialogTitle>
+                <AlertDialogDescription>
+                  {t("settings.security.deleteAccountConfirmBody")}
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>{t("common.cancel")}</AlertDialogCancel>
+                <AlertDialogAction
+                  onClick={handleArchiveAccount}
+                  className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                >
+                  {archiving ? t("common.loading") : t("settings.security.deleteAccountConfirmAction")}
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
         </div>
       </div>
     </>

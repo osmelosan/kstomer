@@ -11,6 +11,8 @@ export type Organization = {
   postal_code: string | null;
   country: string | null;
   description: string | null;
+  is_test: boolean;
+  archived_at: string | null;
   created_at: string;
   updated_at: string;
 };
@@ -47,6 +49,9 @@ export function useOrganizations() {
     setLoading(true);
     fetchOrgs(userId).then(async (orgs) => {
       if (cancelled) return;
+      // A user with only archived organizations (account archival pending
+      // permanent deletion) must not get a fresh default org auto-created —
+      // only truly zero rows (brand-new signup) triggers that.
       if (orgs.length === 0) {
         if (creatingForUserRef.current === userId) {
           // Another invocation is already creating the default org for this
@@ -66,7 +71,7 @@ export function useOrganizations() {
           .single();
         if (!cancelled && created) setOrganizations([created as Organization]);
       } else {
-        setOrganizations(orgs);
+        setOrganizations(orgs.filter((o) => !o.archived_at));
       }
       setLoading(false);
     });
@@ -114,11 +119,26 @@ export function useOrganizations() {
     setOrganizations((prev) => prev.filter((o) => o.id !== id));
   }, []);
 
+  // GDPR account archival (droit à l'effacement): marks every organization
+  // owned by the user as archived instead of deleting immediately. Archived
+  // organizations disappear from the app right away but are only purged for
+  // good 12 months later, by the /api/cron/organization-archival cron job.
+  const archiveAccount = useCallback(async () => {
+    if (!user) return;
+    const now = new Date().toISOString();
+    await supabase
+      .from("organizations")
+      .update({ archived_at: now })
+      .eq("owner_id", user.id)
+      .is("archived_at", null);
+    setOrganizations([]);
+  }, [user]);
+
   const refetch = useCallback(async () => {
     if (!user) return;
     const orgs = await fetchOrgs(user.id);
-    setOrganizations(orgs);
+    setOrganizations(orgs.filter((o) => !o.archived_at));
   }, [user, fetchOrgs]);
 
-  return { organizations, loading, createOrg, updateOrg, deleteOrg, refetch };
+  return { organizations, loading, createOrg, updateOrg, deleteOrg, archiveAccount, refetch };
 }

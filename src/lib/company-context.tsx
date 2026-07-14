@@ -24,6 +24,7 @@ type Ctx = {
   createOrg: (name: string, address?: string) => Promise<Organization | null>;
   updateOrg: (id: string, patch: { name?: string; address?: string | null; city?: string | null; postal_code?: string | null; country?: string | null; description?: string | null }) => Promise<Organization | null>;
   deleteOrg: (id: string) => Promise<void>;
+  archiveAccount: () => Promise<void>;
 };
 
 const CompanyContext = createContext<Ctx | null>(null);
@@ -31,7 +32,7 @@ const CompanyContext = createContext<Ctx | null>(null);
 const STORAGE_KEY = "kstomer_current_company_id";
 
 export function CompanyProvider({ children }: { children: ReactNode }) {
-  const { organizations, loading, createOrg, updateOrg, deleteOrg } = useOrganizations();
+  const { organizations, loading, createOrg, updateOrg, deleteOrg, archiveAccount } = useOrganizations();
   const { subscription } = useSubscription();
 
   const companies: Company[] = useMemo(
@@ -93,8 +94,8 @@ export function CompanyProvider({ children }: { children: ReactNode }) {
   };
 
   const value = useMemo(
-    () => ({ current, setCurrent: handleSetCurrent, companies, loading, maxCompanies, createOrg, updateOrg, deleteOrg }),
-    [current, companies, loading, maxCompanies, createOrg, updateOrg, deleteOrg],
+    () => ({ current, setCurrent: handleSetCurrent, companies, loading, maxCompanies, createOrg, updateOrg, deleteOrg, archiveAccount }),
+    [current, companies, loading, maxCompanies, createOrg, updateOrg, deleteOrg, archiveAccount],
   );
 
   return <CompanyContext.Provider value={value}>{children}</CompanyContext.Provider>;

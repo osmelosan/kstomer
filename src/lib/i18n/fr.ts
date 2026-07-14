@@ -947,8 +947,15 @@ export const fr = {
       activeNow: "Actif maintenant",
       signOutSession: "Déconnecter",
       sessionClosed: "Session déconnectée.",
-      deleteAccount: "Supprimer le compte",
-      deleteAccountHint: "Action irréversible. Toutes vos données seront effacées.",
+      deleteAccount: "Archiver mon compte",
+      deleteAccountHint:
+        "Votre compte et toutes ses données (contacts, revendeurs, notes, rappels) sont archivés immédiatement et disparaissent de l'application. Ils sont conservés 12 mois par conformité, puis supprimés définitivement et de façon irréversible.",
+      deleteAccountConfirmTitle: "Archiver votre compte ?",
+      deleteAccountConfirmBody:
+        "Vous serez déconnecté·e immédiatement et vos données ne seront plus accessibles. Elles restent archivées 12 mois (délai RGPD du droit à l'effacement) avant suppression définitive. Passé ce délai, l'action est irréversible.",
+      deleteAccountConfirmAction: "Archiver mon compte",
+      deleteAccountConfirmed: "Votre compte a été archivé.",
+      deleteAccountError: "Une erreur est survenue lors de l'archivage de votre compte. Réessayez.",
     },
     integrations: {
       connected: "Connecté",

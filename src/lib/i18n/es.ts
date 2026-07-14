@@ -930,8 +930,15 @@ export const es = {
       activeNow: "Activa ahora",
       signOutSession: "Cerrar sesión",
       sessionClosed: "Sesión cerrada.",
-      deleteAccount: "Eliminar cuenta",
-      deleteAccountHint: "Acción irreversible. Todos tus datos se eliminarán.",
+      deleteAccount: "Archivar mi cuenta",
+      deleteAccountHint:
+        "Tu cuenta y todos sus datos (contactos, revendedores, notas, recordatorios) se archivan de inmediato y dejan de estar visibles en la app. Se conservan 12 meses por cumplimiento normativo y después se eliminan de forma permanente e irreversible.",
+      deleteAccountConfirmTitle: "¿Archivar tu cuenta?",
+      deleteAccountConfirmBody:
+        "Se cerrará tu sesión de inmediato y dejarás de tener acceso a tus datos. Permanecen archivados 12 meses (plazo RGPD de derecho al olvido) antes de eliminarse definitivamente. Pasado ese plazo, la acción no se puede deshacer.",
+      deleteAccountConfirmAction: "Archivar mi cuenta",
+      deleteAccountConfirmed: "Tu cuenta ha sido archivada.",
+      deleteAccountError: "Ha ocurrido un error al archivar tu cuenta. Inténtalo de nuevo.",
     },
     integrations: {
       connected: "Conectado",
