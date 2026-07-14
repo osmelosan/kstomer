@@ -260,6 +260,12 @@ function KanbanPage() {
                 compact={compact}
                 onAddCard={() => addCard(stage)}
                 onCardClick={(id) => setEditingId(id)}
+                onMoveStage={(id, direction) => {
+                  const idx = STAGES.indexOf(stage);
+                  const nextIdx = idx + direction;
+                  if (nextIdx < 0 || nextIdx >= STAGES.length) return;
+                  void changeStage(id, STAGES[nextIdx]);
+                }}
               />
             ))}
           </div>
@@ -371,12 +377,14 @@ function ColumnView({
   compact,
   onAddCard,
   onCardClick,
+  onMoveStage,
 }: {
   stage: ContactStage;
   contacts: Contact[];
   compact: boolean;
   onAddCard: () => void;
   onCardClick: (id: string) => void;
+  onMoveStage: (id: string, direction: 1 | -1) => void;
 }) {
   const { t } = useTranslation();
   const { setNodeRef, isOver } = useDroppable({ id: stage });
@@ -421,6 +429,7 @@ function ColumnView({
               accent={STAGE_ACCENT[stage]}
               compact={compact}
               onClick={() => onCardClick(c.id)}
+              onMoveStage={(direction) => onMoveStage(c.id, direction)}
             />
           ))
         )}
@@ -442,11 +451,13 @@ function DraggableCard({
   accent,
   compact,
   onClick,
+  onMoveStage,
 }: {
   contact: Contact;
   accent: string;
   compact: boolean;
   onClick: () => void;
+  onMoveStage: (direction: 1 | -1) => void;
 }) {
   const { setNodeRef, attributes, listeners, isDragging } = useDraggable({ id: contact.id });
   return (
@@ -455,6 +466,21 @@ function DraggableCard({
       {...attributes}
       {...listeners}
       onClick={onClick}
+      onKeyDown={(e) => {
+        if (e.key === "Enter") {
+          e.preventDefault();
+          onClick();
+        } else if (e.key === "ArrowRight") {
+          e.preventDefault();
+          onMoveStage(1);
+        } else if (e.key === "ArrowLeft") {
+          e.preventDefault();
+          onMoveStage(-1);
+        } else {
+          listeners?.onKeyDown?.(e);
+        }
+      }}
+      className="rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50"
       style={{ opacity: isDragging ? 0.4 : 1 }}
     >
       <CardView contact={contact} accent={accent} compact={compact} />
