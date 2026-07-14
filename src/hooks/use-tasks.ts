@@ -45,8 +45,23 @@ export function useTasks() {
         setLoading(false);
       }
     });
+
+    const channel = supabase
+      .channel(`tasks-${user.id}`)
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "tasks", filter: `user_id=eq.${user.id}` },
+        () => {
+          fetchTasks(user.id).then((rows) => {
+            if (!cancelled) setTasks(rows);
+          });
+        },
+      )
+      .subscribe();
+
     return () => {
       cancelled = true;
+      supabase.removeChannel(channel);
     };
   }, [user, fetchTasks]);
 
