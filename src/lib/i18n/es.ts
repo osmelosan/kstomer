@@ -262,6 +262,18 @@ export const es = {
         "Opcionalmente, importa tus contactos existentes desde un archivo CSV para empezar más rápido.",
       skip: "Omitir, añadiré contactos más tarde",
     },
+    company: {
+      title: "Cuéntanos sobre tu empresa",
+      subtitle:
+        "Esto alimenta las sugerencias de IA de Kstomer (prospectos, insights): cuanto más completo, mejores serán las recomendaciones.",
+      name: "Nombre de la empresa",
+      city: "Ciudad",
+      country: "País",
+      description: "¿A qué se dedica tu empresa?",
+      descriptionPlaceholder: "ej.: Vendemos software de contabilidad a pequeños comercios en España.",
+      descriptionHint: "La IA lo usa para adaptar las sugerencias de prospectos e insights a tu negocio.",
+      skip: "Omitir, lo completaré más tarde",
+    },
   },
   dashboard: {
     metaTitle: "Panel — Kstomer",

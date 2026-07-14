@@ -249,6 +249,18 @@ export const en = {
       subtitle: "Optionally bring in your existing contacts from a CSV file to get started faster.",
       skip: "Skip, I'll add contacts later",
     },
+    company: {
+      title: "Tell us about your company",
+      subtitle:
+        "This powers Kstomer's AI suggestions (prospects, insights) — the more complete, the better the recommendations.",
+      name: "Company name",
+      city: "City",
+      country: "Country",
+      description: "What does your company do?",
+      descriptionPlaceholder: "e.g. We sell accounting software to small retailers in France.",
+      descriptionHint: "Used by the AI to tailor prospect and insight suggestions to your business.",
+      skip: "Skip, I'll fill this in later",
+    },
   },
   dashboard: {
     metaTitle: "Dashboard — Kstomer",

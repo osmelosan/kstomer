@@ -15,6 +15,7 @@ import { Logo } from "@/components/Logo";
 import i18nGlobal, { SUPPORTED_LANGUAGES, type LanguageCode } from "@/lib/i18n";
 import { useCurrentUser } from "@/hooks/use-current-user";
 import { useContacts } from "@/hooks/use-contacts";
+import { useCompany } from "@/lib/company-context";
 import { CsvContactImport } from "@/components/CsvContactImport";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -34,12 +35,19 @@ function Onboarding() {
   const { t, i18n } = useTranslation();
   const { user, profile } = useCurrentUser();
   const { importContacts } = useContacts();
-  const [step, setStep] = useState<1 | 2>(1);
+  const { companies, updateOrg } = useCompany();
+  const [step, setStep] = useState<1 | 2 | 3>(1);
   const [name, setName] = useState("");
   const [role, setRole] = useState("");
   const [taskReminders, setTaskReminders] = useState(true);
   const [prospect, setProspect] = useState(false);
   const [errors, setErrors] = useState<{ name?: string; role?: string }>({});
+
+  const [companyName, setCompanyName] = useState("");
+  const [companyCity, setCompanyCity] = useState("");
+  const [companyCountry, setCompanyCountry] = useState("");
+  const [companyDescription, setCompanyDescription] = useState("");
+  const [savingCompany, setSavingCompany] = useState(false);
 
   function handleContinue() {
     const next: { name?: string; role?: string } = {};
@@ -47,6 +55,21 @@ function Onboarding() {
     if (!role) next.role = t("onboarding.errors.roleRequired");
     setErrors(next);
     if (Object.keys(next).length === 0) setStep(2);
+  }
+
+  async function saveCompanyAndContinue() {
+    const org = companies[0];
+    if (org) {
+      setSavingCompany(true);
+      await updateOrg(org.id, {
+        name: companyName.trim() || org.name,
+        city: companyCity.trim() || null,
+        country: companyCountry.trim() || null,
+        description: companyDescription.trim() || null,
+      });
+      setSavingCompany(false);
+    }
+    setStep(3);
   }
 
   async function completeOnboarding() {
@@ -60,6 +83,11 @@ function Onboarding() {
       profile?.full_name || (user?.user_metadata?.full_name as string | undefined) || "";
     if (fullName) setName(fullName);
   }, [user, profile]);
+
+  useEffect(() => {
+    const org = companies[0];
+    if (org) setCompanyName((prev) => prev || org.name);
+  }, [companies]);
 
   return (
     <main className="min-h-screen bg-background px-6 py-10">
@@ -96,11 +124,14 @@ function Onboarding() {
         <div className="flex items-center justify-between text-xs font-semibold tracking-wider mb-3">
           <span className="text-secondary">{t("onboarding.configuration")}</span>
           <span className="text-muted-foreground">
-            {t("onboarding.step", { current: step, total: 2 })}
+            {t("onboarding.step", { current: step, total: 3 })}
           </span>
         </div>
         <div className="h-1.5 w-full rounded-full bg-secondary/15 overflow-hidden">
-          <div className="h-full bg-secondary" style={{ width: step === 1 ? "50%" : "100%" }} />
+          <div
+            className="h-full bg-secondary transition-all"
+            style={{ width: `${(step / 3) * 100}%` }}
+          />
         </div>
 
         <div className="mt-10 rounded-2xl bg-card border border-border shadow-[0_1px_3px_rgba(15,27,61,0.05)] p-10">
@@ -176,10 +207,89 @@ function Onboarding() {
                 </button>
               </div>
             </>
-          ) : (
+          ) : step === 2 ? (
             <>
               <button
                 onClick={() => setStep(1)}
+                className="flex items-center gap-2 text-sm font-semibold text-muted-foreground hover:text-foreground"
+              >
+                <ArrowLeft className="h-4 w-4" /> {t("onboarding.back")}
+              </button>
+              <h1 className="mt-4 text-[28px] font-bold tracking-tight">
+                {t("onboarding.company.title")}
+              </h1>
+              <p className="mt-2 text-muted-foreground">{t("onboarding.company.subtitle")}</p>
+
+              <div className="mt-8 space-y-6">
+                <div>
+                  <label className="block text-sm font-semibold mb-2">
+                    {t("onboarding.company.name")}
+                  </label>
+                  <input
+                    value={companyName}
+                    onChange={(e) => setCompanyName(e.target.value)}
+                    className="w-full h-12 px-4 rounded-md border border-input bg-card text-sm focus:outline-none focus:ring-2 focus:ring-ring/50"
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-semibold mb-2">
+                      {t("onboarding.company.city")}
+                    </label>
+                    <input
+                      value={companyCity}
+                      onChange={(e) => setCompanyCity(e.target.value)}
+                      className="w-full h-12 px-4 rounded-md border border-input bg-card text-sm focus:outline-none focus:ring-2 focus:ring-ring/50"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-semibold mb-2">
+                      {t("onboarding.company.country")}
+                    </label>
+                    <input
+                      value={companyCountry}
+                      onChange={(e) => setCompanyCountry(e.target.value)}
+                      className="w-full h-12 px-4 rounded-md border border-input bg-card text-sm focus:outline-none focus:ring-2 focus:ring-ring/50"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-semibold mb-2">
+                    {t("onboarding.company.description")}
+                  </label>
+                  <textarea
+                    rows={4}
+                    value={companyDescription}
+                    onChange={(e) => setCompanyDescription(e.target.value)}
+                    placeholder={t("onboarding.company.descriptionPlaceholder")}
+                    className="w-full rounded-md border border-input bg-card p-3 text-sm focus:outline-none focus:ring-2 focus:ring-ring/50"
+                  />
+                  <p className="mt-1.5 text-xs text-muted-foreground">
+                    {t("onboarding.company.descriptionHint")}
+                  </p>
+                </div>
+
+                <button
+                  onClick={saveCompanyAndContinue}
+                  disabled={savingCompany}
+                  className="mt-4 flex items-center justify-center gap-3 w-full h-13 py-4 rounded-md bg-secondary text-secondary-foreground font-semibold hover:bg-secondary/90 transition-colors disabled:opacity-60"
+                >
+                  {t("onboarding.continue")} <ArrowRight className="h-5 w-5" />
+                </button>
+                <button
+                  onClick={() => setStep(3)}
+                  className="w-full text-center text-sm text-muted-foreground hover:text-foreground"
+                >
+                  {t("onboarding.company.skip")}
+                </button>
+              </div>
+            </>
+          ) : (
+            <>
+              <button
+                onClick={() => setStep(2)}
                 className="flex items-center gap-2 text-sm font-semibold text-muted-foreground hover:text-foreground"
               >
                 <ArrowLeft className="h-4 w-4" /> {t("onboarding.back")}

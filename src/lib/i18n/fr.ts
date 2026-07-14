@@ -276,6 +276,18 @@ export const fr = {
         "Importez éventuellement vos contacts existants depuis un fichier CSV pour démarrer plus vite.",
       skip: "Passer, j'ajouterai mes contacts plus tard",
     },
+    company: {
+      title: "Parlez-nous de votre entreprise",
+      subtitle:
+        "Ces informations alimentent les suggestions IA de Kstomer (prospects, insights) — plus elles sont complètes, meilleures sont les recommandations.",
+      name: "Nom de l'entreprise",
+      city: "Ville",
+      country: "Pays",
+      description: "Que fait votre entreprise ?",
+      descriptionPlaceholder: "ex : Nous vendons des logiciels de comptabilité aux petits commerces en France.",
+      descriptionHint: "Utilisé par l'IA pour adapter les suggestions de prospects et d'insights à votre activité.",
+      skip: "Passer, je compléterai plus tard",
+    },
   },
   dashboard: {
     metaTitle: "Tableau de bord — Kstomer",
