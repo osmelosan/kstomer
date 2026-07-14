@@ -10,7 +10,6 @@ export const fr = {
     email: "Email",
     password: "Mot de passe",
     passwordHint: "Au moins 8 caractères. Les mots de passe compromis sont refusés.",
-    fullName: "Nom complet",
     newPassword: "Nouveau mot de passe",
     confirmPassword: "Confirmer le mot de passe",
     continueWithGoogle: "Continuer avec Google",

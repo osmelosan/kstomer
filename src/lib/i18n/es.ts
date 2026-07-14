@@ -10,7 +10,6 @@ export const es = {
     email: "Email",
     password: "Contraseña",
     passwordHint: "Al menos 8 caracteres. Las contraseñas comprometidas son rechazadas.",
-    fullName: "Nombre completo",
     newPassword: "Nueva contraseña",
     confirmPassword: "Confirmar contraseña",
     continueWithGoogle: "Continuar con Google",

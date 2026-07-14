@@ -246,7 +246,6 @@ function SignUpForm() {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [fullName, setFullName] = useState("");
   const [loading, setLoading] = useState(false);
   const [sent, setSent] = useState(false);
 
@@ -266,7 +265,6 @@ function SignUpForm() {
       password,
       options: {
         emailRedirectTo: `${window.location.origin}/auth/callback`,
-        data: { full_name: fullName },
       },
     });
     setLoading(false);
@@ -305,15 +303,6 @@ function SignUpForm() {
     <form onSubmit={onSubmit} className="space-y-4">
       <GoogleButton />
       <Divider />
-      <div className="space-y-2">
-        <Label htmlFor="signup-name">{t("auth.fullName")}</Label>
-        <Input
-          id="signup-name"
-          required
-          value={fullName}
-          onChange={(e) => setFullName(e.target.value)}
-        />
-      </div>
       <div className="space-y-2">
         <Label htmlFor="signup-email">{t("auth.email")}</Label>
         <Input
