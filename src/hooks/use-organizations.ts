@@ -134,11 +134,27 @@ export function useOrganizations() {
     setOrganizations([]);
   }, [user]);
 
+  // Undo an archival within the 12-month retention window: clears
+  // archived_at on every archived org owned by the user, making them
+  // active again before the purge cron can permanently delete them.
+  const restoreAccount = useCallback(async () => {
+    if (!user) return [];
+    const { data } = await supabase
+      .from("organizations")
+      .update({ archived_at: null })
+      .eq("owner_id", user.id)
+      .not("archived_at", "is", null)
+      .select();
+    const restored = (data as Organization[] | null) ?? [];
+    if (restored.length > 0) setOrganizations((prev) => [...prev, ...restored]);
+    return restored;
+  }, [user]);
+
   const refetch = useCallback(async () => {
     if (!user) return;
     const orgs = await fetchOrgs(user.id);
     setOrganizations(orgs.filter((o) => !o.archived_at));
   }, [user, fetchOrgs]);
 
-  return { organizations, loading, createOrg, updateOrg, deleteOrg, archiveAccount, refetch };
+  return { organizations, loading, createOrg, updateOrg, deleteOrg, archiveAccount, restoreAccount, refetch };
 }

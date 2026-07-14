@@ -1022,4 +1022,14 @@ export const fr = {
       errorCredits: "Crédits IA épuisés. Rechargez votre espace de travail.",
     },
   },
+  accountArchived: {
+    metaTitle: "Compte archivé — Kstomer",
+    title: "Votre compte est archivé",
+    body: "Vous avez archivé ce compte. Il est conservé 12 mois avant suppression définitive et irréversible. Vous pouvez le restaurer à tout moment avant ce délai.",
+    bodyWithDays: "Ce compte est archivé et sera supprimé définitivement et de façon irréversible dans {{days}} jours, sauf si vous le restaurez maintenant.",
+    restoreAction: "Restaurer mon compte",
+    signOutAction: "Se déconnecter",
+    restored: "Votre compte a été restauré.",
+    restoreError: "Une erreur est survenue lors de la restauration de votre compte. Réessayez.",
+  },
 };

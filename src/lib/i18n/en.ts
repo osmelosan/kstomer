@@ -990,4 +990,14 @@ export const en = {
       errorCredits: "AI credits exhausted. Top up your workspace.",
     },
   },
+  accountArchived: {
+    metaTitle: "Account archived — Kstomer",
+    title: "Your account is archived",
+    body: "You archived this account. It's kept for 12 months before being permanently and irreversibly deleted. You can restore it at any time before then.",
+    bodyWithDays: "This account is archived and will be permanently and irreversibly deleted in {{days}} days unless you restore it now.",
+    restoreAction: "Restore my account",
+    signOutAction: "Sign out",
+    restored: "Your account has been restored.",
+    restoreError: "Something went wrong restoring your account. Please try again.",
+  },
 };

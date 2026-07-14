@@ -1005,4 +1005,14 @@ export const es = {
       errorCredits: "Créditos de IA agotados. Recarga tu espacio de trabajo.",
     },
   },
+  accountArchived: {
+    metaTitle: "Cuenta archivada — Kstomer",
+    title: "Tu cuenta está archivada",
+    body: "Archivaste esta cuenta. Se conserva 12 meses antes de eliminarse de forma permanente e irreversible. Puedes restaurarla en cualquier momento antes de ese plazo.",
+    bodyWithDays: "Esta cuenta está archivada y se eliminará de forma permanente e irreversible en {{days}} días si no la restauras.",
+    restoreAction: "Restaurar mi cuenta",
+    signOutAction: "Cerrar sesión",
+    restored: "Tu cuenta ha sido restaurada.",
+    restoreError: "Ha ocurrido un error al restaurar tu cuenta. Inténtalo de nuevo.",
+  },
 };

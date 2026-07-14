@@ -20,6 +20,21 @@ export const Route = createFileRoute("/_authenticated")({
       }
     }
 
+    if (location.pathname !== "/account-archived") {
+      const { data: orgs } = await supabase
+        .from("organizations")
+        .select("archived_at")
+        .eq("owner_id", data.user.id);
+      const hasActiveOrg = (orgs ?? []).some((o) => !o.archived_at);
+      const hasArchivedOrg = (orgs ?? []).some((o) => o.archived_at);
+      // A brand-new user has zero orgs at all (useOrganizations creates the
+      // default one) — only redirect when every org the user owns is
+      // archived, i.e. their account is in the GDPR retention window.
+      if (!hasActiveOrg && hasArchivedOrg) {
+        throw redirect({ to: "/account-archived" });
+      }
+    }
+
     return { user: data.user };
   },
   component: () => <Outlet />,
