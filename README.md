@@ -150,7 +150,7 @@ Kanban, Contacts, Dashboard, Analytics, Resellers, Archives, Tasks, and billing 
 | **Billing** | `subscriptions` |
 | **AI** | `ai_insight_cache`, `ai_insights`, `ai_prompt_cache`, `agent_logs` |
 
-19 tables total, all with RLS enabled. `contact_notes` / `reseller_notes` replaced `notes` / `note_edit_history` on 2026-07-13 (multiple timestamped notes per contact/reseller, no edit history). `ai_insights`, `ai_prompt_cache`, `user_roles`, and `agent_logs` are currently empty — reserved for planned (V2) features rather than dead schema. Full field-level schema: [`supabase/kstomer-schema-v1.4.dbml`](supabase/kstomer-schema-v1.4.dbml).
+`organizations` gained `is_test` (flags test/demo accounts, exempt from plan limits and business metrics, admin-only via SQL) and `archived_at` (account-level GDPR archival, 12 months before permanent deletion, mirroring `contacts`/`resellers`) on 2026-07-14. 19 tables total, all with RLS enabled. `contact_notes` / `reseller_notes` replaced `notes` / `note_edit_history` on 2026-07-13 (multiple timestamped notes per contact/reseller, no edit history). `ai_insights`, `ai_prompt_cache`, `user_roles`, and `agent_logs` are currently empty — reserved for planned (V2) features rather than dead schema. Full field-level schema: [`supabase/kstomer-schema-v1.4.dbml`](supabase/kstomer-schema-v1.4.dbml).
 
 ## Pricing
 

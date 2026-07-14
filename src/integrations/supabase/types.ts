@@ -383,11 +383,13 @@ export type Database = {
       organizations: {
         Row: {
           address: string | null;
+          archived_at: string | null;
           city: string | null;
           country: string | null;
           created_at: string;
           description: string | null;
           id: string;
+          is_test: boolean;
           name: string;
           owner_id: string;
           postal_code: string | null;
@@ -395,11 +397,13 @@ export type Database = {
         };
         Insert: {
           address?: string | null;
+          archived_at?: string | null;
           city?: string | null;
           country?: string | null;
           created_at?: string;
           description?: string | null;
           id?: string;
+          is_test?: boolean;
           name: string;
           owner_id: string;
           postal_code?: string | null;
@@ -407,11 +411,13 @@ export type Database = {
         };
         Update: {
           address?: string | null;
+          archived_at?: string | null;
           city?: string | null;
           country?: string | null;
           created_at?: string;
           description?: string | null;
           id?: string;
+          is_test?: boolean;
           name?: string;
           owner_id?: string;
           postal_code?: string | null;
