@@ -76,6 +76,32 @@ async function warmProspectsForOrg(
   );
 }
 
+// The Vercel function has a 300s hard limit. Warming was previously a fully
+// sequential loop over every user/org, each doing multiple LLM round trips —
+// past a modest number of accounts that reliably exceeds 300s and the whole
+// run gets killed mid-loop with no summary logged. Bounded concurrency plus a
+// deadline check keeps each run fast and guarantees we stop starting new work
+// (and still return a clean, logged summary) before Vercel kills the function.
+const USER_CONCURRENCY = 8;
+const ORG_CONCURRENCY = 4;
+const DEADLINE_MS = 270_000;
+
+async function runInBatches<T>(
+  items: T[],
+  concurrency: number,
+  deadline: number,
+  fn: (item: T) => Promise<void>,
+): Promise<{ processed: number; truncated: boolean }> {
+  let processed = 0;
+  for (let i = 0; i < items.length; i += concurrency) {
+    if (Date.now() >= deadline) return { processed, truncated: true };
+    const batch = items.slice(i, i + concurrency);
+    await Promise.all(batch.map(fn));
+    processed += batch.length;
+  }
+  return { processed, truncated: false };
+}
+
 export const Route = createFileRoute("/api/cron/warm-ai-cache")({
   server: {
     handlers: {
@@ -94,12 +120,19 @@ export const Route = createFileRoute("/api/cron/warm-ai-cache")({
           return Response.json({ warmed: 0, errors: 0 });
         }
 
+        const deadline = Date.now() + DEADLINE_MS;
+
         let warmed = 0;
         let errors = 0;
         let page = 1;
         const perPage = 200;
+        let usersTruncated = false;
 
         for (;;) {
+          if (Date.now() >= deadline) {
+            usersTruncated = true;
+            break;
+          }
           const { data, error } = await supabaseAdmin.auth.admin.listUsers({ page, perPage });
           if (error) {
             console.error("[cron/warm-ai-cache] listUsers failed:", error);
@@ -108,7 +141,7 @@ export const Route = createFileRoute("/api/cron/warm-ai-cache")({
           const users = data?.users ?? [];
           if (users.length === 0) break;
 
-          for (const user of users) {
+          const result = await runInBatches(users, USER_CONCURRENCY, deadline, async (user) => {
             try {
               await warmTasksForUser(user.id, apiKey);
               warmed += 1;
@@ -116,9 +149,10 @@ export const Route = createFileRoute("/api/cron/warm-ai-cache")({
               errors += 1;
               console.error(`[cron/warm-ai-cache] failed for user ${user.id}:`, err);
             }
-          }
+          });
+          if (result.truncated) usersTruncated = true;
 
-          if (users.length < perPage) break;
+          if (users.length < perPage || result.truncated) break;
           page += 1;
         }
 
@@ -126,29 +160,49 @@ export const Route = createFileRoute("/api/cron/warm-ai-cache")({
         let dashboardErrors = 0;
         let prospectsWarmed = 0;
         let prospectsErrors = 0;
-        const { data: orgs, error: orgsError } = await supabaseAdmin
-          .from("organizations")
-          .select("id, owner_id, name, description, city, country");
-        if (orgsError) {
-          console.error("[cron/warm-ai-cache] list organizations failed:", orgsError);
-        }
-        for (const org of orgs ?? []) {
-          try {
-            await warmDashboardForOrg(org.owner_id, org.id, apiKey);
-            dashboardWarmed += 1;
-          } catch (err) {
-            dashboardErrors += 1;
-            console.error(`[cron/warm-ai-cache] failed for org ${org.id}:`, err);
+        let orgsTruncated = false;
+
+        if (Date.now() < deadline) {
+          const { data: orgs, error: orgsError } = await supabaseAdmin
+            .from("organizations")
+            .select("id, owner_id, name, description, city, country");
+          if (orgsError) {
+            console.error("[cron/warm-ai-cache] list organizations failed:", orgsError);
           }
 
-          if (!org.description && !org.city) continue; // matches analyzeProspects' MISSING_PROFILE guard
-          try {
-            await warmProspectsForOrg(org.owner_id, org.id, org, apiKey);
-            prospectsWarmed += 1;
-          } catch (err) {
-            prospectsErrors += 1;
-            console.error(`[cron/warm-ai-cache] failed prospects for org ${org.id}:`, err);
-          }
+          const orgResult = await runInBatches(
+            orgs ?? [],
+            ORG_CONCURRENCY,
+            deadline,
+            async (org) => {
+              try {
+                await warmDashboardForOrg(org.owner_id, org.id, apiKey);
+                dashboardWarmed += 1;
+              } catch (err) {
+                dashboardErrors += 1;
+                console.error(`[cron/warm-ai-cache] failed for org ${org.id}:`, err);
+              }
+
+              if (!org.description && !org.city) return; // matches analyzeProspects' MISSING_PROFILE guard
+              try {
+                await warmProspectsForOrg(org.owner_id, org.id, org, apiKey);
+                prospectsWarmed += 1;
+              } catch (err) {
+                prospectsErrors += 1;
+                console.error(`[cron/warm-ai-cache] failed prospects for org ${org.id}:`, err);
+              }
+            },
+          );
+          orgsTruncated = orgResult.truncated;
+        } else {
+          orgsTruncated = true;
+        }
+
+        if (usersTruncated || orgsTruncated) {
+          console.error("[cron/warm-ai-cache] hit deadline, run truncated", {
+            usersTruncated,
+            orgsTruncated,
+          });
         }
 
         return Response.json({
@@ -158,6 +212,7 @@ export const Route = createFileRoute("/api/cron/warm-ai-cache")({
           dashboardErrors,
           prospectsWarmed,
           prospectsErrors,
+          truncated: usersTruncated || orgsTruncated,
         });
       },
     },
