@@ -62,14 +62,35 @@ export function useContacts() {
     }
     let cancelled = false;
     setLoading(true);
-    fetchContacts(current.id === "all" ? null : current.id).then((rows) => {
+    const organizationId = current.id === "all" ? null : current.id;
+    fetchContacts(organizationId).then((rows) => {
       if (!cancelled) {
         setContacts(rows);
         setLoading(false);
       }
     });
+
+    const channel = supabase
+      .channel(`contacts-${organizationId ?? "all"}`)
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: "contacts",
+          ...(organizationId ? { filter: `organization_id=eq.${organizationId}` } : {}),
+        },
+        () => {
+          fetchContacts(organizationId).then((rows) => {
+            if (!cancelled) setContacts(rows);
+          });
+        },
+      )
+      .subscribe();
+
     return () => {
       cancelled = true;
+      supabase.removeChannel(channel);
     };
   }, [user, current.id, fetchContacts]);
 

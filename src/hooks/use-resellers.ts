@@ -98,14 +98,35 @@ export function useResellers() {
     }
     let cancelled = false;
     setLoading(true);
-    fetchResellers(current.id === "all" ? null : current.id).then((rows) => {
+    const organizationId = current.id === "all" ? null : current.id;
+    fetchResellers(organizationId).then((rows) => {
       if (!cancelled) {
         setResellers(rows);
         setLoading(false);
       }
     });
+
+    const channel = supabase
+      .channel(`resellers-${organizationId ?? "all"}`)
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: "resellers",
+          ...(organizationId ? { filter: `organization_id=eq.${organizationId}` } : {}),
+        },
+        () => {
+          fetchResellers(organizationId).then((rows) => {
+            if (!cancelled) setResellers(rows);
+          });
+        },
+      )
+      .subscribe();
+
     return () => {
       cancelled = true;
+      supabase.removeChannel(channel);
     };
   }, [user, current.id, fetchResellers]);
 
