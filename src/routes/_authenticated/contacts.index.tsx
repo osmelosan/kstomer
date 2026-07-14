@@ -1,5 +1,5 @@
 import { pageHead } from "@/lib/route-seo";
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { AppShell } from "@/components/AppShell";
 import { Filter, ChevronDown, Plus, Upload } from "lucide-react";
 import { useTranslation, Trans } from "react-i18next";
@@ -7,6 +7,7 @@ import i18n from "@/lib/i18n";
 import { useState } from "react";
 import { useContacts, type ContactStage } from "@/hooks/use-contacts";
 import { useCompany } from "@/lib/company-context";
+import { useRovingRowNav } from "@/hooks/use-roving-row-nav";
 import { CsvContactImport } from "@/components/CsvContactImport";
 import {
   Dialog,
@@ -63,6 +64,7 @@ function initialsOf(name: string) {
 
 function Contacts() {
   const { t, i18n: i18nInst } = useTranslation();
+  const navigate = useNavigate();
   const { contacts, loading, importContacts } = useContacts();
   const { current } = useCompany();
   const [stageFilter, setStageFilter] = useState<StageFilter>("all");
@@ -74,6 +76,7 @@ function Contacts() {
   });
 
   const filtered = contacts.filter((c) => stageFilter === "all" || c.stage === stageFilter);
+  const { getRowProps } = useRovingRowNav(filtered.length);
 
   const stageLabel = t(
     STAGE_OPTIONS.find((o) => o.value === stageFilter)?.labelKey ?? "contacts.stageAll",
@@ -154,36 +157,50 @@ function Contacts() {
                 </td>
               </tr>
             )}
-            {filtered.map((c) => (
-              <tr key={c.id} className="border-b border-border last:border-0 hover:bg-muted/40">
-                <td className="p-4">
-                  <Link
-                    to="/contacts/$id"
-                    params={{ id: c.id }}
-                    className="flex items-center gap-3"
-                  >
-                    <div className="h-9 w-9 rounded-full bg-secondary/15 text-secondary text-xs font-bold grid place-items-center">
-                      {initialsOf(c.contact_name)}
-                    </div>
-                    <div>
-                      <div className="font-semibold">{c.contact_name}</div>
-                      <div className="text-xs text-muted-foreground">{c.email}</div>
-                    </div>
-                  </Link>
-                </td>
-                <td className="p-4">{c.company_name ?? "—"}</td>
-                <td className="p-4">
-                  <span
-                    className={`inline-flex items-center text-xs font-semibold px-3 py-1 rounded-full border ${stageCls(c.stage)}`}
-                  >
-                    {t(`contacts.stages.${c.stage}`)}
-                  </span>
-                </td>
-                <td className="p-4 text-muted-foreground">
-                  {c.last_contact_date ? dateFmt.format(new Date(c.last_contact_date)) : "—"}
-                </td>
-              </tr>
-            ))}
+            {filtered.map((c, i) => {
+              const rowProps = getRowProps(i);
+              return (
+                <tr
+                  key={c.id}
+                  {...rowProps}
+                  onKeyDown={(e) => {
+                    rowProps.onKeyDown(e);
+                    if (e.key === "Enter") {
+                      void navigate({ to: "/contacts/$id", params: { id: c.id } });
+                    }
+                  }}
+                  className="border-b border-border last:border-0 hover:bg-muted/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50 focus-visible:bg-muted/40"
+                >
+                  <td className="p-4">
+                    <Link
+                      to="/contacts/$id"
+                      params={{ id: c.id }}
+                      tabIndex={-1}
+                      className="flex items-center gap-3"
+                    >
+                      <div className="h-9 w-9 rounded-full bg-secondary/15 text-secondary text-xs font-bold grid place-items-center">
+                        {initialsOf(c.contact_name)}
+                      </div>
+                      <div>
+                        <div className="font-semibold">{c.contact_name}</div>
+                        <div className="text-xs text-muted-foreground">{c.email}</div>
+                      </div>
+                    </Link>
+                  </td>
+                  <td className="p-4">{c.company_name ?? "—"}</td>
+                  <td className="p-4">
+                    <span
+                      className={`inline-flex items-center text-xs font-semibold px-3 py-1 rounded-full border ${stageCls(c.stage)}`}
+                    >
+                      {t(`contacts.stages.${c.stage}`)}
+                    </span>
+                  </td>
+                  <td className="p-4 text-muted-foreground">
+                    {c.last_contact_date ? dateFmt.format(new Date(c.last_contact_date)) : "—"}
+                  </td>
+                </tr>
+              );
+            })}
           </tbody>
         </table>
         <div className="flex items-center justify-between p-4 text-sm text-muted-foreground">

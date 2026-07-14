@@ -1,5 +1,5 @@
 import { pageHead } from "@/lib/route-seo";
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { AppShell } from "@/components/AppShell";
 import { Store, TrendingUp, Plus } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -10,6 +10,7 @@ import { analyzeResellers } from "@/lib/resellers-ai.functions";
 import { useResellers, tierFor } from "@/hooks/use-resellers";
 import { useCompany } from "@/lib/company-context";
 import { AiInsightCard, type AiInsightStatus } from "@/components/AiInsightCard";
+import { useRovingRowNav } from "@/hooks/use-roving-row-nav";
 
 export const Route = createFileRoute("/_authenticated/resellers/")({
   head: () =>
@@ -32,9 +33,11 @@ function fmtMoney(n: number) {
 
 function Resellers() {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const { current } = useCompany();
   const { resellers, loading } = useResellers();
   const totalRevenue = resellers.reduce((sum, r) => sum + r.revenue, 0);
+  const { getRowProps } = useRovingRowNav(resellers.length);
 
   return (
     <AppShell
@@ -86,17 +89,26 @@ function Resellers() {
               </tr>
             </thead>
             <tbody>
-              {resellers.map((r) => {
+              {resellers.map((r, i) => {
                 const tier = tierFor(r.revenue);
+                const rowProps = getRowProps(i);
                 return (
                   <tr
                     key={r.id}
-                    className="border-b border-border last:border-0 hover:bg-muted/40 cursor-pointer"
+                    {...rowProps}
+                    onKeyDown={(e) => {
+                      rowProps.onKeyDown(e);
+                      if (e.key === "Enter") {
+                        void navigate({ to: "/resellers/$id", params: { id: r.id } });
+                      }
+                    }}
+                    className="border-b border-border last:border-0 hover:bg-muted/40 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50 focus-visible:bg-muted/40"
                   >
                     <td className="p-4 font-semibold">
                       <Link
                         to="/resellers/$id"
                         params={{ id: r.id }}
+                        tabIndex={-1}
                         className="text-foreground hover:text-secondary transition-colors"
                       >
                         {r.name}
