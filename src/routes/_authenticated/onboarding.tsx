@@ -78,6 +78,11 @@ function Onboarding() {
     nav({ to: "/dashboard" });
   }
 
+  async function backToSignIn() {
+    await supabase.auth.signOut();
+    nav({ to: "/auth" });
+  }
+
   useEffect(() => {
     const fullName =
       profile?.full_name || (user?.user_metadata?.full_name as string | undefined) || "";
@@ -137,7 +142,13 @@ function Onboarding() {
         <div className="mt-10 rounded-2xl bg-card border border-border shadow-[0_1px_3px_rgba(15,27,61,0.05)] p-10">
           {step === 1 ? (
             <>
-              <h1 className="text-[28px] font-bold tracking-tight">{t("onboarding.title")}</h1>
+              <button
+                onClick={backToSignIn}
+                className="flex items-center gap-2 text-sm font-semibold text-muted-foreground hover:text-foreground"
+              >
+                <ArrowLeft className="h-4 w-4" /> {t("onboarding.backToSignIn")}
+              </button>
+              <h1 className="mt-4 text-[28px] font-bold tracking-tight">{t("onboarding.title")}</h1>
               <p className="mt-2 text-muted-foreground">{t("onboarding.subtitle")}</p>
 
               <div className="mt-8 space-y-6">

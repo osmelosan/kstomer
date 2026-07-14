@@ -251,6 +251,7 @@ export const es = {
     continue: "Continuar la configuración",
     skip: "Omitir este paso",
     back: "Atrás",
+    backToSignIn: "Volver al inicio de sesión",
     privacy: "Tus datos están seguros y nunca serán compartidos.",
     errors: {
       nameRequired: "Introduce tu nombre completo.",

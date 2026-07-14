@@ -239,6 +239,7 @@ export const en = {
     continue: "Continue setup",
     skip: "Skip this step",
     back: "Back",
+    backToSignIn: "Back to sign in",
     privacy: "Your data is secure and will never be shared.",
     errors: {
       nameRequired: "Please enter your full name.",

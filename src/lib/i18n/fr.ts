@@ -265,6 +265,7 @@ export const fr = {
     continue: "Continuer la configuration",
     skip: "Passer cette étape",
     back: "Retour",
+    backToSignIn: "Retour à la connexion",
     privacy: "Vos données sont sécurisées et ne seront jamais partagées.",
     errors: {
       nameRequired: "Merci de renseigner votre nom complet.",
