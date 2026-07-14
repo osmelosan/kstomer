@@ -1,17 +1,18 @@
-# Histórico de commits por módulo
+# Historique des commits par module
 
-Este changelog agrupa el historial de git de `kstomer` según los módulos del
-bootcamp. El repo no tiene commits para "Semana 1: Cadrage, Stratégie y Choix
-de Stack" — ese trabajo (elección de stack, scaffolding inicial) se hizo antes
-de este historial de git, por lo que no aparece aquí.
+Ce changelog regroupe l'historique git de `kstomer` selon les modules du
+bootcamp. Le dépôt ne contient aucun commit pour « Semaine 1 : Cadrage,
+Stratégie et Choix de Stack » — ce travail (choix de la stack, scaffolding
+initial) a été fait avant le début de cet historique git, donc il n'apparaît
+pas ici.
 
-Los módulos avanzaron de forma entrelazada (no en bloques secuenciales), así
-que las fechas se solapan entre secciones.
+Les modules ont avancé de façon entrelacée (pas en blocs séquentiels), donc
+les dates se chevauchent entre les sections.
 
-## 🎯 Semana 1 — Cadrage, Stratégie y Choix de Stack
-_(sin commits registrados en git — trabajo previo al historial actual)_
+## 🎯 Semaine 1 — Cadrage, Stratégie et Choix de Stack
+_(aucun commit enregistré dans git — travail antérieur à l'historique actuel)_
 
-## 💿 Semana 2 — Architecture de données et Back-end
+## 💿 Semaine 2 — Architecture de données et Back-end
 
 - `546b031` feat: wire Contacts to real Supabase data, migrate CRM tables to organizations
 - `8fb0a9d` feat: wire Kanban to real Supabase data as a stage-grouped Contacts view
@@ -32,7 +33,7 @@ _(sin commits registrados en git — trabajo previo al historial actual)_
 - `61cab69` Reject binary files masquerading as CSV in contact import
 - `03164eb` Drop full-name field from signup form
 
-## 🎨 Semana 3 — Front-end
+## 🎨 Semaine 3 — Front-end
 
 - `2eb3201` Fix mobile contact header overlap and notes placeholder i18n key
 - `0f74c10` Merge branch 'claude/mobile-layout-notes-placeholder-elg3rk' into main
@@ -57,7 +58,7 @@ _(sin commits registrados en git — trabajo previo al historial actual)_
 - `df8c804` Update Empire plan monthly price to €51
 - `1d7b34e` Fix Empire plan annual price to €51/month
 
-## 🤖 Semana 4 — Intelligence métier et automatisation
+## 🤖 Semaine 4 — Intelligence métier et automatisation
 
 - `90fe346` Add prompt caching to the Claude system prompts for the AI insight cards
 - `9851016` Switch AI insight cards to Haiku 4.5, Prospects to Sonnet 5
@@ -72,7 +73,7 @@ _(sin commits registrados en git — trabajo previo al historial actual)_
 - `e629b29` Bound concurrency and add a deadline to the AI cache warm cron
 - `a82e56c` Prewarm the dashboard AI briefing cache at 4am UTC
 
-## 📊 Semana 5 — Dashboards de données et déploiement sécurisé
+## 📊 Semaine 5 — Dashboards de données et déploiement sécurisé
 
 - `a3d0cac` feat: wire Analytics to real Supabase data, drop two unbacked sections
 - `45fb9eb` Add automatic J-30/J-7/J renewal reminders and real notifications feed
@@ -82,7 +83,7 @@ _(sin commits registrados en git — trabajo previo al historial actual)_
 - `e7a7277` Merge pull request #21 from osmelosan/claude/ai-briefing-priority-alignment-lggt7z
 - `096fdd4` Add Supabase Realtime sync for contacts, resellers, and tasks (#24)
 
-## 📝 Transversal (docs / general, no atado a un módulo específico)
+## 📝 Transversal (docs / général, non rattaché à un module précis)
 
 - `47bd663` Update README with current system state
 - `3d2083b` Add terminology note about organizations vs accounts model
