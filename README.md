@@ -22,7 +22,7 @@
 
 ## À propos
 
-Kstomer aide les fondateurs solo et les consultants à reprendre le contrôle de leurs ventes en quelques minutes : un pipeline Kanban, un carnet de contacts unifié, des rappels de tâches et des analyses légères — le tout dans un seul outil, pensé pour la rapidité, la clarté et la confiance. Pas de CRM d'entreprise surchargé, pas de bruit — juste ce dont une activité commerciale d'une seule personne a réellement besoin.
+Kstomer aide les fondateurs solo et les consultants à reprendre le contrôle de leurs ventes en quelques minutes : un pipeline Kanban, un carnet de contacts unifié, des rappels de tâches et des analyses légères, le tout dans un seul outil, pensé pour la rapidité, la clarté et la confiance. Pas de CRM d'entreprise surchargé, pas de bruit, juste ce dont une activité commerciale d'une seule personne a réellement besoin.
 
 ## Fonctionnalités
 
@@ -94,8 +94,6 @@ bun install
 # 3. Lancer le serveur de développement
 bun run dev
 ```
-
-L'application tourne par défaut sur `http://localhost:3000`.
 
 ## Scripts disponibles
 
