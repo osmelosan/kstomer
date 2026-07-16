@@ -6,7 +6,7 @@
   <img alt="Kstomer" src="public/kstomer-horizontal-on-light.png" width="360">
 </picture>
 
-### The efficient, precise, no-noise CRM for solopreneurs.
+### Le CRM efficace, précis et sans bruit pour les solopreneurs.
 
 [![React](https://img.shields.io/badge/React-19-149eca?logo=react&logoColor=white)](https://react.dev)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.8-3178c6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
@@ -20,115 +20,115 @@
 
 ---
 
-## About
+## À propos
 
-Kstomer helps solo founders and consultants take control of their sales in minutes: a Kanban pipeline, a unified contact book, task reminders, and lightweight analytics — all in one tool, built for speed, clarity and trust. No bloated enterprise CRM, no noise — just what a one-person sales operation actually needs.
+Kstomer aide les fondateurs solo et les consultants à reprendre le contrôle de leurs ventes en quelques minutes : un pipeline Kanban, un carnet de contacts unifié, des rappels de tâches et des analyses légères — le tout dans un seul outil, pensé pour la rapidité, la clarté et la confiance. Pas de CRM d'entreprise surchargé, pas de bruit — juste ce dont une activité commerciale d'une seule personne a réellement besoin.
 
-## Features
+## Fonctionnalités
 
-- 🗂️ **Kanban pipeline** — drag-and-drop deal tracking (`@dnd-kit`)
-- 📇 **Unified contact book** — one place for every prospect and client
-- ✅ **Tasks & follow-up reminders** — never drop a deal
-- 📊 **AI-assisted insights** — Claude tool-calling agent diagnoses and next steps on the Dashboard (including an AI-suggested prospects card), Tasks, Analytics, and Resellers pages
-- 🤝 **Reseller / portfolio management** — track partners and their pipelines
-- 🏢 **Multi-organization support** — switch between companies, with a guided 3-step onboarding flow (profile → company info → CSV import) that's fully navigable back and forth
-- 📥 **CSV contact import** — bulk-import contacts (first/last name, company, email, phone, stage, dates) from onboarding or the Contacts page, with duplicate-email detection and rejection of non-CSV files masquerading as `.csv`
-- 💳 **Built-in billing** — Stripe Checkout, embedded checkout, billing portal, and subscription management
-- 🌍 **Multi-language** — English, Spanish and French, with IP-based auto-detection
+- 🗂️ **Pipeline Kanban** — suivi des affaires par glisser-déposer (`@dnd-kit`)
+- 📇 **Carnet de contacts unifié** — un seul endroit pour chaque prospect et client
+- ✅ **Tâches et rappels de relance** — ne laissez jamais tomber une affaire
+- 📊 **Insights assistés par IA** — un agent Claude à appel d'outils diagnostique la situation et propose les prochaines étapes sur le Tableau de bord (dont une carte de prospects suggérés par l'IA), les Tâches, l'Analytique et les Revendeurs
+- 🤝 **Gestion des revendeurs / portefeuille** — suivez les partenaires et leurs pipelines
+- 🏢 **Support multi-organisation** — basculez entre les entreprises, avec un parcours d'onboarding guidé en 3 étapes (profil → informations sur l'entreprise → import CSV) entièrement navigable dans les deux sens
+- 📥 **Import CSV de contacts** — importez des contacts en masse (prénom/nom, entreprise, email, téléphone, étape, dates) depuis l'onboarding ou la page Contacts, avec détection des doublons par email et rejet des fichiers non-CSV déguisés en `.csv`
+- 💳 **Facturation intégrée** — Stripe Checkout, checkout intégré, portail de facturation et gestion des abonnements
+- 🌍 **Multilingue** — français, espagnol et anglais, avec détection automatique par IP
 
-## Tech stack
+## Stack technique
 
-| Layer | Stack |
+| Couche | Stack |
 |---|---|
-| **Framework** | [TanStack Start](https://tanstack.com/start) + [TanStack Router](https://tanstack.com/router) (file-based routing, SSR), React 19, Vite 8, Nitro (Cloudflare target) |
-| **UI** | Tailwind CSS v4, [shadcn/ui](https://ui.shadcn.com) (new-york style) on Radix UI primitives, `lucide-react`, `recharts` |
-| **Data & forms** | TanStack Query, `react-hook-form` + `zod` |
-| **Backend** | [Supabase](https://supabase.com) — Postgres, Auth, Row Level Security |
-| **Payments** | [Stripe](https://stripe.com) SDK, used directly (no gateway abstraction) |
-| **AI** | Claude (`@anthropic-ai/sdk`), called directly — tool-calling agent loop, no gateway abstraction |
-| **i18n** | `i18next` / `react-i18next` (en, es, fr) |
-| **Tooling** | TypeScript (strict), ESLint 9 (flat config), Prettier, Bun |
+| **Framework** | [TanStack Start](https://tanstack.com/start) + [TanStack Router](https://tanstack.com/router) (routage basé sur les fichiers, SSR), React 19, Vite 8, Nitro (cible Cloudflare) |
+| **UI** | Tailwind CSS v4, [shadcn/ui](https://ui.shadcn.com) (style new-york) sur les primitives Radix UI, `lucide-react`, `recharts` |
+| **Données et formulaires** | TanStack Query, `react-hook-form` + `zod` |
+| **Back-end** | [Supabase](https://supabase.com) — Postgres, Auth, Row Level Security |
+| **Paiements** | SDK [Stripe](https://stripe.com), utilisé directement (pas d'abstraction de passerelle) |
+| **IA** | Claude (`@anthropic-ai/sdk`), appelé directement — boucle d'agent à appel d'outils, pas d'abstraction de passerelle |
+| **i18n** | `i18next` / `react-i18next` (fr, es, en) |
+| **Outillage** | TypeScript (strict), ESLint 9 (config flat), Prettier, Bun |
 
-## Project structure
+## Structure du projet
 
 ```
 src/
-├── routes/                  # TanStack Router file-based routes
-│   ├── index.tsx            # Marketing home page
-│   ├── pricing.tsx          # Pricing page
-│   ├── auth*.tsx            # Sign in / reset password / OAuth callback
-│   ├── checkout.return.tsx  # Post-Stripe-checkout return
-│   ├── api/public/payments/webhook.ts  # Stripe webhook handler
-│   ├── api/cron/warm-ai-cache.ts       # Vercel Cron: pre-warm Tasks AI insight cache
-│   └── _authenticated/      # Dashboard, kanban, contacts, tasks,
-│                             # analytics, resellers, archives, settings
-├── components/               # App shell, command palette, checkout UI, ...
-│   └── ui/                   # shadcn/ui primitives
+├── routes/                  # Routes TanStack Router basées sur les fichiers
+│   ├── index.tsx            # Page d'accueil marketing
+│   ├── pricing.tsx          # Page des tarifs
+│   ├── auth*.tsx            # Connexion / réinitialisation du mot de passe / callback OAuth
+│   ├── checkout.return.tsx  # Retour après Stripe Checkout
+│   ├── api/public/payments/webhook.ts  # Gestionnaire du webhook Stripe
+│   ├── api/cron/warm-ai-cache.ts       # Vercel Cron : préchauffe le cache d'insights IA des Tâches
+│   └── _authenticated/      # Tableau de bord, kanban, contacts, tâches,
+│                             # analytique, revendeurs, archives, paramètres
+├── components/               # Coque de l'app, palette de commandes, UI de checkout, ...
+│   └── ui/                   # Primitives shadcn/ui
 ├── hooks/                    # use-tasks, use-subscription, use-organizations, ...
 ├── lib/                      # pricing-plans, stripe, i18n, utils
-│   ├── crm-ai-tools.server.ts       # Shared tool definitions for the AI insights cards
-│   ├── dashboard-ai.functions.ts    # AI insights server fn for the Dashboard
-│   ├── tasks-ai.functions.ts        # AI insights server fn for Tasks
-│   ├── analytics-ai.functions.ts    # AI insights server fn for Analytics
-│   ├── resellers-ai.functions.ts    # AI insights server fn for Resellers
-│   ├── prospects-ai.functions.ts    # AI-suggested prospects card (Dashboard)
-│   └── csv-contacts.ts              # CSV parsing/validation for bulk contact import
-├── integrations/supabase/    # Browser + server Supabase clients, auth, DB types
+│   ├── crm-ai-tools.server.ts       # Définitions d'outils partagées pour les cartes d'insights IA
+│   ├── dashboard-ai.functions.ts    # Fonction serveur d'insights IA pour le Tableau de bord
+│   ├── tasks-ai.functions.ts        # Fonction serveur d'insights IA pour les Tâches
+│   ├── analytics-ai.functions.ts    # Fonction serveur d'insights IA pour l'Analytique
+│   ├── resellers-ai.functions.ts    # Fonction serveur d'insights IA pour les Revendeurs
+│   ├── prospects-ai.functions.ts    # Carte de prospects suggérés par l'IA (Tableau de bord)
+│   └── csv-contacts.ts              # Analyse/validation CSV pour l'import de contacts en masse
+├── integrations/supabase/    # Clients Supabase navigateur + serveur, auth, types DB
 └── assets/
 supabase/
-└── migrations/                # SQL migrations
-public/                        # Brand assets, favicon, llms.txt
+└── migrations/                # Migrations SQL
+public/                        # Ressources de marque, favicon, llms.txt
 ```
 
-## Getting started
+## Démarrage
 
-**Prerequisites:** [Bun](https://bun.sh) (preferred) or Node.js 20+
+**Prérequis :** [Bun](https://bun.sh) (recommandé) ou Node.js 20+
 
 ```bash
-# 1. Install dependencies
+# 1. Installer les dépendances
 bun install
-# or: npm install
+# ou : npm install
 
-# 2. Configure environment variables (see below) in .env / .env.development
+# 2. Configurer les variables d'environnement (voir ci-dessous) dans .env / .env.development
 
-# 3. Run the dev server
+# 3. Lancer le serveur de développement
 bun run dev
 ```
 
-The app runs at `http://localhost:3000` by default.
+L'application tourne par défaut sur `http://localhost:3000`.
 
-## Available scripts
+## Scripts disponibles
 
 | Script | Description |
 |---|---|
-| `bun run dev` | Start the Vite dev server |
-| `bun run build` | Production build |
-| `bun run build:dev` | Development-mode build |
-| `bun run preview` | Preview a production build locally |
-| `bun run lint` | Run ESLint |
-| `bun run format` | Format the codebase with Prettier |
+| `bun run dev` | Démarre le serveur de développement Vite |
+| `bun run build` | Build de production |
+| `bun run build:dev` | Build en mode développement |
+| `bun run preview` | Prévisualiser un build de production en local |
+| `bun run lint` | Lancer ESLint |
+| `bun run format` | Formater le code avec Prettier |
 
-> No automated test suite exists yet.
+> Aucune suite de tests automatisés n'existe pour l'instant.
 
-## Environment variables
+## Variables d'environnement
 
-Non-secret config and empty placeholders live in the committed `.env`; secrets are set in the **Vercel dashboard** (Settings → Environment Variables), not committed to the repo.
+La configuration non sensible et les emplacements vides des secrets se trouvent dans le fichier `.env` versionné ; les secrets sont définis dans le **tableau de bord Vercel** (Settings → Environment Variables), sans être commités dans le dépôt.
 
-| Variable | Where it's set | Notes |
+| Variable | Où elle est définie | Notes |
 |---|---|---|
-| `SUPABASE_URL` / `VITE_SUPABASE_URL` | `.env` (committed) | Supabase project URL (server / client) |
-| `SUPABASE_PUBLISHABLE_KEY` / `VITE_SUPABASE_PUBLISHABLE_KEY` | `.env` (committed) | Supabase anon/public key (server / client) |
-| `SUPABASE_SERVICE_ROLE_KEY` | Vercel only | Server-only secret — used by the Stripe webhook handler and the privileged server-side Supabase client |
-| `STRIPE_SECRET_KEY` | Vercel + local `.env.development` | Test key: `sk_test_…` |
-| `STRIPE_LIVE_SECRET_KEY` | Vercel only | Live key: `sk_live_…` (when going live) |
-| `VITE_PAYMENTS_CLIENT_TOKEN` | `.env.development` / Vercel | Stripe publishable key (`pk_test_…` or `pk_live_…`) — sandbox vs. live is inferred from this prefix |
-| `PAYMENTS_SANDBOX_WEBHOOK_SECRET` | Vercel only | Stripe webhook signing secret (test mode) — verifies `/api/public/payments/webhook` requests |
-| `PAYMENTS_LIVE_WEBHOOK_SECRET` | Vercel only | Stripe webhook signing secret (live mode) |
-| `ANTHROPIC_API_KEY` | Vercel only | Server-only secret — Claude API key used by the Dashboard, Tasks, Analytics, Resellers, and Prospects AI insights functions |
-| `CRON_SECRET` | Vercel only | Authenticates the Vercel Cron requests that hit `/api/cron/warm-ai-cache`, `/api/cron/renewal-reminders`, and `/api/cron/organization-archival` |
-| `SUPABASE_PROJECT_ID` / `VITE_SUPABASE_PROJECT_ID` | `.env` (committed) | Supabase CLI project ref (server / client) |
+| `SUPABASE_URL` / `VITE_SUPABASE_URL` | `.env` (versionné) | URL du projet Supabase (serveur / client) |
+| `SUPABASE_PUBLISHABLE_KEY` / `VITE_SUPABASE_PUBLISHABLE_KEY` | `.env` (versionné) | Clé anon/publique Supabase (serveur / client) |
+| `SUPABASE_SERVICE_ROLE_KEY` | Vercel uniquement | Secret serveur uniquement — utilisé par le gestionnaire du webhook Stripe et le client Supabase serveur privilégié |
+| `STRIPE_SECRET_KEY` | Vercel + `.env.development` en local | Clé de test : `sk_test_…` |
+| `STRIPE_LIVE_SECRET_KEY` | Vercel uniquement | Clé live : `sk_live_…` (en production) |
+| `VITE_PAYMENTS_CLIENT_TOKEN` | `.env.development` / Vercel | Clé publiable Stripe (`pk_test_…` ou `pk_live_…`) — le mode sandbox vs. live est déduit de ce préfixe |
+| `PAYMENTS_SANDBOX_WEBHOOK_SECRET` | Vercel uniquement | Secret de signature du webhook Stripe (mode test) — vérifie les requêtes vers `/api/public/payments/webhook` |
+| `PAYMENTS_LIVE_WEBHOOK_SECRET` | Vercel uniquement | Secret de signature du webhook Stripe (mode live) |
+| `ANTHROPIC_API_KEY` | Vercel uniquement | Secret serveur uniquement — clé API Claude utilisée par les fonctions d'insights IA du Tableau de bord, des Tâches, de l'Analytique, des Revendeurs et des Prospects |
+| `CRON_SECRET` | Vercel uniquement | Authentifie les requêtes Vercel Cron qui appellent `/api/cron/warm-ai-cache`, `/api/cron/renewal-reminders` et `/api/cron/organization-archival` |
+| `SUPABASE_PROJECT_ID` / `VITE_SUPABASE_PROJECT_ID` | `.env` (versionné) | Référence de projet Supabase CLI (serveur / client) |
 
-## Database
+## Base de données
 
 > ⚠️ **Terminologie** : le modèle multi-utilisateurs repose sur l'entité `organizations`
 > (propriétaire unique `owner_id`), et non `accounts`/`account_members` comme décrit
@@ -136,52 +136,51 @@ Non-secret config and empty placeholders live in the committed `.env`; secrets a
 > le 03/07/2026 (migrations `migrate_crm_tables_to_organizations` et
 > `drop_orphaned_accounts_schema`).
 
-Backed by Supabase Postgres. All tables have Row Level Security enabled, scoped per-organization (or per-user for account-level tables). Schema changes live as SQL migrations in `supabase/migrations/`.
+Adossé à Supabase Postgres. Toutes les tables ont la Row Level Security activée, avec un périmètre par organisation (ou par utilisateur pour les tables au niveau du compte). Les changements de schéma sont versionnés sous forme de migrations SQL dans `supabase/migrations/`.
 
-`profiles` (`id`, `email`, `full_name`, `avatar_url`, `phone`) is populated automatically on signup via an `on_auth_user_created` trigger on `auth.users`.
+`profiles` (`id`, `email`, `full_name`, `avatar_url`, `phone`) est peuplée automatiquement à l'inscription via un trigger `on_auth_user_created` sur `auth.users`.
 
-Kanban, Contacts, Dashboard, Analytics, Resellers, Archives, Tasks, and billing all read and write real Supabase data — none of the CRM pages render static/mock data anymore:
+Kanban, Contacts, Tableau de bord, Analytique, Revendeurs, Archives, Tâches et facturation lisent et écrivent tous de vraies données Supabase — aucune page CRM n'affiche plus de données statiques/factices :
 
-| Area | Tables |
+| Domaine | Tables |
 |---|---|
-| **Core CRM** | `contacts` (pipeline card / stage), `subscription_details`, `contact_notes`, `reseller_notes`, `stage_history` |
-| **Resellers** | `resellers`, `reseller_contacts`, `reseller_contact_history` |
-| **Org & ops** | `organizations`, `profiles`, `user_roles`, `tasks`, `reminders`, `notifications` |
-| **Billing** | `subscriptions` |
-| **AI** | `ai_insight_cache`, `ai_insights`, `ai_prompt_cache`, `agent_logs` |
+| **CRM principal** | `contacts` (carte de pipeline / étape), `subscription_details`, `contact_notes`, `reseller_notes`, `stage_history` |
+| **Revendeurs** | `resellers`, `reseller_contacts`, `reseller_contact_history` |
+| **Organisation et opérations** | `organizations`, `profiles`, `user_roles`, `tasks`, `reminders`, `notifications` |
+| **Facturation** | `subscriptions` |
+| **IA** | `ai_insight_cache`, `ai_insights`, `ai_prompt_cache`, `agent_logs` |
 
-`organizations` gained `is_test` (flags test/demo accounts, exempt from plan limits and business metrics, admin-only via SQL) and `archived_at` (account-level GDPR archival, 12 months before permanent deletion, mirroring `contacts`/`resellers`) on 2026-07-14. `contacts` gained `first_name` (required) and `last_name` (optional) on 2026-07-14, backfilled from the existing `contact_name`; `contact_name` stays as the single denormalized display string used everywhere else (lists, kanban, notifications, reseller views, AI tools) and is kept in sync from `first_name`/`last_name` wherever a contact is created or edited — the contact detail page and the CSV import/template now capture first and last name as separate fields, other entry points (kanban card editor, mobile quick-add) still take one free-text name and split it automatically. 19 tables total, all with RLS enabled. `contact_notes` / `reseller_notes` replaced `notes` / `note_edit_history` on 2026-07-13 (multiple timestamped notes per contact/reseller, no edit history). The frontend (contact/reseller detail pages, the mobile quick-add sheet, and the new-contact form) was updated on 2026-07-14 to match — notes are added one at a time via an explicit **save** button (no autosave) and listed newest first; the old single-note-with-autosave-and-version-history UI is gone. `ai_insights`, `ai_prompt_cache`, `user_roles`, and `agent_logs` are currently empty — reserved for planned (V2) features rather than dead schema. Full field-level schema: [`supabase/kstomer-schema-v1.4.dbml`](supabase/kstomer-schema-v1.4.dbml).
+`organizations` a gagné `is_test` (marque les comptes de test/démo, exemptés des limites de plan et des métriques métier, modifiable uniquement en SQL par un admin) et `archived_at` (archivage RGPD au niveau du compte, 12 mois avant suppression définitive, à l'image de `contacts`/`resellers`) le 14/07/2026. `contacts` a gagné `first_name` (obligatoire) et `last_name` (optionnel) le 14/07/2026, rétro-remplis depuis le `contact_name` existant ; `contact_name` reste la chaîne d'affichage dénormalisée unique utilisée partout ailleurs (listes, kanban, notifications, vues revendeurs, outils IA) et est maintenue synchronisée à partir de `first_name`/`last_name` à chaque création ou modification d'un contact — la page de détail du contact et l'import/modèle CSV capturent désormais le prénom et le nom comme des champs distincts, tandis que les autres points d'entrée (éditeur de carte kanban, ajout rapide mobile) prennent toujours un nom en texte libre unique et le séparent automatiquement. 19 tables au total, toutes avec la RLS activée. `contact_notes` / `reseller_notes` ont remplacé `notes` / `note_edit_history` le 13/07/2026 (plusieurs notes horodatées par contact/revendeur, sans historique de modification). Le front-end (pages de détail contact/revendeur, feuille d'ajout rapide mobile, et formulaire de nouveau contact) a été mis à jour le 14/07/2026 en conséquence — les notes sont ajoutées une par une via un bouton **enregistrer** explicite (pas de sauvegarde automatique) et listées de la plus récente à la plus ancienne ; l'ancienne interface à note unique avec sauvegarde automatique et historique de versions a disparu. `ai_insights`, `ai_prompt_cache`, `user_roles` et `agent_logs` sont actuellement vides — réservées à des fonctionnalités prévues (V2) plutôt qu'à un schéma mort. Schéma complet au niveau des champs : [`supabase/kstomer-schema-v1.4.dbml`](supabase/kstomer-schema-v1.4.dbml).
 
-## Sign up flow
+## Parcours d'inscription
 
-- **No email confirmation step (for now)** — since outbound email isn't configured and test signups use nonexistent addresses, `supabase.auth.signUp` on `/auth` no longer waits on a "check your inbox" screen: once Supabase returns a session, the user goes straight to onboarding. This requires **"Confirm email" to be disabled** in the Supabase dashboard (Authentication → Providers → Email) — while enabled, `signUp` doesn't return a session and outbound mail hits Supabase's default rate limit (`429: email rate limit exceeded`) since no custom SMTP is configured.
-- The sign-up form only collects **email and password** — full name is asked once, in onboarding step 1, not duplicated on `/auth`.
-- Onboarding is a 3-step, fully back-navigable flow: profile (name, role, notification prefs) → company info (name, city, country, description — powers the AI-suggested prospects card, which requires `organizations.description` or `.city` to be set) → CSV contact import. Step 1 has a "back to sign in" action that signs the user out.
+- **Pas d'étape de confirmation par email (pour l'instant)** — comme l'envoi d'email sortant n'est pas configuré et que les inscriptions de test utilisent des adresses inexistantes, `supabase.auth.signUp` sur `/auth` n'attend plus un écran « vérifiez votre boîte mail » : dès que Supabase renvoie une session, l'utilisateur est envoyé directement vers l'onboarding. Cela nécessite que **« Confirm email » soit désactivé** dans le tableau de bord Supabase (Authentication → Providers → Email) — tant que c'est activé, `signUp` ne renvoie pas de session et l'envoi sortant se heurte à la limite de débit par défaut de Supabase (`429: email rate limit exceeded`) puisqu'aucun SMTP personnalisé n'est configuré.
+- Le formulaire d'inscription ne collecte que **l'email et le mot de passe** — le nom complet est demandé une seule fois, à l'étape 1 de l'onboarding, sans être dupliqué sur `/auth`.
+- L'onboarding est un parcours en 3 étapes, entièrement navigable dans les deux sens : profil (nom, rôle, préférences de notification) → informations sur l'entreprise (nom, ville, pays, description — alimente la carte de prospects suggérés par l'IA, qui nécessite que `organizations.description` ou `.city` soit renseigné) → import CSV de contacts. L'étape 1 propose une action « retour à la connexion » qui déconnecte l'utilisateur.
 
-## Pricing
+## Tarifs
 
-Plans are defined in [`src/lib/pricing-plans.ts`](src/lib/pricing-plans.ts) and billed in EUR via Stripe. Price IDs are Stripe **lookup keys** — matching lookup keys must exist in the Stripe dashboard for each price.
+Les plans sont définis dans [`src/lib/pricing-plans.ts`](src/lib/pricing-plans.ts) et facturés en EUR via Stripe. Les identifiants de prix sont des **lookup keys** Stripe — des lookup keys correspondantes doivent exister dans le tableau de bord Stripe pour chaque prix.
 
-| Plan | Monthly | Yearly (per month) | Companies | Highlights |
+| Plan | Mensuel | Annuel (par mois) | Entreprises | Points forts |
 |---|---|---|---|---|
-| **Starter** | €17 | €13 | 1 | Solo use, smart pipeline & reminders, personalized AI dashboard |
-| **Expansion** ⭐ | €37 | €28 | Unlimited | Multi-company, unlimited pipelines, advanced AI portfolio analysis |
-| **Empire** | €67 | €51 | Unlimited | Up to 5 users, manager views & team KPIs, permissions and audit log |
+| **Starter** | 17 € | 13 € | 1 | Usage solo, pipeline et rappels intelligents, tableau de bord IA personnalisé |
+| **Expansion** ⭐ | 37 € | 28 € | Illimité | Multi-entreprise, pipelines illimités, analyse IA avancée du portefeuille |
+| **Empire** | 67 € | 51 € | Illimité | Jusqu'à 5 utilisateurs, vues manager et KPI d'équipe, permissions et journal d'audit |
 
-All plans include a 14-day free trial.
+Tous les plans incluent un essai gratuit de 14 jours.
 
-## Billing & background jobs
+## Facturation et tâches de fond
 
-- **Checkout & portal** — `createCheckoutSession` creates a Stripe embedded checkout session (price resolved by lookup key); `createPortalSession` opens the Stripe Billing Portal for existing subscribers.
-- **Webhook** — `src/routes/api/public/payments/webhook.ts` handles `customer.subscription.created/updated/deleted`, verifies the signature (HMAC via `PAYMENTS_SANDBOX_WEBHOOK_SECRET` / `PAYMENTS_LIVE_WEBHOOK_SECRET`), and upserts into the `subscriptions` table. Sandbox vs. live is selected via a `?env=` query param on the endpoint.
-- **AI insight caching** — Dashboard/Tasks/Analytics/Resellers/Prospects insight cards are cached in `ai_insight_cache` and only regenerated once per day (or on manual refresh), to avoid calling Claude on every page load.
-- **Vercel Cron** (`vercel.json`) — a daily job hits `/api/cron/warm-ai-cache` (guarded by `CRON_SECRET`) to pre-warm the Tasks AI cache; other cards stay lazy-cached to avoid mixing data across tenants under RLS.
-- **Account-level GDPR archival & purge** — Settings → Security → "Archive my account" sets `archived_at` on every organization the user owns, signs them out, and clears cached queries; the org disappears from the app immediately (`useOrganizations` filters out archived orgs and skips auto-creating a new default one for these users). Logging back in with only archived orgs redirects to `/account-archived`, a standalone page showing days left in the 12-month retention window with a **restore** action (clears `archived_at`) or sign-out. `/api/cron/organization-archival` runs daily and permanently deletes any `organizations` row still archived after 12 months (`is_test` accounts are excluded); cascading FKs remove all of that organization's contacts, resellers, notes, reminders, etc. in the same operation.
-- **AI model routing** — Dashboard/Tasks/Analytics/Resellers use Claude Haiku 4.5 (summarizing already-fetched data); Prospects uses Sonnet 5 (web-search-grounded reasoning). System prompts use prompt caching (`cache_control: ephemeral`) to reduce token cost.
+- **Checkout et portail** — `createCheckoutSession` crée une session Stripe Checkout intégrée (prix résolu par lookup key) ; `createPortalSession` ouvre le portail de facturation Stripe pour les abonnés existants.
+- **Webhook** — `src/routes/api/public/payments/webhook.ts` gère `customer.subscription.created/updated/deleted`, vérifie la signature (HMAC via `PAYMENTS_SANDBOX_WEBHOOK_SECRET` / `PAYMENTS_LIVE_WEBHOOK_SECRET`), et met à jour la table `subscriptions`. Le choix sandbox vs. live se fait via un paramètre de requête `?env=` sur le endpoint.
+- **Cache des insights IA** — les cartes d'insights du Tableau de bord/Tâches/Analytique/Revendeurs/Prospects sont mises en cache dans `ai_insight_cache` et régénérées seulement une fois par jour (ou lors d'une actualisation manuelle), pour éviter d'appeler Claude à chaque chargement de page.
+- **Vercel Cron** (`vercel.json`) — une tâche quotidienne appelle `/api/cron/warm-ai-cache` (protégée par `CRON_SECRET`) pour préchauffer le cache IA des Tâches ; les autres cartes restent mises en cache paresseusement pour éviter de mélanger les données entre locataires sous la RLS.
+- **Archivage et purge RGPD au niveau du compte** — Paramètres → Sécurité → « Archiver mon compte » définit `archived_at` sur chaque organisation possédée par l'utilisateur, le déconnecte, et vide les requêtes en cache ; l'organisation disparaît immédiatement de l'application (`useOrganizations` filtre les organisations archivées et ne recrée pas automatiquement une nouvelle organisation par défaut pour ces utilisateurs). Se reconnecter en n'ayant que des organisations archivées redirige vers `/account-archived`, une page autonome affichant les jours restants dans la fenêtre de rétention de 12 mois, avec une action de **restauration** (efface `archived_at`) ou de déconnexion. `/api/cron/organization-archival` tourne quotidiennement et supprime définitivement toute ligne `organizations` encore archivée après 12 mois (les comptes `is_test` sont exclus) ; les clés étrangères en cascade suppriment tous les contacts, revendeurs, notes, rappels, etc. de cette organisation dans la même opération.
+- **Routage des modèles IA** — Tableau de bord/Tâches/Analytique/Revendeurs utilisent Claude Haiku 4.5 (résumé de données déjà récupérées) ; Prospects utilise Sonnet 5 (raisonnement ancré sur une recherche web). Les prompts système utilisent la mise en cache de prompts (`cache_control: ephemeral`) pour réduire le coût en tokens.
 
-## Deployment
+## Déploiement
 
-- **Platform:** [Vercel](https://vercel.com) — all deploys go through Vercel.
-- **Editor:** the repo is also connected to [Lovable.dev](https://lovable.dev) for visual/AI-assisted editing; git remains the source of truth.
-- **Workflow:** changes are pushed directly to `main` — no long-lived feature branches.
-
+- **Plateforme :** [Vercel](https://vercel.com) — tous les déploiements passent par Vercel.
+- **Éditeur :** le dépôt est aussi connecté à [Lovable.dev](https://lovable.dev) pour l'édition visuelle assistée par IA ; git reste la source de vérité.
+- **Workflow :** les changements sont poussés directement sur `main` — pas de branches de fonctionnalités de longue durée.
