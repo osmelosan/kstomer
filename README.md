@@ -106,7 +106,6 @@ bun run dev
 | `bun run lint` | Lancer ESLint |
 | `bun run format` | Formater le code avec Prettier |
 
-> Aucune suite de tests automatisés n'existe pour l'instant.
 
 ## Variables d'environnement
 
@@ -181,4 +180,3 @@ Tous les plans incluent un essai gratuit de 14 jours.
 
 - **Plateforme :** [Vercel](https://vercel.com) — tous les déploiements passent par Vercel.
 - **Éditeur :** le dépôt est aussi connecté à [Lovable.dev](https://lovable.dev) pour l'édition visuelle assistée par IA ; git reste la source de vérité.
-- **Workflow :** les changements sont poussés directement sur `main` — pas de branches de fonctionnalités de longue durée.
