@@ -120,6 +120,11 @@ export const Route = createFileRoute("/api/cron/warm-ai-cache")({
           return Response.json({ warmed: 0, errors: 0 });
         }
 
+        // Optional scoping for manual/on-demand runs (e.g. verifying the job works
+        // against a single test account without warming every real user/org).
+        // Omitting it preserves the normal all-users cron behavior.
+        const onlyEmail = new URL(request.url).searchParams.get("onlyEmail");
+
         const deadline = Date.now() + DEADLINE_MS;
 
         let warmed = 0;
@@ -127,6 +132,7 @@ export const Route = createFileRoute("/api/cron/warm-ai-cache")({
         let page = 1;
         const perPage = 200;
         let usersTruncated = false;
+        let targetUserId: string | null = null;
 
         for (;;) {
           if (Date.now() >= deadline) {
@@ -138,8 +144,14 @@ export const Route = createFileRoute("/api/cron/warm-ai-cache")({
             console.error("[cron/warm-ai-cache] listUsers failed:", error);
             break;
           }
-          const users = data?.users ?? [];
+          let users = data?.users ?? [];
           if (users.length === 0) break;
+
+          if (onlyEmail) {
+            const match = users.find((u) => u.email === onlyEmail);
+            if (match) targetUserId = match.id;
+            users = match ? [match] : [];
+          }
 
           const result = await runInBatches(users, USER_CONCURRENCY, deadline, async (user) => {
             try {
@@ -152,8 +164,13 @@ export const Route = createFileRoute("/api/cron/warm-ai-cache")({
           });
           if (result.truncated) usersTruncated = true;
 
-          if (users.length < perPage || result.truncated) break;
+          if (onlyEmail && targetUserId) break;
+          if (data.users.length < perPage || result.truncated) break;
           page += 1;
+        }
+
+        if (onlyEmail && !targetUserId) {
+          return Response.json({ warmed: 0, errors: 0, note: `no user found for ${onlyEmail}` });
         }
 
         let dashboardWarmed = 0;
@@ -169,9 +186,12 @@ export const Route = createFileRoute("/api/cron/warm-ai-cache")({
           if (orgsError) {
             console.error("[cron/warm-ai-cache] list organizations failed:", orgsError);
           }
+          const scopedOrgs = onlyEmail
+            ? (orgs ?? []).filter((org) => org.owner_id === targetUserId)
+            : (orgs ?? []);
 
           const orgResult = await runInBatches(
-            orgs ?? [],
+            scopedOrgs,
             ORG_CONCURRENCY,
             deadline,
             async (org) => {
