@@ -106,8 +106,12 @@ export function useResellers() {
       }
     });
 
+    // Suffixed with a unique id so concurrent useResellers() instances each
+    // get their own channel — Supabase reuses a channel by exact topic name,
+    // and adding a postgres_changes listener to one that's already
+    // subscribed throws.
     const channel = supabase
-      .channel(`resellers-${organizationId ?? "all"}`)
+      .channel(`resellers-${organizationId ?? "all"}-${crypto.randomUUID()}`)
       .on(
         "postgres_changes",
         {

@@ -70,8 +70,12 @@ export function useContacts() {
       }
     });
 
+    // Suffixed with a unique id so concurrent useContacts() instances (e.g. a
+    // page and MobileQuickActions mounted at once) each get their own
+    // channel — Supabase reuses a channel by exact topic name, and adding a
+    // postgres_changes listener to one that's already subscribed throws.
     const channel = supabase
-      .channel(`contacts-${organizationId ?? "all"}`)
+      .channel(`contacts-${organizationId ?? "all"}-${crypto.randomUUID()}`)
       .on(
         "postgres_changes",
         {

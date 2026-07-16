@@ -46,8 +46,12 @@ export function useTasks() {
       }
     });
 
+    // Suffixed with a unique id so concurrent useTasks() instances each get
+    // their own channel — Supabase reuses a channel by exact topic name, and
+    // adding a postgres_changes listener to one that's already subscribed
+    // throws.
     const channel = supabase
-      .channel(`tasks-${user.id}`)
+      .channel(`tasks-${user.id}-${crypto.randomUUID()}`)
       .on(
         "postgres_changes",
         { event: "*", schema: "public", table: "tasks", filter: `user_id=eq.${user.id}` },
