@@ -76,7 +76,8 @@ src/
 ├── integrations/supabase/    # Clients Supabase navigateur + serveur, auth, types DB
 └── assets/
 supabase/
-└── migrations/                # Migrations SQL
+├── migrations/                # Migrations SQL
+└── seed.sql                   # Données de démo (organisation « Verdant Bureau » pour test@test.com)
 public/                        # Ressources de marque, favicon, llms.txt
 ```
 
@@ -146,6 +147,10 @@ Kanban, Contacts, Tableau de bord, Analytique, Revendeurs, Archives, Tâches et 
 | **Organisation et opérations** | `organizations`, `profiles`, `user_roles`, `tasks`, `reminders`, `notifications` |
 | **Facturation** | `subscriptions` |
 | **IA** | `ai_insight_cache`, `ai_insights`, `ai_prompt_cache`, `agent_logs` |
+
+**18/07/2026** : le Dashboard affichait encore deux indicateurs statiques — « Chiffre d'affaires » et « Clients actifs » valaient toujours `12 450,00 €` / `24`, quel que soit l'utilisateur ou l'entreprise sélectionnée. Corrigé : les deux sont désormais calculés en direct depuis `contacts` (`stage = 'active'`) et `subscription_details.deal_value`, filtrés par organisation (`src/hooks/use-dashboard-metrics.ts`), et affichent `0` pour toute organisation sans contact actif. Le troisième indicateur du Dashboard, « Taux de conversion », reste à ce jour une valeur statique (hors périmètre de ce correctif).
+
+`supabase/seed.sql` (18/07/2026, idempotent) peuple une seconde organisation de démonstration, **Verdant Bureau** (`is_test = true`), pour l'utilisateur réel `test@test.com` — qui possède déjà l'organisation « Acme ». Objectif : démontrer que les données de deux entreprises différentes restent compartimentées (RLS par `organization_id`/`owner_id`), sans toucher à l'organisation réelle de l'utilisateur.
 
 `organizations` a gagné `is_test` (marque les comptes de test/démo, exemptés des limites de plan et des métriques métier, modifiable uniquement en SQL par un admin) et `archived_at` (archivage RGPD au niveau du compte, 12 mois avant suppression définitive, à l'image de `contacts`/`resellers`) le 14/07/2026. `contacts` a gagné `first_name` (obligatoire) et `last_name` (optionnel) le 14/07/2026, rétro-remplis depuis le `contact_name` existant ; `contact_name` reste la chaîne d'affichage dénormalisée unique utilisée partout ailleurs (listes, kanban, notifications, vues revendeurs, outils IA) et est maintenue synchronisée à partir de `first_name`/`last_name` à chaque création ou modification d'un contact — la page de détail du contact et l'import/modèle CSV capturent désormais le prénom et le nom comme des champs distincts, tandis que les autres points d'entrée (éditeur de carte kanban, ajout rapide mobile) prennent toujours un nom en texte libre unique et le séparent automatiquement. 19 tables au total, toutes avec la RLS activée. `contact_notes` / `reseller_notes` ont remplacé `notes` / `note_edit_history` le 13/07/2026 (plusieurs notes horodatées par contact/revendeur, sans historique de modification). Le front-end (pages de détail contact/revendeur, feuille d'ajout rapide mobile, et formulaire de nouveau contact) a été mis à jour le 14/07/2026 en conséquence — les notes sont ajoutées une par une via un bouton **enregistrer** explicite (pas de sauvegarde automatique) et listées de la plus récente à la plus ancienne ; l'ancienne interface à note unique avec sauvegarde automatique et historique de versions a disparu. `ai_insights`, `ai_prompt_cache`, `user_roles` et `agent_logs` sont actuellement vides — réservées à des fonctionnalités prévues (V2) plutôt qu'à un schéma mort. Schéma complet au niveau des champs : [`supabase/kstomer-schema-v1.4.dbml`](supabase/kstomer-schema-v1.4.dbml).
 
