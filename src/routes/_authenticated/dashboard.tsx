@@ -17,6 +17,7 @@ import i18n from "@/lib/i18n";
 import { useEffect, useState } from "react";
 import { useRevenueGoal } from "@/hooks/use-revenue-goal";
 import { useCurrentUser } from "@/hooks/use-current-user";
+import { useDashboardMetrics } from "@/hooks/use-dashboard-metrics";
 import { useCompany } from "@/lib/company-context";
 import { useServerFn } from "@tanstack/react-start";
 import { analyzeDashboard } from "@/lib/dashboard-ai.functions";
@@ -39,13 +40,20 @@ function Dashboard() {
   const { t, i18n: i18nInstance } = useTranslation();
   const { goal } = useRevenueGoal();
   const { profile, user } = useCurrentUser();
-  const currentRevenue = 12450;
+  const { current } = useCompany();
+  const organizationId = current.id === "all" ? null : current.id;
+  const { data: metrics } = useDashboardMetrics(organizationId);
+  const currentRevenue = metrics.revenue;
   const locale = i18nInstance.language || "fr";
   const goalFormatted = new Intl.NumberFormat(locale, {
     style: "currency",
     currency: "EUR",
     maximumFractionDigits: 0,
   }).format(goal);
+  const revenueFormatted = new Intl.NumberFormat(locale, {
+    style: "currency",
+    currency: "EUR",
+  }).format(currentRevenue);
   const progress = Math.min(100, Math.round((currentRevenue / goal) * 100));
   const fullName =
     profile?.full_name ||
@@ -69,14 +77,14 @@ function Dashboard() {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 mb-8 md:mb-10">
         <MetricCard
           label={t("dashboard.revenue")}
-          value="12 450,00 €"
+          value={revenueFormatted}
           accent={{ tone: "success", label: t("dashboard.revenueDelta") }}
           progress={progress}
           footer={t("dashboard.revenueGoal", { goal: goalFormatted })}
         />
         <MetricCard
           label={t("dashboard.activeClients")}
-          value="24"
+          value={String(metrics.subscriberCount)}
           accent={{ tone: "info", label: t("dashboard.newBadge") }}
           footer={
             <span className="inline-flex items-center gap-1">
