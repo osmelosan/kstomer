@@ -146,3 +146,119 @@ values
     'Grand Compte', 168000.00, 14000.00, '2026-06-20 00:00:00+00', '2026-06-20 00:00:00+00'
   )
 on conflict (id) do nothing;
+
+-- ============================================================================
+-- Seed enrichment: July 2026 activity for Verdant Bureau, so the dashboard's
+-- trend badges (revenueDelta, newBadge, vsLastMonth) and the average
+-- sales-cycle metric (avgCycle) have real, non-zero data instead of hitting
+-- useDashboardMetrics' zero-guards. The June-dated rows above are untouched
+-- — this block only appends. Same eeeeeeee-... UUID family, idempotent via
+-- fixed ids + `on conflict do nothing`.
+-- ============================================================================
+
+-- ---------------------------------------------------------------------------
+-- contacts (3 more 'active' contacts, created in July 2026)
+-- ---------------------------------------------------------------------------
+insert into public.contacts
+  (id, organization_id, created_by_user_id, owner_user_id, contact_name, first_name, last_name,
+   company_name, email, phone, stage, confidence_level, renewal_date, last_contact_date,
+   created_at, updated_at)
+values
+  (
+    'eeeeeeee-0000-0000-0000-0000000000c9', 'eeeeeeee-0000-0000-0000-000000000000',
+    (select id from auth.users where email = 'test@test.com'),
+    (select id from auth.users where email = 'test@test.com'),
+    'Léa Perrot', 'Léa', 'Perrot',
+    'Classeur & Reliure SAS', 'lea.perrot@classeur-reliure.fr', '+33 6 90 23 56 78',
+    'active', 5, '2027-07-11 00:00:00+00', '2026-07-15 10:00:00+00',
+    '2026-07-02 09:00:00+00', '2026-07-15 10:00:00+00'
+  ),
+  (
+    'eeeeeeee-0000-0000-0000-0000000000ca', 'eeeeeeee-0000-0000-0000-000000000000',
+    (select id from auth.users where email = 'test@test.com'),
+    (select id from auth.users where email = 'test@test.com'),
+    'Maxime Roussel', 'Maxime', 'Roussel',
+    'Agrafe Moderne Distribution', 'maxime.roussel@agrafe-moderne.fr', '+33 6 01 34 67 89',
+    'active', 4, '2027-07-12 00:00:00+00', '2026-07-16 09:30:00+00',
+    '2026-07-04 11:30:00+00', '2026-07-16 09:30:00+00'
+  ),
+  (
+    'eeeeeeee-0000-0000-0000-0000000000cb', 'eeeeeeee-0000-0000-0000-000000000000',
+    (select id from auth.users where email = 'test@test.com'),
+    (select id from auth.users where email = 'test@test.com'),
+    'Inès Caron', 'Inès', 'Caron',
+    'Fournitures du Nord SARL', 'ines.caron@fournitures-nord.fr', '+33 6 15 48 72 03',
+    'active', 5, '2027-07-12 00:00:00+00', '2026-07-17 14:00:00+00',
+    '2026-07-06 15:00:00+00', '2026-07-17 14:00:00+00'
+  )
+on conflict (id) do nothing;
+
+-- ---------------------------------------------------------------------------
+-- subscription_details for the 3 new active contacts
+-- ---------------------------------------------------------------------------
+insert into public.subscription_details
+  (id, contact_id, organization_id, plan_name, deal_value, mrr, subscription_start_date, updated_at)
+values
+  (
+    'eeeeeeee-0000-0000-0000-0000000000d4', 'eeeeeeee-0000-0000-0000-0000000000c9',
+    'eeeeeeee-0000-0000-0000-000000000000',
+    'Essentiel', 9600.00, 800.00, '2026-07-11 00:00:00+00', '2026-07-11 00:00:00+00'
+  ),
+  (
+    'eeeeeeee-0000-0000-0000-0000000000d5', 'eeeeeeee-0000-0000-0000-0000000000ca',
+    'eeeeeeee-0000-0000-0000-000000000000',
+    'Croissance', 43200.00, 3600.00, '2026-07-12 00:00:00+00', '2026-07-12 00:00:00+00'
+  ),
+  (
+    'eeeeeeee-0000-0000-0000-0000000000d6', 'eeeeeeee-0000-0000-0000-0000000000cb',
+    'eeeeeeee-0000-0000-0000-000000000000',
+    'Grand Compte', 180000.00, 15000.00, '2026-07-12 00:00:00+00', '2026-07-12 00:00:00+00'
+  )
+on conflict (id) do nothing;
+
+-- ---------------------------------------------------------------------------
+-- stage_history: backfilled 'to active' transitions for all 6 currently-
+-- active Verdant Bureau contacts. The 3 seeded earlier (c6-c8) have none —
+-- that seed inserted them directly via SQL rather than through the app's
+-- changeStage flow — so useDashboardMetrics' avgCycleDays would otherwise
+-- fall back to null/"—" for this org. from_stage is backfilled as
+-- 'proposal' (the pipeline stage immediately before 'active') since no real
+-- prior-stage history exists for any of these seeded contacts.
+-- changed_by_user_id mirrors how use-contacts.ts's changeStage() populates
+-- it for real usage (the acting user's id) — here, test@test.com, this
+-- organization's sole owner/user.
+-- ---------------------------------------------------------------------------
+insert into public.stage_history
+  (id, contact_id, organization_id, from_stage, to_stage, changed_by_user_id, changed_at)
+values
+  (
+    'eeeeeeee-0000-0000-0000-0000000000e1', 'eeeeeeee-0000-0000-0000-0000000000c6',
+    'eeeeeeee-0000-0000-0000-000000000000', 'proposal', 'active',
+    (select id from auth.users where email = 'test@test.com'), '2026-06-25 00:00:00+00'
+  ),
+  (
+    'eeeeeeee-0000-0000-0000-0000000000e2', 'eeeeeeee-0000-0000-0000-0000000000c7',
+    'eeeeeeee-0000-0000-0000-000000000000', 'proposal', 'active',
+    (select id from auth.users where email = 'test@test.com'), '2026-06-22 00:00:00+00'
+  ),
+  (
+    'eeeeeeee-0000-0000-0000-0000000000e3', 'eeeeeeee-0000-0000-0000-0000000000c8',
+    'eeeeeeee-0000-0000-0000-000000000000', 'proposal', 'active',
+    (select id from auth.users where email = 'test@test.com'), '2026-06-20 00:00:00+00'
+  ),
+  (
+    'eeeeeeee-0000-0000-0000-0000000000e4', 'eeeeeeee-0000-0000-0000-0000000000c9',
+    'eeeeeeee-0000-0000-0000-000000000000', 'proposal', 'active',
+    (select id from auth.users where email = 'test@test.com'), '2026-07-11 09:00:00+00'
+  ),
+  (
+    'eeeeeeee-0000-0000-0000-0000000000e5', 'eeeeeeee-0000-0000-0000-0000000000ca',
+    'eeeeeeee-0000-0000-0000-000000000000', 'proposal', 'active',
+    (select id from auth.users where email = 'test@test.com'), '2026-07-12 11:30:00+00'
+  ),
+  (
+    'eeeeeeee-0000-0000-0000-0000000000e6', 'eeeeeeee-0000-0000-0000-0000000000cb',
+    'eeeeeeee-0000-0000-0000-000000000000', 'proposal', 'active',
+    (select id from auth.users where email = 'test@test.com'), '2026-07-12 15:00:00+00'
+  )
+on conflict (id) do nothing;

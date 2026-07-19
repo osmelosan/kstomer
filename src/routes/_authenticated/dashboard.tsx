@@ -7,6 +7,7 @@ import {
   Phone,
   Linkedin,
   TrendingUp,
+  TrendingDown,
   Sparkles,
   Building2,
   RefreshCw,
@@ -42,7 +43,7 @@ function Dashboard() {
   const { profile, user } = useCurrentUser();
   const { current } = useCompany();
   const organizationId = current.id === "all" ? null : current.id;
-  const { data: metrics } = useDashboardMetrics(organizationId);
+  const { data: metrics, loading } = useDashboardMetrics(organizationId);
   const currentRevenue = metrics.revenue;
   const locale = i18nInstance.language || "fr";
   const goalFormatted = new Intl.NumberFormat(locale, {
@@ -77,27 +78,45 @@ function Dashboard() {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 mb-8 md:mb-10">
         <MetricCard
           label={t("dashboard.revenue")}
-          value={revenueFormatted}
-          accent={{ tone: "success", label: t("dashboard.revenueDelta") }}
+          value={loading ? "—" : revenueFormatted}
+          accent={{
+            tone: metrics.revenueDeltaPct >= 0 ? "success" : "danger",
+            label: loading
+              ? "—"
+              : t("dashboard.revenueDelta", { delta: fmtSignedPct(metrics.revenueDeltaPct) }),
+          }}
           progress={progress}
           footer={t("dashboard.revenueGoal", { goal: goalFormatted })}
         />
         <MetricCard
           label={t("dashboard.activeClients")}
-          value={String(metrics.subscriberCount)}
-          accent={{ tone: "info", label: t("dashboard.newBadge") }}
+          value={loading ? "—" : String(metrics.subscriberCount)}
+          accent={{
+            tone: "info",
+            label: loading ? "—" : t("dashboard.newBadge", { count: metrics.newActiveCount }),
+          }}
           footer={
             <span className="inline-flex items-center gap-1">
-              <TrendingUp className="h-3 w-3 text-success" />
-              {t("dashboard.vsLastMonth")}
+              {metrics.activeDeltaPct >= 0 ? (
+                <TrendingUp className="h-3 w-3 text-success" />
+              ) : (
+                <TrendingDown className="h-3 w-3 text-destructive" />
+              )}
+              {loading
+                ? "—"
+                : t("dashboard.vsLastMonth", { delta: fmtSignedPct(metrics.activeDeltaPct) })}
             </span>
           }
         />
         <MetricCard
           label={t("dashboard.conversionRate")}
-          value="38,2%"
+          value={loading ? "—" : `${metrics.conversionRate.toFixed(1)}%`}
           accent={{ tone: "warning", label: t("dashboard.toMonitor") }}
-          footer={t("dashboard.avgCycle")}
+          footer={
+            loading || metrics.avgCycleDays === null
+              ? "—"
+              : t("dashboard.avgCycle", { count: metrics.avgCycleDays })
+          }
         />
       </div>
 
@@ -127,6 +146,11 @@ function toneClasses(tone: Tone) {
     default:
       return "bg-muted text-muted-foreground border-border";
   }
+}
+
+function fmtSignedPct(n: number) {
+  const rounded = Math.round(n);
+  return rounded >= 0 ? `+${rounded}` : `${rounded}`;
 }
 
 function MetricCard({
