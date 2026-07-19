@@ -10,6 +10,7 @@ import { Logo } from "@/components/Logo";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { PasswordInput } from "@/components/ui/password-input";
 import { Label } from "@/components/ui/label";
 import i18n from "@/lib/i18n";
 import { pageHead } from "@/lib/route-seo";
@@ -218,9 +219,8 @@ function SignInForm({ onSwitchForgot }: { onSwitchForgot: () => void }) {
       </div>
       <div className="space-y-2">
         <Label htmlFor="signin-password">{t("auth.password")}</Label>
-        <Input
+        <PasswordInput
           id="signin-password"
-          type="password"
           autoComplete="current-password"
           required
           value={password}
@@ -316,9 +316,8 @@ function SignUpForm() {
       </div>
       <div className="space-y-2">
         <Label htmlFor="signup-password">{t("auth.password")}</Label>
-        <Input
+        <PasswordInput
           id="signup-password"
-          type="password"
           autoComplete="new-password"
           required
           minLength={8}

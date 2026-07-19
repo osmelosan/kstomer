@@ -8,7 +8,7 @@ import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
 import { Logo } from "@/components/Logo";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { PasswordInput } from "@/components/ui/password-input";
 import { Label } from "@/components/ui/label";
 import i18n from "@/lib/i18n";
 
@@ -95,9 +95,8 @@ function ResetPasswordPage() {
               <form onSubmit={onSubmit} className="space-y-4">
                 <div className="space-y-2">
                   <Label htmlFor="new-password">{t("auth.newPassword")}</Label>
-                  <Input
+                  <PasswordInput
                     id="new-password"
-                    type="password"
                     autoComplete="new-password"
                     required
                     minLength={8}
@@ -107,9 +106,8 @@ function ResetPasswordPage() {
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="confirm-password">{t("auth.confirmPassword")}</Label>
-                  <Input
+                  <PasswordInput
                     id="confirm-password"
-                    type="password"
                     autoComplete="new-password"
                     required
                     minLength={8}
