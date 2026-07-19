@@ -34,7 +34,7 @@ Kstomer aide les fondateurs solo et les consultants à reprendre le contrôle de
 - 🏢 **Support multi-organisation** — basculez entre les entreprises, avec un parcours d'onboarding guidé en 3 étapes (profil → informations sur l'entreprise → import CSV) entièrement navigable dans les deux sens
 - 📥 **Import CSV de contacts** — importez des contacts en masse (prénom/nom, entreprise, email, téléphone, étape, dates) depuis l'onboarding ou la page Contacts, avec détection des doublons par email et rejet des fichiers non-CSV déguisés en `.csv`
 - 💳 **Facturation intégrée** — Stripe Checkout, checkout intégré, portail de facturation et gestion des abonnements
-- 🌍 **Multilingue** — français, espagnol et anglais, avec détection automatique par IP
+- 🌍 **Multilingue** — français, espagnol et anglais
 
 ## Stack technique
 
