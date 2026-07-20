@@ -961,9 +961,11 @@ export const en = {
     title: "Tasks",
     subtitle: "All your priority actions in one place.",
     new: "New task",
+    editTask: "Edit task",
     search: "Search a task…",
     empty: "No tasks match your filters.",
     created: "Task created.",
+    updated: "Task updated.",
     filters: {
       all: "All",
       todo: "To do",
@@ -976,11 +978,19 @@ export const en = {
       medium: "Medium",
       low: "Low",
     },
+    status: {
+      todo: "To do",
+      inProgress: "In progress",
+      done: "Done",
+    },
     form: {
       title: "Title",
+      contact: "Contact",
       priority: "Priority",
       dueDate: "Due date",
+      status: "Status",
       create: "Create",
+      save: "Save",
       cancel: "Cancel",
     },
     seed: {

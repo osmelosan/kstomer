@@ -993,9 +993,11 @@ export const fr = {
     title: "Tâches",
     subtitle: "Toutes vos actions prioritaires en un seul endroit.",
     new: "Nouvelle tâche",
+    editTask: "Modifier la tâche",
     search: "Rechercher une tâche…",
     empty: "Aucune tâche ne correspond à vos filtres.",
     created: "Tâche créée.",
+    updated: "Tâche mise à jour.",
     filters: {
       all: "Toutes",
       todo: "À faire",
@@ -1008,11 +1010,19 @@ export const fr = {
       medium: "Moyenne",
       low: "Basse",
     },
+    status: {
+      todo: "À faire",
+      inProgress: "En cours",
+      done: "Terminée",
+    },
     form: {
       title: "Intitulé",
+      contact: "Contact",
       priority: "Priorité",
       dueDate: "Échéance",
+      status: "Statut",
       create: "Créer",
+      save: "Enregistrer",
       cancel: "Annuler",
     },
     seed: {

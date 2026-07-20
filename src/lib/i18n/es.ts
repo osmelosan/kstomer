@@ -976,9 +976,11 @@ export const es = {
     title: "Tareas",
     subtitle: "Todas tus acciones prioritarias en un solo lugar.",
     new: "Nueva tarea",
+    editTask: "Editar tarea",
     search: "Buscar una tarea…",
     empty: "Ninguna tarea coincide con tus filtros.",
     created: "Tarea creada.",
+    updated: "Tarea actualizada.",
     filters: {
       all: "Todas",
       todo: "Por hacer",
@@ -991,11 +993,19 @@ export const es = {
       medium: "Media",
       low: "Baja",
     },
+    status: {
+      todo: "Por hacer",
+      inProgress: "En curso",
+      done: "Hecha",
+    },
     form: {
       title: "Título",
+      contact: "Contacto",
       priority: "Prioridad",
       dueDate: "Vencimiento",
+      status: "Estado",
       create: "Crear",
+      save: "Guardar",
       cancel: "Cancelar",
     },
     seed: {

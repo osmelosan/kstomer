@@ -24,7 +24,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
-import { Plus, CheckSquare, Calendar as CalendarIcon, User2 } from "lucide-react";
+import { Plus, CheckSquare, Calendar as CalendarIcon, User2, Pencil } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { useServerFn } from "@tanstack/react-start";
@@ -32,6 +32,14 @@ import { analyzeTasks } from "@/lib/tasks-ai.functions";
 import { AiInsightCard, type AiInsightStatus } from "@/components/AiInsightCard";
 
 type TasksSearch = { focus?: string };
+
+type TaskFormValues = {
+  title: string;
+  contact: string | null;
+  priority: TaskPriority;
+  dueDate: string;
+  status: TaskStatus;
+};
 
 export const Route = createFileRoute("/_authenticated/tasks")({
   validateSearch: (search: Record<string, unknown>): TasksSearch => ({
@@ -50,11 +58,12 @@ export const Route = createFileRoute("/_authenticated/tasks")({
 function TasksPage() {
   const { t } = useTranslation();
   const { focus } = Route.useSearch();
-  const { tasks, loading, createTask, toggleDone } = useTasks();
+  const { tasks, loading, createTask, updateTask, toggleDone } = useTasks();
   const [status, setStatus] = useState<TaskStatus | "all">("all");
   const [priority, setPriority] = useState<TaskPriority | "all">("all");
   const [query, setQuery] = useState("");
   const [open, setOpen] = useState(false);
+  const [editingTask, setEditingTask] = useState<Task | null>(null);
   const [highlight, setHighlight] = useState<string | undefined>(focus);
   const rowRefs = useRef<Record<string, HTMLDivElement | null>>({});
 
@@ -88,15 +97,31 @@ function TasksPage() {
     });
   }, [tasks, status, priority, query]);
 
-  const handleCreate = async (data: { title: string; priority: TaskPriority; dueDate: string }) => {
+  const handleCreate = async (data: TaskFormValues) => {
     const created = await createTask({
       title: data.title,
       priority: data.priority,
       dueDate: data.dueDate || new Date().toISOString().slice(0, 10),
+      contact: data.contact ?? undefined,
     });
     if (created) {
       setOpen(false);
       toast.success(t("tasks.created"));
+    }
+  };
+
+  const handleUpdate = async (data: TaskFormValues) => {
+    if (!editingTask) return;
+    const updated = await updateTask(editingTask.id, {
+      title: data.title,
+      contact: data.contact,
+      priority: data.priority,
+      due_date: data.dueDate || new Date().toISOString().slice(0, 10),
+      status: data.status,
+    });
+    if (updated) {
+      setEditingTask(null);
+      toast.success(t("tasks.updated"));
     }
   };
 
@@ -111,7 +136,7 @@ function TasksPage() {
               <Plus className="h-4 w-4" /> {t("tasks.new")}
             </button>
           </DialogTrigger>
-          <NewTaskDialog onCreate={handleCreate} onCancel={() => setOpen(false)} />
+          <TaskFormDialog onSave={handleCreate} onCancel={() => setOpen(false)} />
         </Dialog>
       }
     >
@@ -160,6 +185,7 @@ function TasksPage() {
               key={task.id}
               task={task}
               onToggle={() => toggleDone(task)}
+              onEdit={() => setEditingTask(task)}
               highlighted={highlight === task.id}
               rowRef={(el) => {
                 rowRefs.current[task.id] = el;
@@ -168,6 +194,22 @@ function TasksPage() {
           ))}
         </div>
       )}
+
+      <Dialog
+        open={!!editingTask}
+        onOpenChange={(o) => {
+          if (!o) setEditingTask(null);
+        }}
+      >
+        {editingTask && (
+          <TaskFormDialog
+            key={editingTask.id}
+            task={editingTask}
+            onSave={handleUpdate}
+            onCancel={() => setEditingTask(null)}
+          />
+        )}
+      </Dialog>
     </AppShell>
   );
 }
@@ -175,11 +217,13 @@ function TasksPage() {
 function TaskRow({
   task,
   onToggle,
+  onEdit,
   highlighted,
   rowRef,
 }: {
   task: Task;
   onToggle: () => void;
+  onEdit: () => void;
   highlighted?: boolean;
   rowRef?: (el: HTMLDivElement | null) => void;
 }) {
@@ -238,33 +282,49 @@ function TaskRow({
       >
         {t(`tasks.priority.${task.priority}`)}
       </span>
+      <button
+        onClick={onEdit}
+        aria-label={t("tasks.editTask")}
+        className="text-muted-foreground hover:text-foreground opacity-0 group-hover:opacity-100 focus-visible:opacity-100 transition-opacity shrink-0"
+      >
+        <Pencil className="h-4 w-4" />
+      </button>
     </div>
   );
 }
 
-function NewTaskDialog({
-  onCreate,
+function TaskFormDialog({
+  task,
+  onSave,
   onCancel,
 }: {
-  onCreate: (data: { title: string; priority: TaskPriority; dueDate: string }) => void;
+  task?: Task;
+  onSave: (data: TaskFormValues) => void;
   onCancel: () => void;
 }) {
   const { t } = useTranslation();
-  const [title, setTitle] = useState("");
-  const [priority, setPriority] = useState<TaskPriority>("medium");
-  const [dueDate, setDueDate] = useState(new Date().toISOString().slice(0, 10));
+  const [title, setTitle] = useState(task?.title ?? "");
+  const [contact, setContact] = useState(task?.contact ?? "");
+  const [priority, setPriority] = useState<TaskPriority>(task?.priority ?? "medium");
+  const [dueDate, setDueDate] = useState(
+    task ? task.due_date.slice(0, 10) : new Date().toISOString().slice(0, 10),
+  );
+  const [status, setStatus] = useState<TaskStatus>(task?.status ?? "todo");
 
   const submit = () => {
-    if (!title.trim()) return;
-    onCreate({ title: title.trim(), priority, dueDate });
-    setTitle("");
-    setPriority("medium");
+    if (!title.trim() || !dueDate) return;
+    onSave({ title: title.trim(), contact: contact.trim() || null, priority, dueDate, status });
+    if (!task) {
+      setTitle("");
+      setContact("");
+      setPriority("medium");
+    }
   };
 
   return (
     <DialogContent>
       <DialogHeader>
-        <DialogTitle>{t("tasks.new")}</DialogTitle>
+        <DialogTitle>{task ? t("tasks.editTask") : t("tasks.new")}</DialogTitle>
       </DialogHeader>
       <div className="space-y-4 py-2">
         <div className="space-y-2">
@@ -275,6 +335,10 @@ function NewTaskDialog({
             onChange={(e) => setTitle(e.target.value)}
             autoFocus
           />
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="task-contact">{t("tasks.form.contact")}</Label>
+          <Input id="task-contact" value={contact} onChange={(e) => setContact(e.target.value)} />
         </div>
         <div className="grid grid-cols-2 gap-4">
           <div className="space-y-2">
@@ -300,6 +364,21 @@ function NewTaskDialog({
             />
           </div>
         </div>
+        {task && (
+          <div className="space-y-2">
+            <Label>{t("tasks.form.status")}</Label>
+            <Select value={status} onValueChange={(v) => setStatus(v as TaskStatus)}>
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="todo">{t("tasks.status.todo")}</SelectItem>
+                <SelectItem value="in_progress">{t("tasks.status.inProgress")}</SelectItem>
+                <SelectItem value="done">{t("tasks.status.done")}</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        )}
       </div>
       <DialogFooter>
         <button
@@ -310,10 +389,10 @@ function NewTaskDialog({
         </button>
         <button
           onClick={submit}
-          disabled={!title.trim()}
+          disabled={!title.trim() || !dueDate}
           className="h-10 px-4 rounded-md bg-secondary text-secondary-foreground text-sm font-semibold hover:bg-secondary/90 disabled:opacity-50"
         >
-          {t("tasks.form.create")}
+          {task ? t("tasks.form.save") : t("tasks.form.create")}
         </button>
       </DialogFooter>
     </DialogContent>
