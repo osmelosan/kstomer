@@ -17,7 +17,7 @@ export async function runCrmAgent({
   tools: CrmTool[];
   maxTokens?: number;
 }): Promise<string> {
-  const client = new Anthropic({ apiKey });
+  const client = new Anthropic({ apiKey, timeout: 25_000, maxRetries: 1 });
   const toolsByName = new Map(tools.map((t) => [t.definition.name, t]));
   const messages: Anthropic.MessageParam[] = [{ role: "user", content: prompt }];
 
