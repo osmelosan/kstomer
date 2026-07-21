@@ -7,7 +7,9 @@ import { toast } from "sonner";
 import { AppShell } from "@/components/AppShell";
 import i18n from "@/lib/i18n";
 import { useNuki, type NukiLock, type NukiGrant } from "@/hooks/use-nuki";
+import { useContacts } from "@/hooks/use-contacts";
 import { GrantAccessDialog } from "@/components/GrantAccessDialog";
+import { BulkGrantAccessDialog, type BulkContact } from "@/components/BulkGrantAccessDialog";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -18,7 +20,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { KeyRound, Lock, Plus, RefreshCw, Loader2, BatteryWarning } from "lucide-react";
+import { KeyRound, Lock, Plus, Users, RefreshCw, Loader2, BatteryWarning } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/apps/nuki")({
   head: () =>
@@ -33,13 +35,19 @@ export const Route = createFileRoute("/_authenticated/apps/nuki")({
 
 function AccessPage() {
   const { t } = useTranslation();
-  const { orgId, connected, loading, grants, listNukiLocks, grant, revoke } = useNuki();
+  const { orgId, connected, loading, grants, listNukiLocks, grant, grantBulk, revoke } = useNuki();
+  const { contacts } = useContacts();
 
   const [locks, setLocks] = useState<NukiLock[]>([]);
   const [locksLoading, setLocksLoading] = useState(false);
   const [locksError, setLocksError] = useState<string | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [bulkOpen, setBulkOpen] = useState(false);
   const [revokeTarget, setRevokeTarget] = useState<NukiGrant | null>(null);
+
+  const bulkContacts: BulkContact[] = contacts
+    .filter((c) => !!c.email)
+    .map((c) => ({ id: c.id, name: c.contact_name, email: c.email as string }));
 
   const refreshLocks = async () => {
     if (!connected) return;
@@ -63,6 +71,14 @@ function AccessPage() {
   const handleGrant = async (params: Parameters<typeof grant>[0]) => {
     await grant(params);
     toast.success(t("nuki.toast.granted"));
+  };
+
+  const handleBulk = async (params: Parameters<typeof grantBulk>[0]) => {
+    const res = await grantBulk(params);
+    const failed = res.results.filter((r) => !r.ok).length;
+    if (failed === 0) toast.success(t("nuki.bulk.createdCount", { count: res.created }));
+    else toast.warning(t("nuki.bulk.partial", { created: res.created, failed }));
+    return res;
   };
 
   const handleRevoke = async () => {
@@ -136,6 +152,15 @@ function AccessPage() {
                 </button>
                 <button
                   type="button"
+                  onClick={() => setBulkOpen(true)}
+                  disabled={locks.length === 0}
+                  className="inline-flex items-center gap-1.5 h-9 px-3 rounded-md border border-border text-sm font-semibold hover:bg-muted disabled:opacity-50"
+                >
+                  <Users className="h-4 w-4" />
+                  {t("nuki.bulk.button")}
+                </button>
+                <button
+                  type="button"
                   onClick={() => setDialogOpen(true)}
                   disabled={locks.length === 0}
                   className="inline-flex items-center gap-1.5 h-9 px-3 rounded-md bg-secondary text-secondary-foreground text-sm font-semibold hover:bg-secondary/90 disabled:opacity-50"
@@ -178,6 +203,14 @@ function AccessPage() {
         onOpenChange={setDialogOpen}
         locks={locks}
         onSubmit={handleGrant}
+      />
+
+      <BulkGrantAccessDialog
+        open={bulkOpen}
+        onOpenChange={setBulkOpen}
+        locks={locks}
+        contacts={bulkContacts}
+        onSubmit={handleBulk}
       />
 
       <AlertDialog open={!!revokeTarget} onOpenChange={(v) => !v && setRevokeTarget(null)}>

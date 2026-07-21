@@ -2,7 +2,13 @@ import { useCallback, useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useCompany } from "@/lib/company-context";
 import { useCurrentUser } from "./use-current-user";
-import { listLocks, saveNukiToken, grantAccess, revokeAccess } from "@/lib/nuki.functions";
+import {
+  listLocks,
+  saveNukiToken,
+  grantAccess,
+  grantAccessBulk,
+  revokeAccess,
+} from "@/lib/nuki.functions";
 
 export type NukiLock = { smartlockId: number; name: string; batteryCritical: boolean };
 
@@ -157,6 +163,23 @@ export function useNuki(options?: { contactId?: string }) {
     [orgId, fetchGrants],
   );
 
+  const grantBulk = useCallback(
+    async (params: {
+      smartlockId: number;
+      smartlockName?: string | null;
+      recipients: { contactId?: string | null; name: string; email: string }[];
+      allowedFrom?: string | null;
+      allowedUntil?: string | null;
+    }) => {
+      if (!orgId) throw new Error("Select a company first");
+      const res = await grantAccessBulk({ data: { organizationId: orgId, ...params } });
+      if ("error" in res) throw new Error(res.error);
+      if (orgId) fetchGrants(orgId).then(setGrants);
+      return res;
+    },
+    [orgId, fetchGrants],
+  );
+
   const revoke = useCallback(
     async (grantId: string) => {
       const res = await revokeAccess({ data: { grantId } });
@@ -177,6 +200,7 @@ export function useNuki(options?: { contactId?: string }) {
     disconnect,
     listNukiLocks,
     grant,
+    grantBulk,
     revoke,
   };
 }

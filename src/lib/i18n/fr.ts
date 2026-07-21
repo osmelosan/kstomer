@@ -1044,6 +1044,23 @@ export const fr = {
       granted: "Accès accordé.",
       revoked: "Accès révoqué.",
     },
+    bulk: {
+      button: "Accès en masse",
+      title: "Accorder des accès en masse",
+      subtitle:
+        "Sélectionnez des contacts pour leur envoyer une invitation de l'app Nuki par e-mail.",
+      contacts: "Contacts",
+      noContacts: "Aucun contact avec e-mail dans cette entreprise.",
+      searchContacts: "Rechercher un contact…",
+      selectAll: "Tout sélectionner",
+      selectedCount: "{{count}} sélectionnés",
+      submit: "Accorder à {{count}}",
+      errorNoContacts: "Sélectionnez au moins un contact.",
+      createdCount: "{{count}} accès créés.",
+      failedCount: "{{count}} échoués",
+      partial: "{{created}} créés, {{failed}} échoués.",
+      done: "Terminé",
+    },
     dialog: {
       title: "Accorder un accès à la serrure",
       subtitle: "Créez un code clavier ou une clé d'application, avec une validité optionnelle.",

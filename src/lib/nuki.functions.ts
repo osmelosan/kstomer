@@ -198,6 +198,102 @@ export const grantAccess = createServerFn({ method: "POST" })
     },
   );
 
+type BulkRecipient = { contactId?: string | null; name: string; email: string };
+
+type BulkResult =
+  | {
+      created: number;
+      results: { name: string; email: string; ok: boolean; error?: string }[];
+    }
+  | { error: string };
+
+// Bulk app-key grant: one lock, many CRM contacts, each gets a Nuki email
+// invitation. Individual failures are collected so a bad recipient doesn't
+// abort the whole batch.
+export const grantAccessBulk = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator(
+    (data: {
+      organizationId: string;
+      smartlockId: number;
+      smartlockName?: string | null;
+      recipients: BulkRecipient[];
+      allowedFrom?: string | null;
+      allowedUntil?: string | null;
+    }) => {
+      if (!UUID_RE.test(data.organizationId)) throw new Error("Invalid organizationId");
+      if (!Number.isInteger(data.smartlockId)) throw new Error("Invalid smartlockId");
+      if (!Array.isArray(data.recipients) || data.recipients.length === 0) {
+        throw new Error("Select at least one contact");
+      }
+      if (data.recipients.length > 100) throw new Error("Too many recipients (max 100)");
+      for (const r of data.recipients) {
+        if (!r.name || r.name.trim().length === 0) throw new Error("A recipient is missing a name");
+        if (!r.email || !/^\S+@\S+\.\S+$/.test(r.email)) {
+          throw new Error(`Invalid email for ${r.name || "a recipient"}`);
+        }
+        if (r.contactId && !UUID_RE.test(r.contactId)) throw new Error("Invalid contactId");
+      }
+      return data;
+    },
+  )
+  .handler(async ({ data, context }): Promise<BulkResult> => {
+    try {
+      const token = await resolveToken(context.supabase, data.organizationId);
+      const nuki = await import("@/lib/nuki.server");
+      const restrictions = {
+        allowedFromDate: toNukiDate(data.allowedFrom),
+        allowedUntilDate: toNukiDate(data.allowedUntil),
+      };
+
+      const results: { name: string; email: string; ok: boolean; error?: string }[] = [];
+      const rows: Database["public"]["Tables"]["nuki_access_grants"]["Insert"][] = [];
+
+      for (const r of data.recipients) {
+        try {
+          await nuki.createAppKey(token, data.smartlockId, {
+            name: r.name,
+            email: r.email,
+            ...restrictions,
+          });
+          let nukiAuthId: string | null = null;
+          try {
+            nukiAuthId = await nuki.findAuthId(token, data.smartlockId, r.name);
+          } catch {
+            /* non-fatal */
+          }
+          rows.push({
+            organization_id: data.organizationId,
+            contact_id: r.contactId ?? null,
+            smartlock_id: String(data.smartlockId),
+            smartlock_name: data.smartlockName ?? null,
+            nuki_auth_id: nukiAuthId,
+            type: "app_key",
+            name: r.name,
+            allowed_from: data.allowedFrom ?? null,
+            allowed_until: data.allowedUntil ?? null,
+            status: "active",
+            created_by_user_id: context.userId,
+          });
+          results.push({ name: r.name, email: r.email, ok: true });
+        } catch (e) {
+          const { getNukiErrorMessage } = await import("@/lib/nuki.server");
+          results.push({ name: r.name, email: r.email, ok: false, error: getNukiErrorMessage(e) });
+        }
+      }
+
+      if (rows.length > 0) {
+        const { error } = await context.supabase.from("nuki_access_grants").insert(rows);
+        if (error) return { error: error.message };
+      }
+
+      return { created: rows.length, results };
+    } catch (error) {
+      const { getNukiErrorMessage } = await import("@/lib/nuki.server");
+      return { error: getNukiErrorMessage(error) };
+    }
+  });
+
 export const revokeAccess = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((data: { grantId: string }) => {
