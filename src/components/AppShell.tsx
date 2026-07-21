@@ -8,6 +8,7 @@ import {
   Archive,
   BarChart3,
   CheckSquare,
+  KeyRound,
   UserCircle,
   LogOut,
   ChevronDown,
@@ -55,6 +56,7 @@ const NAV: NavItem[] = [
   { to: "/tasks", key: "nav.tasks", icon: CheckSquare },
   { to: "/contacts", key: "nav.contacts", icon: Contact2 },
   { to: "/resellers", key: "nav.resellers", icon: Store },
+  { to: "/access", key: "nav.access", icon: KeyRound },
   { to: "/analytics", key: "nav.analytics", icon: BarChart3 },
   { to: "/archives", key: "nav.archives", icon: Archive },
 ];

@@ -350,6 +350,110 @@ export type Database = {
           },
         ]
       }
+      nuki_access_grants: {
+        Row: {
+          allowed_from: string | null
+          allowed_until: string | null
+          contact_id: string | null
+          created_at: string
+          created_by_user_id: string | null
+          id: string
+          name: string
+          nuki_auth_id: string | null
+          organization_id: string
+          smartlock_id: string
+          smartlock_name: string | null
+          status: string
+          type: string
+          updated_at: string
+        }
+        Insert: {
+          allowed_from?: string | null
+          allowed_until?: string | null
+          contact_id?: string | null
+          created_at?: string
+          created_by_user_id?: string | null
+          id?: string
+          name: string
+          nuki_auth_id?: string | null
+          organization_id: string
+          smartlock_id: string
+          smartlock_name?: string | null
+          status?: string
+          type: string
+          updated_at?: string
+        }
+        Update: {
+          allowed_from?: string | null
+          allowed_until?: string | null
+          contact_id?: string | null
+          created_at?: string
+          created_by_user_id?: string | null
+          id?: string
+          name?: string
+          nuki_auth_id?: string | null
+          organization_id?: string
+          smartlock_id?: string
+          smartlock_name?: string | null
+          status?: string
+          type?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "nuki_access_grants_contact_id_fkey"
+            columns: ["contact_id"]
+            isOneToOne: false
+            referencedRelation: "contacts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "nuki_access_grants_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      nuki_connections: {
+        Row: {
+          api_token_encrypted: string
+          connected_at: string
+          created_at: string
+          id: string
+          organization_id: string
+          token_last4: string | null
+          updated_at: string
+        }
+        Insert: {
+          api_token_encrypted: string
+          connected_at?: string
+          created_at?: string
+          id?: string
+          organization_id: string
+          token_last4?: string | null
+          updated_at?: string
+        }
+        Update: {
+          api_token_encrypted?: string
+          connected_at?: string
+          created_at?: string
+          id?: string
+          organization_id?: string
+          token_last4?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "nuki_connections_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: true
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       organizations: {
         Row: {
           address: string | null

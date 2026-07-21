@@ -12,8 +12,8 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as PricingRouteImport } from './routes/pricing'
-import { Route as AccountArchivedRouteImport } from './routes/account-archived'
 import { Route as AuthRouteImport } from './routes/auth'
+import { Route as AccountArchivedRouteImport } from './routes/account-archived'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as CheckoutReturnRouteImport } from './routes/checkout.return'
@@ -26,6 +26,7 @@ import { Route as AuthenticatedKanbanRouteImport } from './routes/_authenticated
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedArchivesRouteImport } from './routes/_authenticated/archives'
 import { Route as AuthenticatedAnalyticsRouteImport } from './routes/_authenticated/analytics'
+import { Route as AuthenticatedAccessRouteImport } from './routes/_authenticated/access'
 import { Route as AuthenticatedResellersIndexRouteImport } from './routes/_authenticated/resellers.index'
 import { Route as AuthenticatedContactsIndexRouteImport } from './routes/_authenticated/contacts.index'
 import { Route as ApiCronWarmAiCacheRouteImport } from './routes/api/cron/warm-ai-cache'
@@ -52,14 +53,14 @@ const PricingRoute = PricingRouteImport.update({
   path: '/pricing',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AccountArchivedRoute = AccountArchivedRouteImport.update({
-  id: '/account-archived',
-  path: '/account-archived',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
   path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AccountArchivedRoute = AccountArchivedRouteImport.update({
+  id: '/account-archived',
+  path: '/account-archived',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
@@ -119,6 +120,11 @@ const AuthenticatedArchivesRoute = AuthenticatedArchivesRouteImport.update({
 const AuthenticatedAnalyticsRoute = AuthenticatedAnalyticsRouteImport.update({
   id: '/analytics',
   path: '/analytics',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedAccessRoute = AuthenticatedAccessRouteImport.update({
+  id: '/access',
+  path: '/access',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedResellersIndexRoute =
@@ -181,11 +187,12 @@ const ApiPublicPaymentsWebhookRoute =
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/account-archived': typeof AccountArchivedRoute
   '/auth': typeof AuthRouteWithChildren
   '/pricing': typeof PricingRoute
-  '/account-archived': typeof AccountArchivedRoute
   '/reset-password': typeof ResetPasswordRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/access': typeof AuthenticatedAccessRoute
   '/analytics': typeof AuthenticatedAnalyticsRoute
   '/archives': typeof AuthenticatedArchivesRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
@@ -209,11 +216,12 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/account-archived': typeof AccountArchivedRoute
   '/auth': typeof AuthRouteWithChildren
   '/pricing': typeof PricingRoute
-  '/account-archived': typeof AccountArchivedRoute
   '/reset-password': typeof ResetPasswordRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/access': typeof AuthenticatedAccessRoute
   '/analytics': typeof AuthenticatedAnalyticsRoute
   '/archives': typeof AuthenticatedArchivesRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
@@ -238,11 +246,12 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
+  '/account-archived': typeof AccountArchivedRoute
   '/auth': typeof AuthRouteWithChildren
   '/pricing': typeof PricingRoute
-  '/account-archived': typeof AccountArchivedRoute
   '/reset-password': typeof ResetPasswordRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/_authenticated/access': typeof AuthenticatedAccessRoute
   '/_authenticated/analytics': typeof AuthenticatedAnalyticsRoute
   '/_authenticated/archives': typeof AuthenticatedArchivesRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
@@ -268,11 +277,12 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/account-archived'
     | '/auth'
     | '/pricing'
-    | '/account-archived'
     | '/reset-password'
     | '/sitemap.xml'
+    | '/access'
     | '/analytics'
     | '/archives'
     | '/dashboard'
@@ -296,11 +306,12 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/account-archived'
     | '/auth'
     | '/pricing'
-    | '/account-archived'
     | '/reset-password'
     | '/sitemap.xml'
+    | '/access'
     | '/analytics'
     | '/archives'
     | '/dashboard'
@@ -324,11 +335,12 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/_authenticated'
+    | '/account-archived'
     | '/auth'
     | '/pricing'
-    | '/account-archived'
     | '/reset-password'
     | '/sitemap.xml'
+    | '/_authenticated/access'
     | '/_authenticated/analytics'
     | '/_authenticated/archives'
     | '/_authenticated/dashboard'
@@ -354,9 +366,9 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
+  AccountArchivedRoute: typeof AccountArchivedRoute
   AuthRoute: typeof AuthRouteWithChildren
   PricingRoute: typeof PricingRoute
-  AccountArchivedRoute: typeof AccountArchivedRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   CheckoutReturnRoute: typeof CheckoutReturnRoute
@@ -389,18 +401,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PricingRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/account-archived': {
-      id: '/account-archived'
-      path: '/account-archived'
-      fullPath: '/account-archived'
-      preLoaderRoute: typeof AccountArchivedRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/auth': {
       id: '/auth'
       path: '/auth'
       fullPath: '/auth'
       preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/account-archived': {
+      id: '/account-archived'
+      path: '/account-archived'
+      fullPath: '/account-archived'
+      preLoaderRoute: typeof AccountArchivedRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated': {
@@ -485,6 +497,13 @@ declare module '@tanstack/react-router' {
       path: '/analytics'
       fullPath: '/analytics'
       preLoaderRoute: typeof AuthenticatedAnalyticsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/access': {
+      id: '/_authenticated/access'
+      path: '/access'
+      fullPath: '/access'
+      preLoaderRoute: typeof AuthenticatedAccessRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/resellers/': {
@@ -579,6 +598,7 @@ const AuthenticatedResellersRouteWithChildren =
   )
 
 interface AuthenticatedRouteRouteChildren {
+  AuthenticatedAccessRoute: typeof AuthenticatedAccessRoute
   AuthenticatedAnalyticsRoute: typeof AuthenticatedAnalyticsRoute
   AuthenticatedArchivesRoute: typeof AuthenticatedArchivesRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
@@ -593,6 +613,7 @@ interface AuthenticatedRouteRouteChildren {
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedAccessRoute: AuthenticatedAccessRoute,
   AuthenticatedAnalyticsRoute: AuthenticatedAnalyticsRoute,
   AuthenticatedArchivesRoute: AuthenticatedArchivesRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
@@ -622,9 +643,9 @@ const AuthRouteWithChildren = AuthRoute._addFileChildren(AuthRouteChildren)
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
+  AccountArchivedRoute: AccountArchivedRoute,
   AuthRoute: AuthRouteWithChildren,
   PricingRoute: PricingRoute,
-  AccountArchivedRoute: AccountArchivedRoute,
   ResetPasswordRoute: ResetPasswordRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   CheckoutReturnRoute: CheckoutReturnRoute,

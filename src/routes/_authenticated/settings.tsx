@@ -44,7 +44,10 @@ import {
   Zap,
   Webhook,
   Check,
+  KeyRound,
+  Loader2,
 } from "lucide-react";
+import { useNuki } from "@/hooks/use-nuki";
 import { cn } from "@/lib/utils";
 import { useRevenueGoal, DEFAULT_REVENUE_GOAL } from "@/hooks/use-revenue-goal";
 import { useCurrentUser } from "@/hooks/use-current-user";
@@ -751,7 +754,9 @@ function IntegrationsSection() {
   ];
 
   return (
-    <div className="k-card p-7">
+    <div className="space-y-6">
+      <NukiIntegrationCard />
+      <div className="k-card p-7">
       <h3 className="text-[18px] font-semibold tracking-tight mb-4">
         {t("settings.sections.integrations")}
       </h3>
@@ -783,6 +788,106 @@ function IntegrationsSection() {
             </div>
           );
         })}
+      </div>
+      </div>
+    </div>
+  );
+}
+
+function NukiIntegrationCard() {
+  const { t } = useTranslation();
+  const { orgId, connected, tokenLast4, loading, connect, disconnect } = useNuki();
+  const [token, setToken] = useState("");
+  const [busy, setBusy] = useState(false);
+
+  const handleConnect = async () => {
+    if (!token.trim()) return;
+    setBusy(true);
+    try {
+      await connect(token.trim());
+      setToken("");
+      toast.success(t("settings.integrations.nukiConnected"));
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : String(e));
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const handleDisconnect = async () => {
+    setBusy(true);
+    try {
+      await disconnect();
+      toast.success(t("settings.integrations.nukiDisconnected"));
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  return (
+    <div className="k-card p-7">
+      <div className="flex items-start gap-3">
+        <div className="h-10 w-10 rounded-md bg-muted grid place-items-center shrink-0">
+          <KeyRound className="h-5 w-5" />
+        </div>
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-2">
+            <h3 className="text-[16px] font-semibold">{t("settings.integrations.nuki")}</h3>
+            {connected && (
+              <span className="inline-flex items-center gap-1 text-xs font-semibold text-emerald-600">
+                <Check className="h-3.5 w-3.5" />
+                {t("settings.integrations.connected")}
+              </span>
+            )}
+          </div>
+          <p className="text-xs text-muted-foreground mt-0.5">
+            {t("settings.integrations.nukiDesc")}
+          </p>
+
+          {!orgId ? (
+            <p className="text-sm text-muted-foreground mt-4">
+              {t("settings.integrations.nukiSelectCompany")}
+            </p>
+          ) : loading ? (
+            <p className="text-sm text-muted-foreground mt-4">{t("common.loading")}</p>
+          ) : connected ? (
+            <div className="mt-4 flex items-center gap-3 flex-wrap">
+              <span className="text-sm text-muted-foreground">
+                {t("settings.integrations.nukiConnectedAs", { last4: tokenLast4 ?? "••••" })}
+              </span>
+              <button
+                type="button"
+                onClick={handleDisconnect}
+                disabled={busy}
+                className="h-9 px-3 rounded-md border border-border text-sm font-semibold hover:bg-muted disabled:opacity-50"
+              >
+                {t("settings.integrations.nukiDisconnect")}
+              </button>
+            </div>
+          ) : (
+            <div className="mt-4 space-y-2">
+              <input
+                type="password"
+                value={token}
+                onChange={(e) => setToken(e.target.value)}
+                placeholder={t("settings.integrations.nukiTokenPlaceholder")}
+                className="w-full h-10 px-3 rounded-md bg-muted border border-transparent text-sm focus:outline-none focus:bg-card focus:border-input focus:ring-2 focus:ring-ring/40"
+              />
+              <p className="text-xs text-muted-foreground">
+                {t("settings.integrations.nukiTokenHint")}
+              </p>
+              <button
+                type="button"
+                onClick={handleConnect}
+                disabled={busy || !token.trim()}
+                className="inline-flex items-center gap-2 h-9 px-3 rounded-md bg-primary text-primary-foreground text-sm font-semibold hover:bg-primary/90 disabled:opacity-50"
+              >
+                {busy && <Loader2 className="h-4 w-4 animate-spin" />}
+                {t("settings.integrations.connect")}
+              </button>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

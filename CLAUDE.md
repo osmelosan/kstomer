@@ -12,6 +12,7 @@
 | `STRIPE_LIVE_SECRET_KEY` | Vercel only | Live key: `sk_live_…` (when going live) |
 | `VITE_PAYMENTS_CLIENT_TOKEN` | `.env.development` / Vercel | Stripe publishable key (`pk_test_…` or `pk_live_…`) |
 | `SUPABASE_URL` / `SUPABASE_PUBLISHABLE_KEY` | `.env` (committed) | Already set |
+| `NUKI_TOKEN_ENCRYPTION_KEY` | Vercel + local `.env` | Server secret used to AES-GCM encrypt each org's Nuki API token. The Nuki tokens themselves are entered per-org in the UI (Settings → Integrations), not in env. |
 
 ## Stripe
 - Uses the Stripe SDK directly (no Lovable gateway).

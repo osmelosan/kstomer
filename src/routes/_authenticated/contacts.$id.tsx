@@ -63,6 +63,7 @@ import { cn } from "@/lib/utils";
 import { useServerFn } from "@tanstack/react-start";
 import { analyzeContactHealth, draftFollowUp } from "@/lib/contact-ai.functions";
 import { AiInsightCard, type AiInsightStatus } from "@/components/AiInsightCard";
+import { ContactAccessCard } from "@/components/ContactAccessCard";
 
 export const Route = createFileRoute("/_authenticated/contacts/$id")({
   head: ({ params }) =>
@@ -431,6 +432,9 @@ function ContactDetails() {
 
         {/* AI relationship health */}
         <ContactHealthCard contactId={contact.id} onDraftClick={() => setDraftOpen(true)} />
+
+        {/* Nuki smart lock access */}
+        <ContactAccessCard contactId={contact.id} />
 
         {/* Notes */}
         <div className="k-card p-8">
