@@ -359,6 +359,9 @@ export const fr = {
     statusAll: "Statut : tous",
     sourceAll: "Source : toutes",
     stageAll: "Étape : toutes",
+    groupByCompany: "Grouper par entreprise",
+    ungroup: "Afficher en liste",
+    noCompanyGroup: "Sans entreprise",
     th: {
       name: "Nom & Prénom",
       company: "Entreprise",
@@ -561,6 +564,12 @@ export const fr = {
       copy: "Copier",
       copied: "Copié !",
     },
+  },
+  companyCombobox: {
+    placeholder: "Sélectionner ou saisir une entreprise…",
+    searchPlaceholder: "Rechercher ou créer une entreprise…",
+    empty: "Aucune entreprise pour l'instant.",
+    create: "Ajouter « {{value}} »",
   },
   newContact: {
     metaTitle: "Nouveau contact — Kstomer",

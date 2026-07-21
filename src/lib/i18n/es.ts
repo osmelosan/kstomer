@@ -345,6 +345,9 @@ export const es = {
     statusAll: "Estado: todos",
     sourceAll: "Origen: todos",
     stageAll: "Etapa: todas",
+    groupByCompany: "Agrupar por empresa",
+    ungroup: "Ver como lista",
+    noCompanyGroup: "Sin empresa",
     th: {
       name: "Nombre y apellido",
       company: "Empresa",
@@ -546,6 +549,12 @@ export const es = {
       copy: "Copiar",
       copied: "¡Copiado!",
     },
+  },
+  companyCombobox: {
+    placeholder: "Selecciona o escribe una empresa…",
+    searchPlaceholder: "Buscar o crear empresa…",
+    empty: "No hay empresas todavía.",
+    create: 'Añadir "{{value}}"',
   },
   newContact: {
     metaTitle: "Nuevo contacto — Kstomer",

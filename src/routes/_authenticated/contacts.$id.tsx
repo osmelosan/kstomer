@@ -57,6 +57,8 @@ import {
 } from "@/components/ui/dialog";
 import { useAutosave, type AutosaveStatus } from "@/hooks/use-autosave";
 import { useContact } from "@/hooks/use-contact";
+import { useCompanyNames } from "@/hooks/use-company-names";
+import { CompanyCombobox } from "@/components/CompanyCombobox";
 import type { Contact, ContactStage } from "@/hooks/use-contacts";
 import { joinContactName } from "@/lib/contact-name";
 import { cn } from "@/lib/utils";
@@ -92,6 +94,7 @@ function ContactDetails() {
     archiveContact,
     deleteContact,
   } = useContact(id);
+  const { companyNames } = useCompanyNames();
 
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState<Contact | null>(null);
@@ -328,14 +331,22 @@ function ContactDetails() {
               onChange={(v) => setDraft({ ...view, phone: v || null })}
               draftValue={view.phone ?? ""}
             />
-            <InfoField
-              icon={<Briefcase className="h-4 w-4" />}
-              label={t("contactDetail.company")}
-              value={view.company_name ?? "—"}
-              editing={editing}
-              onChange={(v) => setDraft({ ...view, company_name: v || null })}
-              draftValue={view.company_name ?? ""}
-            />
+            <div>
+              <div className="k-label mb-2 flex items-center gap-2">
+                <Briefcase className="h-4 w-4" />
+                {t("contactDetail.company")}
+              </div>
+              {editing ? (
+                <CompanyCombobox
+                  value={view.company_name ?? ""}
+                  onChange={(v) => setDraft({ ...view, company_name: v.trim() ? v : null })}
+                  options={companyNames}
+                  className="h-9"
+                />
+              ) : (
+                <div className="font-medium text-sm">{view.company_name ?? "—"}</div>
+              )}
+            </div>
             <div>
               <InfoField
                 icon={<Calendar className="h-4 w-4" />}

@@ -5,7 +5,9 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import i18n from "@/lib/i18n";
 import { useContacts } from "@/hooks/use-contacts";
+import { useCompanyNames } from "@/hooks/use-company-names";
 import { useCompany } from "@/lib/company-context";
+import { CompanyCombobox } from "@/components/CompanyCombobox";
 import { supabase } from "@/integrations/supabase/client";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -26,6 +28,7 @@ function NewContact() {
   const { t } = useTranslation();
   const { current } = useCompany();
   const { contacts, createContact } = useContacts();
+  const { companyNames } = useCompanyNames();
   const [form, setForm] = useState({
     firstName: "",
     lastName: "",
@@ -128,11 +131,14 @@ function NewContact() {
             value={form.phone}
             onChange={(v) => setForm({ ...form, phone: v })}
           />
-          <Field
-            label={t("newContact.company")}
-            value={form.company}
-            onChange={(v) => setForm({ ...form, company: v })}
-          />
+          <div>
+            <label className="block text-sm font-semibold mb-2">{t("newContact.company")}</label>
+            <CompanyCombobox
+              value={form.company}
+              onChange={(v) => setForm({ ...form, company: v })}
+              options={companyNames}
+            />
+          </div>
         </div>
 
         <div>
