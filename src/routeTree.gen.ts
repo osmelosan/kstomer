@@ -26,9 +26,9 @@ import { Route as AuthenticatedKanbanRouteImport } from './routes/_authenticated
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedArchivesRouteImport } from './routes/_authenticated/archives'
 import { Route as AuthenticatedAnalyticsRouteImport } from './routes/_authenticated/analytics'
-import { Route as AuthenticatedAccessRouteImport } from './routes/_authenticated/access'
 import { Route as AuthenticatedResellersIndexRouteImport } from './routes/_authenticated/resellers.index'
 import { Route as AuthenticatedContactsIndexRouteImport } from './routes/_authenticated/contacts.index'
+import { Route as AuthenticatedAppsIndexRouteImport } from './routes/_authenticated/apps.index'
 import { Route as ApiCronWarmAiCacheRouteImport } from './routes/api/cron/warm-ai-cache'
 import { Route as ApiCronRenewalRemindersRouteImport } from './routes/api/cron/renewal-reminders'
 import { Route as ApiCronOrganizationArchivalRouteImport } from './routes/api/cron/organization-archival'
@@ -36,6 +36,7 @@ import { Route as AuthenticatedResellersNewRouteImport } from './routes/_authent
 import { Route as AuthenticatedResellersIdRouteImport } from './routes/_authenticated/resellers.$id'
 import { Route as AuthenticatedContactsNewRouteImport } from './routes/_authenticated/contacts.new'
 import { Route as AuthenticatedContactsIdRouteImport } from './routes/_authenticated/contacts.$id'
+import { Route as AuthenticatedAppsNukiRouteImport } from './routes/_authenticated/apps.nuki'
 import { Route as ApiPublicPaymentsWebhookRouteImport } from './routes/api/public/payments/webhook'
 
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
@@ -122,11 +123,6 @@ const AuthenticatedAnalyticsRoute = AuthenticatedAnalyticsRouteImport.update({
   path: '/analytics',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
-const AuthenticatedAccessRoute = AuthenticatedAccessRouteImport.update({
-  id: '/access',
-  path: '/access',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any)
 const AuthenticatedResellersIndexRoute =
   AuthenticatedResellersIndexRouteImport.update({
     id: '/',
@@ -139,6 +135,11 @@ const AuthenticatedContactsIndexRoute =
     path: '/contacts/',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedAppsIndexRoute = AuthenticatedAppsIndexRouteImport.update({
+  id: '/apps/',
+  path: '/apps/',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const ApiCronWarmAiCacheRoute = ApiCronWarmAiCacheRouteImport.update({
   id: '/api/cron/warm-ai-cache',
   path: '/api/cron/warm-ai-cache',
@@ -178,6 +179,11 @@ const AuthenticatedContactsIdRoute = AuthenticatedContactsIdRouteImport.update({
   path: '/contacts/$id',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedAppsNukiRoute = AuthenticatedAppsNukiRouteImport.update({
+  id: '/apps/nuki',
+  path: '/apps/nuki',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const ApiPublicPaymentsWebhookRoute =
   ApiPublicPaymentsWebhookRouteImport.update({
     id: '/api/public/payments/webhook',
@@ -192,7 +198,6 @@ export interface FileRoutesByFullPath {
   '/pricing': typeof PricingRoute
   '/reset-password': typeof ResetPasswordRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
-  '/access': typeof AuthenticatedAccessRoute
   '/analytics': typeof AuthenticatedAnalyticsRoute
   '/archives': typeof AuthenticatedArchivesRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
@@ -203,6 +208,7 @@ export interface FileRoutesByFullPath {
   '/tasks': typeof AuthenticatedTasksRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/checkout/return': typeof CheckoutReturnRoute
+  '/apps/nuki': typeof AuthenticatedAppsNukiRoute
   '/contacts/$id': typeof AuthenticatedContactsIdRoute
   '/contacts/new': typeof AuthenticatedContactsNewRoute
   '/resellers/$id': typeof AuthenticatedResellersIdRoute
@@ -210,6 +216,7 @@ export interface FileRoutesByFullPath {
   '/api/cron/organization-archival': typeof ApiCronOrganizationArchivalRoute
   '/api/cron/renewal-reminders': typeof ApiCronRenewalRemindersRoute
   '/api/cron/warm-ai-cache': typeof ApiCronWarmAiCacheRoute
+  '/apps/': typeof AuthenticatedAppsIndexRoute
   '/contacts/': typeof AuthenticatedContactsIndexRoute
   '/resellers/': typeof AuthenticatedResellersIndexRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
@@ -221,7 +228,6 @@ export interface FileRoutesByTo {
   '/pricing': typeof PricingRoute
   '/reset-password': typeof ResetPasswordRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
-  '/access': typeof AuthenticatedAccessRoute
   '/analytics': typeof AuthenticatedAnalyticsRoute
   '/archives': typeof AuthenticatedArchivesRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
@@ -231,6 +237,7 @@ export interface FileRoutesByTo {
   '/tasks': typeof AuthenticatedTasksRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/checkout/return': typeof CheckoutReturnRoute
+  '/apps/nuki': typeof AuthenticatedAppsNukiRoute
   '/contacts/$id': typeof AuthenticatedContactsIdRoute
   '/contacts/new': typeof AuthenticatedContactsNewRoute
   '/resellers/$id': typeof AuthenticatedResellersIdRoute
@@ -238,6 +245,7 @@ export interface FileRoutesByTo {
   '/api/cron/organization-archival': typeof ApiCronOrganizationArchivalRoute
   '/api/cron/renewal-reminders': typeof ApiCronRenewalRemindersRoute
   '/api/cron/warm-ai-cache': typeof ApiCronWarmAiCacheRoute
+  '/apps': typeof AuthenticatedAppsIndexRoute
   '/contacts': typeof AuthenticatedContactsIndexRoute
   '/resellers': typeof AuthenticatedResellersIndexRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
@@ -251,7 +259,6 @@ export interface FileRoutesById {
   '/pricing': typeof PricingRoute
   '/reset-password': typeof ResetPasswordRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
-  '/_authenticated/access': typeof AuthenticatedAccessRoute
   '/_authenticated/analytics': typeof AuthenticatedAnalyticsRoute
   '/_authenticated/archives': typeof AuthenticatedArchivesRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
@@ -262,6 +269,7 @@ export interface FileRoutesById {
   '/_authenticated/tasks': typeof AuthenticatedTasksRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/checkout/return': typeof CheckoutReturnRoute
+  '/_authenticated/apps/nuki': typeof AuthenticatedAppsNukiRoute
   '/_authenticated/contacts/$id': typeof AuthenticatedContactsIdRoute
   '/_authenticated/contacts/new': typeof AuthenticatedContactsNewRoute
   '/_authenticated/resellers/$id': typeof AuthenticatedResellersIdRoute
@@ -269,6 +277,7 @@ export interface FileRoutesById {
   '/api/cron/organization-archival': typeof ApiCronOrganizationArchivalRoute
   '/api/cron/renewal-reminders': typeof ApiCronRenewalRemindersRoute
   '/api/cron/warm-ai-cache': typeof ApiCronWarmAiCacheRoute
+  '/_authenticated/apps/': typeof AuthenticatedAppsIndexRoute
   '/_authenticated/contacts/': typeof AuthenticatedContactsIndexRoute
   '/_authenticated/resellers/': typeof AuthenticatedResellersIndexRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
@@ -282,7 +291,6 @@ export interface FileRouteTypes {
     | '/pricing'
     | '/reset-password'
     | '/sitemap.xml'
-    | '/access'
     | '/analytics'
     | '/archives'
     | '/dashboard'
@@ -293,6 +301,7 @@ export interface FileRouteTypes {
     | '/tasks'
     | '/auth/callback'
     | '/checkout/return'
+    | '/apps/nuki'
     | '/contacts/$id'
     | '/contacts/new'
     | '/resellers/$id'
@@ -300,6 +309,7 @@ export interface FileRouteTypes {
     | '/api/cron/organization-archival'
     | '/api/cron/renewal-reminders'
     | '/api/cron/warm-ai-cache'
+    | '/apps/'
     | '/contacts/'
     | '/resellers/'
     | '/api/public/payments/webhook'
@@ -311,7 +321,6 @@ export interface FileRouteTypes {
     | '/pricing'
     | '/reset-password'
     | '/sitemap.xml'
-    | '/access'
     | '/analytics'
     | '/archives'
     | '/dashboard'
@@ -321,6 +330,7 @@ export interface FileRouteTypes {
     | '/tasks'
     | '/auth/callback'
     | '/checkout/return'
+    | '/apps/nuki'
     | '/contacts/$id'
     | '/contacts/new'
     | '/resellers/$id'
@@ -328,6 +338,7 @@ export interface FileRouteTypes {
     | '/api/cron/organization-archival'
     | '/api/cron/renewal-reminders'
     | '/api/cron/warm-ai-cache'
+    | '/apps'
     | '/contacts'
     | '/resellers'
     | '/api/public/payments/webhook'
@@ -340,7 +351,6 @@ export interface FileRouteTypes {
     | '/pricing'
     | '/reset-password'
     | '/sitemap.xml'
-    | '/_authenticated/access'
     | '/_authenticated/analytics'
     | '/_authenticated/archives'
     | '/_authenticated/dashboard'
@@ -351,6 +361,7 @@ export interface FileRouteTypes {
     | '/_authenticated/tasks'
     | '/auth/callback'
     | '/checkout/return'
+    | '/_authenticated/apps/nuki'
     | '/_authenticated/contacts/$id'
     | '/_authenticated/contacts/new'
     | '/_authenticated/resellers/$id'
@@ -358,6 +369,7 @@ export interface FileRouteTypes {
     | '/api/cron/organization-archival'
     | '/api/cron/renewal-reminders'
     | '/api/cron/warm-ai-cache'
+    | '/_authenticated/apps/'
     | '/_authenticated/contacts/'
     | '/_authenticated/resellers/'
     | '/api/public/payments/webhook'
@@ -499,13 +511,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAnalyticsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/_authenticated/access': {
-      id: '/_authenticated/access'
-      path: '/access'
-      fullPath: '/access'
-      preLoaderRoute: typeof AuthenticatedAccessRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
     '/_authenticated/resellers/': {
       id: '/_authenticated/resellers/'
       path: '/'
@@ -518,6 +523,13 @@ declare module '@tanstack/react-router' {
       path: '/contacts'
       fullPath: '/contacts/'
       preLoaderRoute: typeof AuthenticatedContactsIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/apps/': {
+      id: '/_authenticated/apps/'
+      path: '/apps'
+      fullPath: '/apps/'
+      preLoaderRoute: typeof AuthenticatedAppsIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/api/cron/warm-ai-cache': {
@@ -569,6 +581,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedContactsIdRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/apps/nuki': {
+      id: '/_authenticated/apps/nuki'
+      path: '/apps/nuki'
+      fullPath: '/apps/nuki'
+      preLoaderRoute: typeof AuthenticatedAppsNukiRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/api/public/payments/webhook': {
       id: '/api/public/payments/webhook'
       path: '/api/public/payments/webhook'
@@ -598,7 +617,6 @@ const AuthenticatedResellersRouteWithChildren =
   )
 
 interface AuthenticatedRouteRouteChildren {
-  AuthenticatedAccessRoute: typeof AuthenticatedAccessRoute
   AuthenticatedAnalyticsRoute: typeof AuthenticatedAnalyticsRoute
   AuthenticatedArchivesRoute: typeof AuthenticatedArchivesRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
@@ -607,13 +625,14 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedResellersRoute: typeof AuthenticatedResellersRouteWithChildren
   AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
   AuthenticatedTasksRoute: typeof AuthenticatedTasksRoute
+  AuthenticatedAppsNukiRoute: typeof AuthenticatedAppsNukiRoute
   AuthenticatedContactsIdRoute: typeof AuthenticatedContactsIdRoute
   AuthenticatedContactsNewRoute: typeof AuthenticatedContactsNewRoute
+  AuthenticatedAppsIndexRoute: typeof AuthenticatedAppsIndexRoute
   AuthenticatedContactsIndexRoute: typeof AuthenticatedContactsIndexRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
-  AuthenticatedAccessRoute: AuthenticatedAccessRoute,
   AuthenticatedAnalyticsRoute: AuthenticatedAnalyticsRoute,
   AuthenticatedArchivesRoute: AuthenticatedArchivesRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
@@ -622,8 +641,10 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedResellersRoute: AuthenticatedResellersRouteWithChildren,
   AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
   AuthenticatedTasksRoute: AuthenticatedTasksRoute,
+  AuthenticatedAppsNukiRoute: AuthenticatedAppsNukiRoute,
   AuthenticatedContactsIdRoute: AuthenticatedContactsIdRoute,
   AuthenticatedContactsNewRoute: AuthenticatedContactsNewRoute,
+  AuthenticatedAppsIndexRoute: AuthenticatedAppsIndexRoute,
   AuthenticatedContactsIndexRoute: AuthenticatedContactsIndexRoute,
 }
 

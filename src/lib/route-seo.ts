@@ -19,6 +19,7 @@ type RouteKey =
   | "resellers"
   | "onboarding"
   | "pricing"
+  | "apps"
   | "access"
   | "settings";
 
@@ -92,6 +93,11 @@ const DESCRIPTIONS: Record<RouteKey, Record<Lang, string>> = {
     fr: "Choisissez votre plan Kstomer : Starter, Expansion ou Empire. Essai gratuit 14 jours.",
     en: "Choose your Kstomer plan: Starter, Expansion or Empire. 14-day free trial.",
     es: "Elige tu plan Kstomer: Starter, Expansion o Empire. Prueba gratis de 14 días.",
+  },
+  apps: {
+    fr: "Applications et intégrations disponibles dans Kstomer.",
+    en: "Apps and integrations available in Kstomer.",
+    es: "Aplicaciones e integraciones disponibles en Kstomer.",
   },
   access: {
     fr: "Gérez les accès à vos serrures connectées Nuki.",

@@ -1,5 +1,6 @@
 import { pageHead } from "@/lib/route-seo";
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { ArrowLeft } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
@@ -19,12 +20,12 @@ import {
 } from "@/components/ui/alert-dialog";
 import { KeyRound, Lock, Plus, RefreshCw, Loader2, BatteryWarning } from "lucide-react";
 
-export const Route = createFileRoute("/_authenticated/access")({
+export const Route = createFileRoute("/_authenticated/apps/nuki")({
   head: () =>
     pageHead({
       routeKey: "access",
       title: i18n.t("nuki.metaTitle"),
-      path: "/access",
+      path: "/apps/nuki",
       noindex: true,
     }),
   component: AccessPage,
@@ -79,6 +80,14 @@ function AccessPage() {
   return (
     <AppShell title={t("nuki.title")} subtitle={t("nuki.subtitle")}>
       <title>{t("nuki.metaTitle")}</title>
+
+      <Link
+        to="/apps"
+        className="mb-4 inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground"
+      >
+        <ArrowLeft className="h-4 w-4" />
+        {t("apps.backToApps")}
+      </Link>
 
       {!orgId ? (
         <div className="k-card p-8 text-sm text-muted-foreground">{t("nuki.selectCompany")}</div>
