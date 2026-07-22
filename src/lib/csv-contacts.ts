@@ -1,6 +1,6 @@
 import Papa from "papaparse";
 import type { ContactStage } from "@/hooks/use-contacts";
-import { joinContactName } from "@/lib/contact-name";
+import { joinContactName, splitContactName } from "@/lib/contact-name";
 import { combinePhoneValue, parsePhoneValue, validatePhoneNumber } from "@/lib/phone-countries";
 
 export const CSV_CONTACT_COLUMNS = [
@@ -44,6 +44,19 @@ const PHONE_HEADER_ALIASES = [
   "mobile",
 ];
 
+// Column-header spellings for a single combined name field, kept for files
+// exported before contacts split into first_name/last_name (or from other
+// CRMs that only have one name column). When present and first_name/last_name
+// aren't, we split it with splitContactName instead of ignoring it.
+const NAME_HEADER_ALIASES = [
+  "name",
+  "full name",
+  "fullname",
+  "nombre",
+  "nombre y apellido",
+  "nombre completo",
+];
+
 function normalizeHeader(header: string): string {
   return header
     .trim()
@@ -55,6 +68,11 @@ function normalizeHeader(header: string): string {
 function findPhoneField(fields: string[]): string | undefined {
   if (fields.includes("phone")) return "phone";
   return fields.find((f) => PHONE_HEADER_ALIASES.includes(normalizeHeader(f)));
+}
+
+function findLegacyNameField(fields: string[]): string | undefined {
+  if (fields.includes("first_name")) return undefined;
+  return fields.find((f) => NAME_HEADER_ALIASES.includes(normalizeHeader(f)));
 }
 
 export type ImportContactRow = {
@@ -119,19 +137,28 @@ export function parseContactsCsv(fileText: string): CsvParseResult {
 
   const fields = result.meta.fields ?? [];
   const phoneField = findPhoneField(fields);
+  const legacyNameField = findLegacyNameField(fields);
   const unknownColumns = fields.filter(
-    (f) => f !== phoneField && !CSV_CONTACT_COLUMNS.includes(f as CsvContactColumn),
+    (f) =>
+      f !== phoneField &&
+      f !== legacyNameField &&
+      !CSV_CONTACT_COLUMNS.includes(f as CsvContactColumn),
   );
   const missingColumns = CSV_CONTACT_COLUMNS.filter(
-    (c) => c === "first_name" && !fields.includes(c),
+    (c) => c === "first_name" && !fields.includes(c) && !legacyNameField,
   );
 
   const rows: ParsedCsvRow[] = result.data.map((raw, index) => {
     const errors: CsvRowErrorCode[] = [];
 
-    const firstName = (raw.first_name ?? "").trim();
+    let firstName = (raw.first_name ?? "").trim();
+    let lastName = (raw.last_name ?? "").trim();
+    if (legacyNameField) {
+      const split = splitContactName((raw[legacyNameField] ?? "").trim());
+      firstName = split.firstName;
+      lastName = split.lastName ?? "";
+    }
     if (!firstName) errors.push("missing_name");
-    const lastName = (raw.last_name ?? "").trim();
 
     const company = (raw.company ?? "").trim();
 
