@@ -76,6 +76,25 @@ async function warmProspectsForOrg(
   );
 }
 
+// Nearby businesses don't change day to day, so forcing a fresh web-search
+// generation for every org on every daily cron run is wasted spend. Prospects
+// are only re-warmed if the cached entry is missing or at least a week old;
+// on-demand visits still get same-day-fresh data via analyzeProspects' own
+// (unforced) daily cache check, independent of this cron.
+const PROSPECTS_WARM_INTERVAL_MS = 7 * 24 * 60 * 60 * 1000;
+
+async function shouldWarmProspects(ownerId: string, orgId: string): Promise<boolean> {
+  const { data: cached } = await supabaseAdmin
+    .from("ai_insight_cache")
+    .select("generated_at")
+    .eq("user_id", ownerId)
+    .eq("feature", "prospects")
+    .eq("scope_id", `${orgId}:fr`)
+    .maybeSingle();
+  if (!cached) return true;
+  return Date.now() - new Date(cached.generated_at).getTime() >= PROSPECTS_WARM_INTERVAL_MS;
+}
+
 // The Vercel function has a 300s hard limit. Warming was previously a fully
 // sequential loop over every user/org, each doing multiple LLM round trips —
 // past a modest number of accounts that reliably exceeds 300s and the whole
@@ -205,8 +224,10 @@ export const Route = createFileRoute("/api/cron/warm-ai-cache")({
 
               if (!org.description && !org.city) return; // matches analyzeProspects' MISSING_PROFILE guard
               try {
-                await warmProspectsForOrg(org.owner_id, org.id, org, apiKey);
-                prospectsWarmed += 1;
+                if (await shouldWarmProspects(org.owner_id, org.id)) {
+                  await warmProspectsForOrg(org.owner_id, org.id, org, apiKey);
+                  prospectsWarmed += 1;
+                }
               } catch (err) {
                 prospectsErrors += 1;
                 console.error(`[cron/warm-ai-cache] failed prospects for org ${org.id}:`, err);
