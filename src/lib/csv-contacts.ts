@@ -1,6 +1,7 @@
 import Papa from "papaparse";
 import type { ContactStage } from "@/hooks/use-contacts";
 import { joinContactName } from "@/lib/contact-name";
+import { combinePhoneValue, parsePhoneValue, validatePhoneNumber } from "@/lib/phone-countries";
 
 export const CSV_CONTACT_COLUMNS = [
   "first_name",
@@ -27,7 +28,34 @@ export type CsvRowErrorCode =
   | "invalid_email"
   | "invalid_stage"
   | "invalid_renewal_date"
-  | "invalid_last_contact_date";
+  | "invalid_last_contact_date"
+  | "invalid_phone";
+
+// Column-header spellings that should be recognized as the phone column even
+// though CSV_CONTACT_COLUMNS only lists the canonical "phone" name — lets
+// users import files exported with a localized header (e.g. "Teléfono").
+const PHONE_HEADER_ALIASES = [
+  "phone",
+  "phone number",
+  "telefono",
+  "tel",
+  "movil",
+  "celular",
+  "mobile",
+];
+
+function normalizeHeader(header: string): string {
+  return header
+    .trim()
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[̀-ͯ]/g, "");
+}
+
+function findPhoneField(fields: string[]): string | undefined {
+  if (fields.includes("phone")) return "phone";
+  return fields.find((f) => PHONE_HEADER_ALIASES.includes(normalizeHeader(f)));
+}
 
 export type ImportContactRow = {
   first_name: string;
@@ -90,7 +118,10 @@ export function parseContactsCsv(fileText: string): CsvParseResult {
   });
 
   const fields = result.meta.fields ?? [];
-  const unknownColumns = fields.filter((f) => !CSV_CONTACT_COLUMNS.includes(f as CsvContactColumn));
+  const phoneField = findPhoneField(fields);
+  const unknownColumns = fields.filter(
+    (f) => f !== phoneField && !CSV_CONTACT_COLUMNS.includes(f as CsvContactColumn),
+  );
   const missingColumns = CSV_CONTACT_COLUMNS.filter(
     (c) => c === "first_name" && !fields.includes(c),
   );
@@ -114,7 +145,17 @@ export function parseContactsCsv(fileText: string): CsvParseResult {
       }
     }
 
-    const phone = (raw.phone ?? "").trim();
+    const phoneRaw = (phoneField ? raw[phoneField] : "")?.trim() ?? "";
+    const phoneNormalized = phoneRaw.startsWith("00") ? `+${phoneRaw.slice(2)}` : phoneRaw;
+    const { iso2: phoneCountry, number: phoneNumber } = parsePhoneValue(phoneNormalized);
+    let phone: string | null = null;
+    if (phoneRaw) {
+      if (validatePhoneNumber(phoneCountry, phoneNumber)) {
+        phone = combinePhoneValue(phoneCountry, phoneNumber);
+      } else {
+        errors.push("invalid_phone");
+      }
+    }
 
     const stageRaw = (raw.stage ?? "").trim().toLowerCase();
     let stage: ContactStage = "new_lead";

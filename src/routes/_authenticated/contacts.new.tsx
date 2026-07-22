@@ -8,6 +8,7 @@ import { useContacts } from "@/hooks/use-contacts";
 import { useCompanyNames } from "@/hooks/use-company-names";
 import { useCompany } from "@/lib/company-context";
 import { CompanyCombobox } from "@/components/CompanyCombobox";
+import { PhoneInput } from "@/components/PhoneInput";
 import { supabase } from "@/integrations/supabase/client";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -126,11 +127,14 @@ function NewContact() {
             error={errors.email}
             onChange={(v) => setForm({ ...form, email: v })}
           />
-          <Field
-            label={t("newContact.phone")}
-            value={form.phone}
-            onChange={(v) => setForm({ ...form, phone: v })}
-          />
+          <div>
+            <label className="block text-sm font-semibold mb-2">{t("newContact.phone")}</label>
+            <PhoneInput
+              value={form.phone}
+              onChange={(v) => setForm({ ...form, phone: v })}
+              className="h-11"
+            />
+          </div>
           <div>
             <label className="block text-sm font-semibold mb-2">{t("newContact.company")}</label>
             <CompanyCombobox

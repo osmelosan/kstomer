@@ -387,7 +387,7 @@ export const es = {
         company: "— opcional. Nombre de la empresa u organización.",
         email:
           "— opcional, pero debe ser una dirección válida si se indica; se usa para detectar duplicados dentro de tu organización.",
-        phone: "— opcional. Cualquier formato de número de teléfono.",
+        phone: "— opcional. Se reconoce el prefijo de país (p. ej. +34) si lo incluyes.",
         stage:
           "— opcional, uno de: new_lead, contacted, proposal, active, at_risk. Por defecto new_lead si se deja en blanco.",
         renewal_date: "— opcional. Formato: AAAA-MM-DD.",
@@ -408,6 +408,7 @@ export const es = {
         invalid_stage: "El stage debe ser uno de: new_lead, contacted, proposal, active, at_risk.",
         invalid_renewal_date: "La fecha de renovación debe tener el formato AAAA-MM-DD.",
         invalid_last_contact_date: "La fecha de último contacto debe tener el formato AAAA-MM-DD.",
+        invalid_phone: "El número de teléfono no parece válido.",
       },
       importButton: "Importar {{count}} contacto(s)",
       importing: "Importando…",
@@ -555,6 +556,11 @@ export const es = {
     searchPlaceholder: "Buscar o crear empresa…",
     empty: "No hay empresas todavía.",
     create: 'Añadir "{{value}}"',
+  },
+  phoneInput: {
+    searchPlaceholder: "Buscar país o prefijo…",
+    empty: "No se encontró ningún país.",
+    invalid: "El número de teléfono no parece válido para {{country}}.",
   },
   newContact: {
     metaTitle: "Nuevo contacto — Kstomer",

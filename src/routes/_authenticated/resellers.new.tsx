@@ -6,6 +6,7 @@ import { useTranslation } from "react-i18next";
 import i18n from "@/lib/i18n";
 import { useResellers } from "@/hooks/use-resellers";
 import { useCompany } from "@/lib/company-context";
+import { PhoneInput } from "@/components/PhoneInput";
 
 export const Route = createFileRoute("/_authenticated/resellers/new")({
   head: () =>
@@ -85,11 +86,14 @@ function NewReseller() {
             value={form.email}
             onChange={(v) => setForm({ ...form, email: v })}
           />
-          <Field
-            label={t("resellers.new.phone")}
-            value={form.phone}
-            onChange={(v) => setForm({ ...form, phone: v })}
-          />
+          <div>
+            <label className="block text-sm font-semibold mb-2">{t("resellers.new.phone")}</label>
+            <PhoneInput
+              value={form.phone}
+              onChange={(v) => setForm({ ...form, phone: v })}
+              className="h-11"
+            />
+          </div>
         </div>
         <div className="flex justify-end gap-3 pt-4 border-t border-border">
           <button

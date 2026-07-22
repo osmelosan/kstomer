@@ -48,6 +48,7 @@ import { useAutosave, type AutosaveStatus } from "@/hooks/use-autosave";
 import { useReseller } from "@/hooks/use-reseller";
 import { useContacts } from "@/hooks/use-contacts";
 import { tierFor } from "@/hooks/use-resellers";
+import { PhoneInput } from "@/components/PhoneInput";
 
 export const Route = createFileRoute("/_authenticated/resellers/$id")({
   head: ({ params }) =>
@@ -293,11 +294,16 @@ function ResellerDetail() {
                   value={view.email ?? ""}
                   onChange={(v) => setDraft({ ...view, email: v || null })}
                 />
-                <EditField
-                  label={t("resellers.detail.phone")}
-                  value={view.phone ?? ""}
-                  onChange={(v) => setDraft({ ...view, phone: v || null })}
-                />
+                <div>
+                  <label className="text-[11px] uppercase tracking-wider text-muted-foreground block mb-1">
+                    {t("resellers.detail.phone")}
+                  </label>
+                  <PhoneInput
+                    value={view.phone ?? ""}
+                    onChange={(v) => setDraft({ ...view, phone: v || null })}
+                    className="h-9"
+                  />
+                </div>
                 <div>
                   <label className="text-[11px] uppercase tracking-wider text-muted-foreground block mb-1">
                     {t("resellers.detail.health")}

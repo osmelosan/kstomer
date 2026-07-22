@@ -401,7 +401,7 @@ export const fr = {
         company: "— optionnel. Nom de l'entreprise ou de l'organisation.",
         email:
           "— optionnel mais doit être une adresse valide si renseignée ; utilisé pour détecter les doublons au sein de votre organisation.",
-        phone: "— optionnel. N'importe quel format de numéro de téléphone.",
+        phone: "— optionnel. L'indicatif du pays (p. ex. +34) est reconnu s'il est inclus.",
         stage:
           "— optionnel, l'une des valeurs : new_lead, contacted, proposal, active, at_risk. Par défaut new_lead si laissé vide.",
         renewal_date: "— optionnel. Format : AAAA-MM-JJ.",
@@ -423,6 +423,7 @@ export const fr = {
           "Le stage doit être l'une des valeurs : new_lead, contacted, proposal, active, at_risk.",
         invalid_renewal_date: "La date de renouvellement doit être au format AAAA-MM-JJ.",
         invalid_last_contact_date: "La date de dernier contact doit être au format AAAA-MM-JJ.",
+        invalid_phone: "Le numéro de téléphone ne semble pas valide.",
       },
       importButton: "Importer {{count}} contact(s)",
       importing: "Importation…",
@@ -570,6 +571,11 @@ export const fr = {
     searchPlaceholder: "Rechercher ou créer une entreprise…",
     empty: "Aucune entreprise pour l'instant.",
     create: "Ajouter « {{value}} »",
+  },
+  phoneInput: {
+    searchPlaceholder: "Rechercher un pays ou un indicatif…",
+    empty: "Aucun pays trouvé.",
+    invalid: "Le numéro de téléphone ne semble pas valide pour {{country}}.",
   },
   newContact: {
     metaTitle: "Nouveau contact — Kstomer",

@@ -374,7 +374,7 @@ export const en = {
         company: "— optional. Company or organization name.",
         email:
           "— optional but must be a valid address if provided; used to detect duplicates within your organization.",
-        phone: "— optional. Any phone number format.",
+        phone: "— optional. The country prefix (e.g. +34) is recognized if included.",
         stage:
           "— optional, one of: new_lead, contacted, proposal, active, at_risk. Defaults to new_lead if left blank.",
         renewal_date: "— optional. Format: YYYY-MM-DD.",
@@ -395,6 +395,7 @@ export const en = {
         invalid_stage: "Stage must be one of: new_lead, contacted, proposal, active, at_risk.",
         invalid_renewal_date: "Renewal date must be in YYYY-MM-DD format.",
         invalid_last_contact_date: "Last contact date must be in YYYY-MM-DD format.",
+        invalid_phone: "Phone number doesn't look valid.",
       },
       importButton: "Import {{count}} contact(s)",
       importing: "Importing…",
@@ -541,6 +542,11 @@ export const en = {
     searchPlaceholder: "Search or create a company…",
     empty: "No companies yet.",
     create: 'Add "{{value}}"',
+  },
+  phoneInput: {
+    searchPlaceholder: "Search country or dial code…",
+    empty: "No country found.",
+    invalid: "Phone number doesn't look valid for {{country}}.",
   },
   newContact: {
     metaTitle: "New contact — Kstomer",

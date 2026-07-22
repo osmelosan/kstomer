@@ -57,6 +57,7 @@ import {
 import { useContact } from "@/hooks/use-contact";
 import { useCompanyNames } from "@/hooks/use-company-names";
 import { CompanyCombobox } from "@/components/CompanyCombobox";
+import { PhoneInput } from "@/components/PhoneInput";
 import type { Contact, ContactStage } from "@/hooks/use-contacts";
 import { joinContactName } from "@/lib/contact-name";
 import { cn } from "@/lib/utils";
@@ -341,14 +342,21 @@ function ContactDetails() {
               onChange={(v) => setDraft({ ...view, email: v || null })}
               draftValue={view.email ?? ""}
             />
-            <InfoField
-              icon={<Phone className="h-4 w-4" />}
-              label={t("contactDetail.phone")}
-              value={view.phone ?? "—"}
-              editing={editing}
-              onChange={(v) => setDraft({ ...view, phone: v || null })}
-              draftValue={view.phone ?? ""}
-            />
+            <div>
+              <div className="k-label mb-2 flex items-center gap-2">
+                <Phone className="h-4 w-4" />
+                {t("contactDetail.phone")}
+              </div>
+              {editing ? (
+                <PhoneInput
+                  value={view.phone ?? ""}
+                  onChange={(v) => setDraft({ ...view, phone: v || null })}
+                  className="h-9"
+                />
+              ) : (
+                <div className="font-medium text-sm">{view.phone ?? "—"}</div>
+              )}
+            </div>
             <div>
               <div className="k-label mb-2 flex items-center gap-2">
                 <Briefcase className="h-4 w-4" />
