@@ -586,6 +586,7 @@ export const fr = {
     email: "Email professionnel",
     phone: "Téléphone",
     company: "Entreprise",
+    position: "Poste",
     status: "Statut",
     notes: "Notes",
     statusOptions: {
@@ -708,6 +709,7 @@ export const fr = {
       subtitle: "Ajoutez un partenaire revendeur à votre CRM.",
       name: "Nom",
       company: "Société",
+      position: "Poste",
       email: "Email",
       phone: "Téléphone",
       create: "Créer le revendeur",

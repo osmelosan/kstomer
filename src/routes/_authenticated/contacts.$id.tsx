@@ -119,6 +119,7 @@ function ContactDetails() {
         last_name: draft.last_name,
         contact_name: joinContactName(draft.first_name, draft.last_name),
         company_name: draft.company_name,
+        cargo: draft.cargo,
         email: draft.email,
         phone: draft.phone,
         stage: draft.stage,
@@ -373,6 +374,14 @@ function ContactDetails() {
                 <div className="font-medium text-sm">{view.company_name ?? "—"}</div>
               )}
             </div>
+            <InfoField
+              icon={<BadgeCheck className="h-4 w-4" />}
+              label={t("contactDetail.position")}
+              value={view.cargo ?? "—"}
+              editing={editing}
+              onChange={(v) => setDraft({ ...view, cargo: v || null })}
+              draftValue={view.cargo ?? ""}
+            />
             <div>
               <InfoField
                 icon={<Calendar className="h-4 w-4" />}

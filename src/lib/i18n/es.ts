@@ -571,6 +571,7 @@ export const es = {
     email: "Email profesional",
     phone: "Teléfono",
     company: "Empresa",
+    position: "Cargo",
     status: "Estado",
     notes: "Notas",
     statusOptions: {
@@ -693,6 +694,7 @@ export const es = {
       subtitle: "Añade un socio distribuidor a tu CRM.",
       name: "Nombre",
       company: "Empresa",
+      position: "Cargo",
       email: "Email",
       phone: "Teléfono",
       create: "Crear distribuidor",

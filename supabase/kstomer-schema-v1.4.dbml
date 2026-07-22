@@ -81,6 +81,7 @@ Table contacts {
   first_name text [not null]
   last_name text
   company_name text
+  cargo text
   email text
   phone text
   stage contact_stage [not null, default: 'new_lead']
@@ -141,6 +142,7 @@ Table resellers {
   owner_user_id uuid [not null, ref: > auth_users.id]
   name text [not null]
   company text
+  cargo text
   email text
   phone text
   confidence_level int4 // CHECK 1-5

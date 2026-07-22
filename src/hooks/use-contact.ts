@@ -56,6 +56,7 @@ export function useContact(id: string) {
           | "first_name"
           | "last_name"
           | "company_name"
+          | "cargo"
           | "email"
           | "phone"
           | "stage"

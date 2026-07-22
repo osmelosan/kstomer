@@ -31,6 +31,7 @@ function mapRow(row: any): Reseller {
     owner_user_id: row.owner_user_id,
     name: row.name,
     company: row.company,
+    cargo: row.cargo,
     email: row.email,
     phone: row.phone,
     confidence_level: row.confidence_level,
@@ -84,7 +85,9 @@ export function useReseller(id: string) {
 
   const updateReseller = useCallback(
     async (
-      patch: Partial<Pick<Reseller, "name" | "company" | "email" | "phone" | "confidence_level">>,
+      patch: Partial<
+        Pick<Reseller, "name" | "company" | "cargo" | "email" | "phone" | "confidence_level">
+      >,
     ) => {
       const { data } = await supabase
         .from("resellers")

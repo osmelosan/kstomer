@@ -22,6 +22,7 @@ export type Contact = {
   first_name: string;
   last_name: string | null;
   company_name: string | null;
+  cargo: string | null;
   email: string | null;
   phone: string | null;
   stage: ContactStage;
@@ -103,6 +104,7 @@ export function useContacts() {
       first_name: string;
       last_name?: string | null;
       company_name?: string | null;
+      cargo?: string | null;
       email?: string | null;
       phone?: string | null;
       stage?: ContactStage;
@@ -119,6 +121,7 @@ export function useContacts() {
           last_name: data.last_name ?? null,
           contact_name: joinContactName(data.first_name, data.last_name),
           company_name: data.company_name ?? null,
+          cargo: data.cargo ?? null,
           email: data.email ?? null,
           phone: data.phone ?? null,
           stage: data.stage ?? "new_lead",
@@ -186,6 +189,7 @@ export function useContacts() {
           | "first_name"
           | "last_name"
           | "company_name"
+          | "cargo"
           | "email"
           | "phone"
           | "stage"

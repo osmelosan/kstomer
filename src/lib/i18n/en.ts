@@ -557,6 +557,7 @@ export const en = {
     email: "Work email",
     phone: "Phone",
     company: "Company",
+    position: "Position",
     status: "Status",
     notes: "Notes",
     statusOptions: {
@@ -679,6 +680,7 @@ export const en = {
       subtitle: "Add a reseller partner to your CRM.",
       name: "Name",
       company: "Company",
+      position: "Position",
       email: "Email",
       phone: "Phone",
       create: "Create reseller",

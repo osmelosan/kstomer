@@ -24,7 +24,7 @@ function NewReseller() {
   const { t } = useTranslation();
   const { current } = useCompany();
   const { createReseller } = useResellers();
-  const [form, setForm] = useState({ name: "", company: "", email: "", phone: "" });
+  const [form, setForm] = useState({ name: "", company: "", cargo: "", email: "", phone: "" });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [submitting, setSubmitting] = useState(false);
 
@@ -56,6 +56,7 @@ function NewReseller() {
       const created = await createReseller({
         name: form.name.trim(),
         company: form.company.trim() || null,
+        cargo: form.cargo.trim() || null,
         email: form.email.trim() || null,
         phone: form.phone.trim() || null,
       });
@@ -79,6 +80,11 @@ function NewReseller() {
             label={t("resellers.new.company")}
             value={form.company}
             onChange={(v) => setForm({ ...form, company: v })}
+          />
+          <Field
+            label={t("resellers.new.position")}
+            value={form.cargo}
+            onChange={(v) => setForm({ ...form, cargo: v })}
           />
           <Field
             label={t("resellers.new.email")}

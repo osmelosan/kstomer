@@ -36,6 +36,7 @@ function NewContact() {
     email: "",
     phone: "",
     company: "",
+    cargo: "",
     notes: "",
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -78,6 +79,7 @@ function NewContact() {
         first_name: form.firstName.trim(),
         last_name: form.lastName.trim() || null,
         company_name: form.company.trim() || null,
+        cargo: form.cargo.trim() || null,
         email: form.email.trim(),
         phone: form.phone.trim() || null,
       });
@@ -143,6 +145,11 @@ function NewContact() {
               options={companyNames}
             />
           </div>
+          <Field
+            label={t("newContact.position")}
+            value={form.cargo}
+            onChange={(v) => setForm({ ...form, cargo: v })}
+          />
         </div>
 
         <div>

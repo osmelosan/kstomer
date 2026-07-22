@@ -224,6 +224,7 @@ export type Database = {
       contacts: {
         Row: {
           archived_at: string | null
+          cargo: string | null
           company_name: string | null
           confidence_level: number | null
           contact_name: string
@@ -244,6 +245,7 @@ export type Database = {
         }
         Insert: {
           archived_at?: string | null
+          cargo?: string | null
           company_name?: string | null
           confidence_level?: number | null
           contact_name: string
@@ -264,6 +266,7 @@ export type Database = {
         }
         Update: {
           archived_at?: string | null
+          cargo?: string | null
           company_name?: string | null
           confidence_level?: number | null
           contact_name?: string
@@ -714,6 +717,7 @@ export type Database = {
       resellers: {
         Row: {
           archived_at: string | null
+          cargo: string | null
           company: string | null
           confidence_level: number | null
           created_at: string
@@ -727,6 +731,7 @@ export type Database = {
         }
         Insert: {
           archived_at?: string | null
+          cargo?: string | null
           company?: string | null
           confidence_level?: number | null
           created_at?: string
@@ -740,6 +745,7 @@ export type Database = {
         }
         Update: {
           archived_at?: string | null
+          cargo?: string | null
           company?: string | null
           confidence_level?: number | null
           created_at?: string

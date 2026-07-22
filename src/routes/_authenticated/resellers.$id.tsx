@@ -6,6 +6,7 @@ import { useTranslation } from "react-i18next";
 import i18n from "@/lib/i18n";
 import {
   ArrowLeft,
+  BadgeCheck,
   Mail,
   Phone,
   Briefcase,
@@ -91,6 +92,7 @@ function ResellerDetail() {
   const [draft, setDraft] = useState<{
     name: string;
     company: string | null;
+    cargo: string | null;
     email: string | null;
     phone: string | null;
     confidence_level: number | null;
@@ -262,6 +264,7 @@ function ResellerDetail() {
                       setDraft({
                         name: reseller.name,
                         company: reseller.company,
+                        cargo: reseller.cargo,
                         email: reseller.email,
                         phone: reseller.phone,
                         confidence_level: reseller.confidence_level,
@@ -288,6 +291,11 @@ function ResellerDetail() {
                   label={t("resellers.new.company")}
                   value={view.company ?? ""}
                   onChange={(v) => setDraft({ ...view, company: v || null })}
+                />
+                <EditField
+                  label={t("resellers.detail.role")}
+                  value={view.cargo ?? ""}
+                  onChange={(v) => setDraft({ ...view, cargo: v || null })}
                 />
                 <EditField
                   label={t("resellers.detail.email")}
@@ -332,6 +340,11 @@ function ResellerDetail() {
                   icon={<Briefcase className="h-3.5 w-3.5" />}
                   label={t("resellers.new.company")}
                   value={view.company ?? "—"}
+                />
+                <Field
+                  icon={<BadgeCheck className="h-3.5 w-3.5" />}
+                  label={t("resellers.detail.role")}
+                  value={view.cargo ?? "—"}
                 />
                 <Field
                   icon={<Mail className="h-3.5 w-3.5" />}

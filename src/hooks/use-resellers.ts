@@ -20,6 +20,7 @@ export type Reseller = {
   owner_user_id: string;
   name: string;
   company: string | null;
+  cargo: string | null;
   email: string | null;
   phone: string | null;
   confidence_level: number | null;
@@ -62,6 +63,7 @@ function mapRow(row: any): Reseller {
     owner_user_id: row.owner_user_id,
     name: row.name,
     company: row.company,
+    cargo: row.cargo,
     email: row.email,
     phone: row.phone,
     confidence_level: row.confidence_level,
@@ -138,6 +140,7 @@ export function useResellers() {
     async (data: {
       name: string;
       company?: string | null;
+      cargo?: string | null;
       email?: string | null;
       phone?: string | null;
     }) => {
@@ -150,6 +153,7 @@ export function useResellers() {
           owner_user_id: user.id,
           name: data.name,
           company: data.company ?? null,
+          cargo: data.cargo ?? null,
           email: data.email ?? null,
           phone: data.phone ?? null,
         })
