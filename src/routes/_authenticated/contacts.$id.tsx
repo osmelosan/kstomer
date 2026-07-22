@@ -13,7 +13,6 @@ import {
   Pencil,
   Check,
   Loader2,
-  CloudUpload,
   Trash2,
   PenLine,
   Copy,
@@ -55,7 +54,6 @@ import {
   DialogTitle,
   DialogDescription,
 } from "@/components/ui/dialog";
-import { useAutosave, type AutosaveStatus } from "@/hooks/use-autosave";
 import { useContact } from "@/hooks/use-contact";
 import { useCompanyNames } from "@/hooks/use-company-names";
 import { CompanyCombobox } from "@/components/CompanyCombobox";
@@ -108,20 +106,30 @@ function ContactDetails() {
   const [editingNoteText, setEditingNoteText] = useState("");
   const [savingNoteEdit, setSavingNoteEdit] = useState(false);
 
-  const profileAutosave = useAutosave(draft, async (value) => {
-    if (!value) return;
-    await updateContact({
-      first_name: value.first_name,
-      last_name: value.last_name,
-      contact_name: joinContactName(value.first_name, value.last_name),
-      company_name: value.company_name,
-      email: value.email,
-      phone: value.phone,
-      stage: value.stage,
-      confidence_level: value.confidence_level,
-      renewal_date: value.renewal_date,
-    });
-  });
+  const [profileSaveStatus, setProfileSaveStatus] = useState<ProfileSaveStatus>("idle");
+  const [profileSavedAt, setProfileSavedAt] = useState<Date | null>(null);
+
+  async function saveProfile() {
+    if (!draft) return;
+    setProfileSaveStatus("saving");
+    try {
+      await updateContact({
+        first_name: draft.first_name,
+        last_name: draft.last_name,
+        contact_name: joinContactName(draft.first_name, draft.last_name),
+        company_name: draft.company_name,
+        email: draft.email,
+        phone: draft.phone,
+        stage: draft.stage,
+        confidence_level: draft.confidence_level,
+        renewal_date: draft.renewal_date,
+      });
+      setProfileSavedAt(new Date());
+      setProfileSaveStatus("saved");
+    } catch {
+      setProfileSaveStatus("idle");
+    }
+  }
 
   async function submitNote() {
     if (!noteDraft.trim() || savingNote) return;
@@ -193,10 +201,12 @@ function ContactDetails() {
 
   function startEditing() {
     setDraft(contact);
+    setProfileSaveStatus("idle");
     setEditing(true);
   }
 
-  function stopEditing() {
+  async function stopEditing() {
+    await saveProfile();
     setEditing(false);
   }
 
@@ -261,19 +271,27 @@ function ContactDetails() {
             </div>
 
             <div className="flex items-center gap-2 flex-wrap ml-auto">
-              <AutosaveIndicator
-                status={profileAutosave.status}
-                savedAt={profileAutosave.savedAt}
-              />
+              {!editing && (
+                <ProfileSaveIndicator status={profileSaveStatus} savedAt={profileSavedAt} />
+              )}
               <button
                 onClick={editing ? stopEditing : startEditing}
-                className={`inline-flex items-center gap-2 h-10 px-4 rounded-md text-sm font-semibold ${
+                disabled={profileSaveStatus === "saving"}
+                className={`inline-flex items-center gap-2 h-10 px-4 rounded-md text-sm font-semibold disabled:opacity-50 disabled:pointer-events-none ${
                   editing
                     ? "border border-input bg-card hover:bg-muted"
                     : "bg-primary text-primary-foreground hover:bg-primary/90"
                 }`}
               >
-                {editing ? <Check className="h-4 w-4" /> : <Pencil className="h-4 w-4" />}
+                {editing ? (
+                  profileSaveStatus === "saving" ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <Check className="h-4 w-4" />
+                  )
+                ) : (
+                  <Pencil className="h-4 w-4" />
+                )}
                 {editing ? t("contactDetail.save") : t("contactDetail.editProfile")}
               </button>
               {!editing && (
@@ -793,32 +811,25 @@ function StageBadge({ stage }: { stage: ContactStage }) {
   );
 }
 
-function AutosaveIndicator({ status, savedAt }: { status: AutosaveStatus; savedAt: Date | null }) {
+type ProfileSaveStatus = "idle" | "saving" | "saved";
+
+function ProfileSaveIndicator({
+  status,
+  savedAt,
+}: {
+  status: ProfileSaveStatus;
+  savedAt: Date | null;
+}) {
   const { t, i18n: i18nInst } = useTranslation();
-  if (status === "idle") return null;
-  if (status === "pending") {
-    return (
-      <span className="inline-flex items-center gap-1.5 text-xs text-muted-foreground">
-        <CloudUpload className="h-3.5 w-3.5" />
-        {t("contactDetail.autosave.pending")}
-      </span>
-    );
-  }
-  if (status === "saving") {
-    return (
-      <span className="inline-flex items-center gap-1.5 text-xs text-muted-foreground">
-        <Loader2 className="h-3.5 w-3.5 animate-spin" />
-        {t("contactDetail.autosave.saving")}
-      </span>
-    );
-  }
-  const time = savedAt
-    ? savedAt.toLocaleTimeString(i18nInst.language, { hour: "2-digit", minute: "2-digit" })
-    : "";
+  if (status !== "saved" || !savedAt) return null;
+  const time = savedAt.toLocaleTimeString(i18nInst.language, {
+    hour: "2-digit",
+    minute: "2-digit",
+  });
   return (
     <span className="inline-flex items-center gap-1.5 text-xs text-success">
       <Check className="h-3.5 w-3.5" />
-      {savedAt ? t("contactDetail.autosave.savedAt", { time }) : t("contactDetail.autosave.saved")}
+      {t("contactDetail.autosave.savedAt", { time })}
     </span>
   );
 }
