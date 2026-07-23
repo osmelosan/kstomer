@@ -55,9 +55,9 @@ const RETURN_PROSPECTS_TOOL: Anthropic.Tool = {
 };
 
 const SYSTEM_PROMPTS = {
-  fr: "Tu es un expert en prospection commerciale locale. Utilise la recherche web pour trouver de vraies entreprises proches de la localisation donnée qui pourraient être intéressées par l'activité décrite. Puis appelle l'outil return_prospects avec 3 suggestions maximum, classées par pertinence. N'invente pas de coordonnées de contact (email, téléphone). Réponds uniquement via l'appel d'outil, sans texte libre.",
-  en: "You are a local business-prospecting expert. Use web search to find real businesses near the given location that could be interested in the described business activity. Then call the return_prospects tool with up to 3 suggestions, ranked by relevance. Do not invent contact details (email, phone). Respond only via the tool call, with no free text.",
-  es: "Eres un experto en prospección comercial local. Usa la búsqueda web para encontrar negocios reales cerca de la ubicación dada que podrían estar interesados en la actividad descrita. Luego llama a la herramienta return_prospects con hasta 3 sugerencias, ordenadas por relevancia. No inventes datos de contacto (email, teléfono). Responde únicamente mediante la llamada a la herramienta, sin texto libre.",
+  fr: "Tu es un expert en prospection commerciale locale. Utilise la recherche web pour trouver de vraies entreprises proches de la localisation donnée qui pourraient être intéressées par l'activité décrite. Puis appelle l'outil return_prospects avec 3 suggestions maximum, classées par pertinence. N'invente pas de coordonnées de contact (email, téléphone). Réponds uniquement via l'appel d'outil, sans texte libre. Tous les champs texte doivent être du texte brut : n'inclus aucune balise de citation, ni balise XML/HTML (par exemple <cite>), dans aucun champ.",
+  en: "You are a local business-prospecting expert. Use web search to find real businesses near the given location that could be interested in the described business activity. Then call the return_prospects tool with up to 3 suggestions, ranked by relevance. Do not invent contact details (email, phone). Respond only via the tool call, with no free text. Every text field must be plain text: do not include citation markers or XML/HTML-like tags (e.g. <cite>) in any field.",
+  es: "Eres un experto en prospección comercial local. Usa la búsqueda web para encontrar negocios reales cerca de la ubicación dada que podrían estar interesados en la actividad descrita. Luego llama a la herramienta return_prospects con hasta 3 sugerencias, ordenadas por relevancia. No inventes datos de contacto (email, teléfono). Responde únicamente mediante la llamada a la herramienta, sin texto libre. Todos los campos de texto deben ser texto plano: no incluyas marcadores de cita ni etiquetas XML/HTML (por ejemplo <cite>) en ningún campo.",
 };
 
 export type OrgProfile = {
@@ -66,6 +66,24 @@ export type OrgProfile = {
   city: string | null;
   country: string | null;
 };
+
+function stripTags(value: string): string {
+  return value.replace(/<\/?[a-z][^>]*>/gi, "").trim();
+}
+
+function sanitizeProspect(prospect: Prospect): Prospect {
+  return {
+    ...prospect,
+    company: stripTags(prospect.company),
+    sector: stripTags(prospect.sector),
+    reason: stripTags(prospect.reason),
+    match: stripTags(prospect.match),
+    contactName: prospect.contactName ? stripTags(prospect.contactName) : prospect.contactName,
+    email: prospect.email ? stripTags(prospect.email) : prospect.email,
+    phone: prospect.phone ? stripTags(prospect.phone) : prospect.phone,
+    linkedin: prospect.linkedin ? stripTags(prospect.linkedin) : prospect.linkedin,
+  };
+}
 
 function buildUserPrompt(language: "fr" | "en" | "es", profile: OrgProfile): string {
   const location = [profile.city, profile.country].filter(Boolean).join(", ") || "unknown location";
@@ -112,7 +130,7 @@ export async function generateProspects(
     );
     if (returnCall) {
       const parsed = returnCall.input as { prospects: Prospect[] };
-      return { prospects: parsed.prospects.slice(0, 5) };
+      return { prospects: parsed.prospects.slice(0, 5).map(sanitizeProspect) };
     }
 
     messages.push({ role: "assistant", content: response.content });
