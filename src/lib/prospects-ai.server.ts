@@ -91,7 +91,6 @@ export async function generateProspects(
     const response = await client.messages.create({
       model: MODEL,
       max_tokens: 2048,
-      thinking: { type: "adaptive" },
       system: [
         {
           type: "text",
@@ -99,7 +98,7 @@ export async function generateProspects(
           cache_control: { type: "ephemeral" },
         },
       ],
-      tools: [{ type: "web_search_20260209", name: "web_search" }, RETURN_PROSPECTS_TOOL],
+      tools: [{ type: "web_search_20250305", name: "web_search" }, RETURN_PROSPECTS_TOOL],
       messages,
     });
 
